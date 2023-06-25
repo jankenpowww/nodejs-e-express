@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../stemp-css/stemp.css" type="text/css">
+    <title>05</title>
+</head>
+<body>
+    <h1>#05 - Conhecendo o HTTP</h1>
+
+    <main>
+        <h1>O JavaScript no <em>server-side</em>.</h1>
+        <p>Como dito milhares de vezes até aqui, <b>o NodeJS permite usarmos o JavaScript fora do que lhe foi proposto inicialmente, que era a de ser utilizado apenas em navegadores</b>. Indo um pouco mais além dos termos <em>front-end</em> e <em>back-end</em>, podemos dizer o JavaScript, até o momento da chegada do NodeJS, <b>é considerado uma linguagem <em>client-side</em></b>. 
+        
+        <p>E o que <em>client-side</em> e <em>server-side</em> querem dizer afinal? Justamente <b>o alcance de utilização da linguagem</b>. Note que, ao contrário do JavaScript (sem o NodeJS, é claro), o PHP pode ser considerado uma tecnologia <em>server-side</em> por justamente conseguir lidar com requisições do usuário, que, dentro de uma aplicação solicita alguma coisa (pode ser acesso a uma página ou área do site) e a linguagem é esse intermédio que responde <b>essas requisições de acordo com protocolos especificos</b>, uma resposta. O JavaScript, para o que foi projetado, é considerado uma linguagem originalmente <em>client-side</em>, por executar apenas no lado do cliente, ou seja, tudo o que diz respeito à interatividade e visual de uma aplicação web, em resumo, JavaScript é linguagem <em>front-end</em>! Note que você não tem a capacidade de utilizar o JavaScript, na sua forma comum, para manipular arquivos ou diretórios de um computador, ou melhor ainda, <b>de lidar com a criação de servidores e com requisições do usuário</b>.</p>
+
+        <p>Com isso, podemos entender ainda mais o poder que o NodeJS dá ao JavaScript <b>expandindo suas formas de uso e como tornou a linguagem igualmente poderosa e comparável às outras linguagens do mercado</b>. Com o NodeJS, <b>agora é possível utilizar o JavaScript como linguagem para criação de servidores web</b>, assim como faz o PHP.</p>
+
+        <p>E para conhecer melhor o uso do JavaScript como linguagem server-side, é preciso conhecer os princípios do back-end como elemento de uma aplicação web, sobretudo, uma outra tecnologia igualmente importante: o HTTP.</p>
+
+        <br><br>
+
+        <h1><em>HyperText Transfer Protocol</em></h1>
+        <p>De forma resumida, o HTTP é a base de comunicação padrão de todos os sites acerca da <em>World Wide Web</em>, ou WWW. Tecnicamente, o HTTP é formado por esse conjunto de ferramentas que lidam com as requisições de um usuário no momento que ele acessa uma página. As linguagens <em>server-side</em>, como dito antes, são esse intermédio que descreve a conexão de um usuário, que entra em uma página da internet, e essa página da internet, por meio do HTTP, <b>envia uma requisição para o servidor que envia uma resposta com essa interação</b>. Do servidor, que recebeu um acesso de um usuário, o próprio precisa enviar uma resposta ao acesso desse usuário, que pode ser a estrutura HTML do site que este está acessando, por exemplo.</p>
+
+        <p>Então, podemos dizer que uma das atividades mais comuns dentro da parte que abrange o <em>back-end</em> é justamente essa interação entre usuário e servidor: o usuário acessa uma parte do site, e o servidor interpreta isso como uma requisição, e precisa retornar uma resposta para o usuário. Essa resposta pode ser o HTML da parte do site que o usuário tentou acessar; da mesma forma que a lógica por trás do <em>back-end</em> do site pode ter alguma regra de lógica que diz que o usuário precisa estar autenticado — e então, enviar uma mensagem de erro. Tudo isso é um exemplo do que a parte <em>back-end</em> de uma aplicação web precisa lidar.</p>
+
+        <p>E para o NodeJS, saiba que já um módulo pronto para ser importado e que lida com essa parte de requisões e resposta de um servidor, bem como criar um servidor utilizando JavaScript, o 'http'!</p>
+
+        <br><br>
+
+        <h1>Criando um servidor com NodeJS</h1>
+        <p>Para isso, é preciso atribuir à uma variável <b>o require() da biblioteca/módulo</b> específico, que é simplesmente 'http'. Com essa variável, teremos acesso à uma série de elementos importantes para criar e manipular nosso primeiro servidor — e quem sabe criar <b>uma interação na prática de requisitar páginas e criar uma lógica para que o servidor criado retorne uma página HTML como resposta ao nosso acesso</b>?</p>
+
+        <p>Para isso, vamos colocar em mente que, na nossa aplicação web, há três áreas que podem ser acessadas: 'home', 'contato' e 'noticias'. Haverá também uma resposta do servidor para caso o usuário tente acessar outra página inexistente. Tenha em mente que, as áreas da aplicação, <b>é chamada também de rota</b>. Rotas fazem parte do endereço URL completo do site, que pode ser identificado na lógica do nosso servidor e, se existe, retorna uma resposta.</p>
+
+<pre>
+<code>
+var <span class="tBranco">http</span> = require(<span class="tLaranja">"http"</span>)
+</code>
+</pre>
+
+        <p>Através da variável <span class="tCodigo"><span class="tBranco">http</span></span> da qual atribuímos todos os componentes do módulo, vamos criar outra variavel onde atribuíremos <b>a lógica de requisição e resposta do nosso servidor</b>, que em seguida vai ser utilizado para rodar o servidor em si. Observe:</p>
+
+<pre>
+<code>
+...
+
+var <span class="tBranco">server</span> = <span class="tBranco">http</span>.<span class="tRosa">createServer</span>((<span class="tBranco"><em>res</em></span>, <span class="tBranco"><em>req</em></span></span>) => {
+
+})
+</code>
+</pre>
+
+        <p>A variável <span class="tCodigo"><span class="tBranco">server</span></span> aqui é o que justamente <b>representa o nosso servidor</b>. Dentro da função anônima a ser executada dentro do método <span class="tCodigo"><span class="tRosa">createServer</span></span>, <b>temos toda a lógica do servidor que vai lidar com as requisições e, com base nisso, retornar respostas para o usuário</b>.</p>
+
+        <p><span class="tCodigo"><span class="tBranco">res</span></span> e <span class="tCodigo"><span class="tBranco">req</span></span>, ambos parâmetros obrigatórios da função anônima do método <span class="tCodigo"><span class="tRosa">createServer</span></span> representa, respectivamente, a resposta do servidor para alguma requisição e a requisição do usuário em si.</p>
+
+        <p>Sabendo que <b>o que determina as rotas, ou seja, o endereço específico da área de um site que navegamos está justamente na URL</b>, é daqui que partimos para criá-las e desenvolver a navegação do nosso site. Se o usuário acessar 'localhost:3000/contato', por exemplo, o servidor vai retornar uma resposta <b>que é justamente o html da requisição feita, que é, em termos mais simples, "acessar a parte de contato do site"</b>.</p>
+
+        <p>Tendo isso em mente, é fácil dizer que <b>temos que ter um jeito de identificar a URL acessada de alguma forma</b>, e com ela, criar a resposta para essa requisição. E é dentro do método createServer() utilizando os parâmetros 'res' e 'req' que fazemos isso. Observe:</p>
+
+<pre>
+<code>
+...
+
+var <span class="tBranco">server</span> = <span class="tBranco">http</span>.<span class="tRosa">createServer</span>((<span class="tBranco"><em>res</em></span>, <span class="tBranco"><em>req</em></span></span>) => {
+
+    <span class="tVerde">//Printa a URL atual. É seguida por / + o caminho/rota
+    //Utilizaremos para testar o valor e então retornar uma resposta.
+    //Vai printar no console toda vez que houver interação com o URL.
+    </span>console.log(<span class="tBranco">req.url</span>)
+
+    <span class="tVerde">//Switch - utilizado para testar o valor.</span>
+    switch (<span class="tBranco">req.url</span>){
+        case <span class="tLaranja">"/"</span>:
+        case <span class="tLaranja">"/home"</span>:
+            <span class="tBranco">res</span>.end(<span class="tLaranja">"&lt;h1&gt;Voce esta na Home&lt;/h1&gt;"</span>)
+        break
+            
+        default:
+            <span class="tBranco">res</span>.end(<span class="tLaranja">"&lt;h1&gt;Essa pagina nao existe!&lt;/h1&gt;"</span>)   
+    }
+})
+</code>
+</pre>
+
+        <p>Para a lógica de requisição e resposta do nosso servidor, temos somente duas possibilidades de retorno do servidor como resposta para o usuário: se a url termina com a rota "/" ou "/home", o servidor vai retornar — e veja que utilizamos <span class="tCodigo"><span class="tBranco">res</span>.end()</span> para toda vez que vamos retornar algo do servidor para o usuário — um &lt;h1&gt; na tela indicando que o usuário acessou a página de home SE a url for igual à "/home", e também se a URL estiver vazia! O servidor também já verifica se há uma rota inexistente e retorna a mensagem do default para o usuário.</p>
+
+        <p>À partir daí, <b>é só criar os cases para as outras duas rotas restantes</b>, mas para isso, precisamos rodar esse servidor...</p>
+
+<pre>
+<code>
+...
+
+<span class="tBranco">server</span>.<span class="tRosa">listen</span>(<span class="tLaranja">5001</span>, <span class="tLaranja">"localhost"</span>, () => {
+    console.log(<span class="tLaranja">"Servidor rodando na porta 5001!"</span>)
+    console.log(<span class="tLaranja">"CTRL + C para encerrar servidor."</span>)
+})
+</code>
+</pre>
+
+        <p>Feito isso, é só rodar <b>o arquivo com o node no terminal</b>. E se tudo ocorreu bem até aqui, todos os console.log() serão executados. Daqui, é só abrir o navegador no endereço do provedor, que é localhost sempre quando estamos abrindo um servidor na nossa máquina local, e o número de porta (que pode ser qualquer número alto). O endereço à ser testado nesse exemplo poderia ser 'localhost:5001/home'.</p>
+
+        <footer>
+            <a href="../a04/a04.html">Página Anterior</a>
+            <a href="../a06/a06.html">Próxima Página</a>
+        </footer>
+    </main>
+</body>
+</html>

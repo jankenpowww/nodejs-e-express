@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../stemp-css/stemp.css" type="text/css">
+
+    <style>
+        body, html{
+            background-image: linear-gradient(to bottom, rgb(111, 255, 0), rgb(53, 137, 255));
+        }
+    </style>
+
+    <title>Extra!</title>
+</head>
+<body>
+    <h1>Extra! - o <em>back-end</em> e seus conceitos</h1>
+
+    <main>
+        <h1>E pra começar, um pouco mais de HTTP...</h1>
+        <p>Mais cedo, quando fomos introduzidos <b>ao uso do JavaScript como linguagem <em>server-side</em></b> para criação do <em>back-end</em> de uma aplicação, foi abordado de forma bastante branda <b>sobre o que era HTTP (ou <em>HyperText Transfer Protocol</em>), qual sua relação quando falamos em <em>back-end</em> com JavaScript e sobretudo com o NodeJS</b>.</p>
+            
+        <p>De forma geral, sabemos que o HTTP é <b>uma série de ferramentas e protocolos — como o nome já imputa — que descrevem o envio e retorno de informações em páginas e aplicações da web</b>. Essa descrição obviamente resume apenas uma das características e capacidades do protocolo HTTP quanto ao seu uso prático. E quando estamos falando em NodeJS, HTTP também representa o módulo nativo de mesmo nome que lida justamente com essas ferramentas, tornando o JavaScript a linguagem de programação utilizada para lidar com suas funcionalidades, ao mesmo que a torna capaz para ser utilizada na estruturação <em>back-end</em> de uma aplicação.</p>
+
+        <p>Tá, e que ferramentas e protocolos e etc. são esses afinal? Tem algumas questões importantes para se pontuar e aprofundar um pouco ao que diz sobre <b>os próprios métodos HTTP</b>: um método HTTP é <b>o que define genericamente uma forma de lidar com essas informações, ou dados, que trafegam como requisição e retornam como resposta</b>. Uma aplicação web comum sempre <b>vai requerer dados e enviar esses dados para algum lugar que seria processada pela estrutura <em>back-end</em> dessa mesma aplicação em questão</b>, então é fácil concluir que <b>para cada tarefa envolvida nesses procedimentos, há um método HTTP por trás</b>.</p>
+
+        <p>E é bom saber que há um número significativo de métodos HTTP, cada um com sua particularidade e uso. Porém, por agora, vamos conhecer dois métodos principais quando estamos falando em enviar e receber dados...</p>
+
+        <br><br>
+
+        <h1>GET e POST</h1>
+        <p>Até o momento, quando utilizamos o módulo nativo do NodeJS e avançamos para desenvolver com o Express, criar a primeira estrutura lógica do nosso servidor envolvendo o acesso de rotas e definir a resposta de uma requisição quando acessamos uma das rotas definidas foi bastante fácil. Entender e associar essa abordagem de "enviar uma requisição e receber um retorno do servidor" com "acessar uma seção de página" e começar a entender os termos e processos mais tecnicos também foi muito fácil, apesar de ser uma atividade bastante simplória e que só compõe uma pequena parte de uma aplicação completa.</p>
+
+        <p>E embora simples até aqui, é super importante, como desenvolvedor <em>back-end</em>, começar ou pelo menos ter uma noção de <b>como o HTTP está por trás disso</b>. Especificamente, que métodos estão associados com essa atividade.</p>
+
+        <p>O método GET, sendo o primeiro método HTTP à ser discutido, define bem a parte desse processo de "receber uma requisição". Não por acaso, no Express, <b>também é nome do método que define uma rota</b>, e onde descrevemos qual vai ser a resposta do servidor ao acessá-la no navegador.</p>
+
+<pre>
+<code>
+<span class="tVerde">//Definindo uma rota e resposta para quando o usuário
+//acessar localhost:XXXX/contato</span>
+
+<span class="tBranco">app</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/cadastro"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">res</span>.<span class="tRosa">send</span>(<span class="tLaranja">"&lt;h1&gt;Olá, mundo!&lt/h1&gt;"</span>)
+})
+</code>
+</pre>
+
+        <p>O método GET, se referindo agora ao método HTTP, <b>é utilizado para definir a captura de um recurso por parte do servidor</b>. Em questão de código, como no exemplo acima, definimos uma possibilidade de rota dentro do nosso servidor que pode ser acessado pelo usuário, esse acesso é capturado (ou "get-ado" xD) pelo servidor, como está definido na lógica de servidor, que retorna uma resposta.</p>
+
+        <p>Para a questão do GET, tanto como método HTTP quanto método do Express, essa de "definir a captura de recurso por parte do servidor" faz mais sentido <b>quando falamos sobre passagem de parâmetros</b>. Tanto como o acesso para uma rota definida na URL quanto acessar uma rota definida por parâmetros é abordada sempre pelo método GET, ainda mais <b>quando falamos por solicitar uma requisição via URL</b>: seja tentando acessar uma rota definida pelo servidor, seja passando valores de parâmetro também definida pelo servidor.</p>
+
+        <footer>
+            <a href="../a07/a07.html">Página Anterior</a>
+            <a href="#">Próxima Página</a>
+        </footer>
+    </main>
+</body>
+</html>

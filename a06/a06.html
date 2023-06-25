@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../stemp-css/stemp.css" type="text/css">
+    <title>06</title>
+</head>
+<body>
+    <h1>#06 - Introdução ao Express</h1>
+
+    <main>
+        <h1><em>Express!</em></h1>
+        <p>Agora que conhecemos de forma sucinta o intuito do uso do Node para o JavaScript no back-end e como funciona o módulo http <b>que lida com as requisições e respostas entre o cliente e o servidor</b>, vamos conhecer um framework que melhora e adiciona mais funcionalidades para o back-end dos nossos projetos futuros: o <em>Express</em>.</p>
+
+        <p><em>Express</em> ou ainda <em>Express.js</em>, é um framework de desenvolvimento back-end baseado em JavaScript que, como já se espera, <b>é utilizado para lidar com a parte back-end de aplicações, utilizando JavaScript</b>. Se tratando de um framework, ele traz muitas melhorias e funcionalidades interessantes da qual o modulo 'http', visto anteriormente, não aborda de forma tão simples ou funcional, o que permite a construção de aplicações, sobretudo aplicações web, de forma muito prática.</p>
+
+        <br><br>
+
+        <h1><em>Node Package Manager</em></h1>
+        <p>Diferentemente do módulo 'http', que é <b>um recurso nativo do Node</b>, o Express precisa ser instalado como uma dependência antes de ser utilizado. Foi dito anteriormente à respeito do npm, ou <em>Node Package Manager</em>, que é o gerenciador de pacotes oficial do NodeJS responsável por gerir bibliotecas e módulos externos para projetos, e que vai ser utilizado para instalar o Express na nossa máquina.</p>
+
+        <p>Com o terminal aberto na pasta do projeto, damos um <span class="tCodigo"><span class="tBranco">npm init</span></span>. Ele pedirá, via terminal, uma série de informações a respeito do próprio projeto, que serão consolidadas dentro de um arquivo .json referente às informações do projeto em si, e também de <b>todos os pacotes e módulos que estamos utilizando e suas informações</b>, que estarão presentes dentro deste arquivo também (você pode simplesmente digitar <span class="tCodigo"><span class="tBranco">npm init -y</span></span> para só criar o .json, sem muita burocracia também xD). Para este passo, <b>é necessário que tenha um arquivo chamado 'package.json' nele</b>. Este arquivo .json é muito importante para as instruções futuras, mas por enquanto, é bom ter isso em mente.</p>
+
+        <p>Com o arquivo package.json na pasta do projeto, vamos instalar o Express finalmente entrando com o seguinte comando abaixo:</p>
+
+<pre>
+<code>
+<span class="tBranco">npm install express --save</span>
+</code>
+</pre>
+
+        <p>Note que a flag <span class="tCodigo"><span class="tBranco">--save</span></span> é opcional e o motivo é bem simples: com '--save', você está informando ao npm que deve instalar a dependência, nesse caso o Express, de forma com <b>que todos os arquivos dos módulos do framework sejam adicionados em uma pasta no diretório do nosso projeto</b>. Esses arquivos, ou melhor dizendo, módulos, serão adicionados em uma pasta chamada 'node_modules', e nele, <b>todos os arquivos/módulos que compõe o framework</b>. Note que, com os exemplos anteriores onde modularizamos nossas funções e chamamos em outro arquivo, acontece o mesmo aqui se você verificar cada arquivo-fonte dos módulos do Express. Lembrando que, para ter o diretório com os arquivos de uma dependência que baixamos via npm no nosso projeto, <b>precisamos ter o arquivo package.json no diretório</b>, uma vez que ele reflete automaticamente todas essas adições e informações do projeto durante o desenvolvimento. <b>É possível utilizar dependências sem salvar os arquivos-fonte, propriamente dizendo (?).</b></p>
+
+        <footer>
+            <a href="../a05/a05.html">Página Anterior</a>
+            <a href="../a07/a07.html">Próxima Página</a>
+        </footer>
+    </main>
+</body>
+</html>

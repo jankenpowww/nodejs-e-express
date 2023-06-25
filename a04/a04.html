@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../stemp-css/stemp.css" type="text/css">
+    <title>04</title>
+</head>
+<body>
+    <h1>#04 - Módulos</h1>
+
+    <main>
+        <h1>Separando tudo bem organizado...</h1>
+        <p>O conceito de módulo, quando falamos em programação, vem de <b>modularizar partes do nosso código</b>. Digamos que tenhamos uma aplicação gigantesca pra desenvolver, é fácil de pensar que seria insustentável e nada prático manter um projeto se não organizassemos ele — ou dividi-lo em partes, que se conversariam em algum momento. <b>Modularizar um código nada mais é do que organizar as funções de uma aplicação inteira em partes</b>, ou seja, teríamos vários arquivos .js que seriam parte de todo o conjunto que representa a nossa aplicação/programa. E se tratando de desenvolver aplicações com JavaScript para além das interações no front-end, mas específico no back-end, veremos como isso é importante.</p>
+
+        <br><br>
+
+        <h1>Praticando, modularizando, exportando...</h1>
+        <p>Consideremos a seguinte situação: temos um único arquivo onde há quatro funções que executam cálculos aritméticos básicos (soma, subtração, multiplicação e divisão). E queremos <b>modularizar essas funções, colocando cada uma em um arquivo especifico</b>.</p> 
+        
+        <p>Na pasta principal do projeto, vamos criar um diretório chamado 'Calculadora', e dentro, estará modularizado, em vários arquivos diferentes, as funções de cálculo citadas mais cedo. Essas funções recebem dois números, e a função retorna o resultado do cálculo entre esses dois valores.</p>
+
+        <p>Tendo em mente que as estruturas das funções seguem a descrição do parágrafo anterior e o que muda é a operação, então é fácil visualizar que vamos separar todas as funções em arquivos separados e fazer o mesmo procedimento para todas as outras três restantes.</p>
+
+        <p>Então, vamos modularizar a função de subtração primeiro. <b>Vamos criar, no diretório 'Calculadora', um arquivo chamado 'sub.js' que terá essa função e exportá-la depois.</b></p>
+
+<pre>
+<code>
+<span class="tVerde">//Note que a função deve ser atribuída à uma variável, que será exportada depois.</span>
+
+let subtracao = function(x, y){
+    return x - y
+}
+
+module.exports = subtracao
+</code>
+</pre>
+
+        <p>A última linha, <span class="tCodigo">module.exports</span>, recebe a variável que foi atribuída a função de subtração. Note que este trecho de código <b>não é reconhecido diretamente nem aparece para auto-completar no editor de código</b> <s>no editor do VSCode, pelo menos</s>, já que <b>module</b> é <b>um objeto que existe somente no NodeJS que exporta valores, e nesse caso, funções de um módulo, que se refere ao código-fonte de um arquivo de onde esses elementos estão sendo importados</b>.</p>
+
+        <p>É esperado que, quando executarmos a nossa aplicação no terminal do Node, essa última linha seja interpretada e então o Node entenda que aquele valor pode ser exportado para outros arquivos-fonte.</p>
+
+        <p>E é aí que podemos criar um arquivo chamado de 'app.js' <b>que será utilizado para chamar todas as funções que exportamos anteriormente</b>, e utilizá-los na prática! <s>entenda como o arquivo main da sua aplicação em C# ou Java :D</s></p>
+
+        <p>Vamos importar a função do módulo de subtração, modularizada mais cedo. O processo é o mesmo para os restantes...</p>
+
+<pre>
+<code>
+var sub = require("./Calculadora/sub")
+
+console.log(sub(6, 2)) <span class="tVerde">//4</span>
+</code>
+</pre>
+
+        <p>O método <span class="tCodigo">require()</span>, recebe uma string com o <b>caminho do módulo da qual exportamos antes</b>. Lembrando que, como dito mais cedo, temos um diretório chamado 'Calculadora' que teria, separado em módulos, os métodos de cada operação. A string, passada como argumento neste método, que é <span class="tCodigo">./Calculadora/sub</span> leva ao diretório especifico onde o arquivo-fonte do método de subtração está. <b>Note que o caminho não precisa incluir a extensão do arquivo</b>.</p>
+
+        <p>É através do require(), inclusive, que importamos módulos de bibliotecas baixadas através do npm para utilizar no nosso projeto.</p>
+
+        <footer>
+            <a href="../a03/a03.html">Página Anterior</a>
+            <a href="../a05/a05.html">Próxima Página</a>
+        </footer>
+    </main>
+</body>
+</html>

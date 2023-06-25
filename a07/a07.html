@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../stemp-css/stemp.css" type="text/css">
+    <title>07</title>
+</head>
+<body>
+    <h1>#07 - Rotas</h1>
+
+    <main>
+        <p>Como visto em aulas anteriores, <b>criar rotas com o módulo padrão do Node, o 'http', não é algo muito trabalhoso</b>, de começo pelo menos. Vimos alguns conceitos beeem principiantes sobre como rotas funcionam e como isso define às navegações de sites e aplicações web num geral. Na prática, criamos um servidor, e depois a lógica de resposta do servidor para cada requisição do usuário, que, a principio, não era feita através de interações de botões ou cliques de links, e sim, diretamente pela URL. Quando acessávamos uma rota definida pela lógica do nosso servidor, ele respondia retornando uma mensagem na tela utilizando HTML; quando uma rota não era definida, o usuário também recebia uma resposta, só que dessa vez uma mensagem de erro.</p>
+
+        <p>Só com o módulo padrão do Node criamos <b>o esqueleto funcional de navegações e páginas da web</b>, a parte back-end do que seria nossa aplicação. Acontece que, este primeiro processo de criar e definir rotas utilizando um framework desta vez é mais prático e intuitivo <s>eu espero</s>.</p>
+
+        <br><br>
+
+        <h1>Criando um servidor — agora com um <em>framework</em>!</h1>
+        <p>Vamos iniciar nossas primeiras práticas com Express agora: no terminal, dentro do diretório, vamos "initar" o projeto com <span class="tCodigo"><span class="tBranco">npm init -y</span></span>. Como visto anteriormente, <b>vai criar um arquivo .json à respeito do nosso projeto e dependências instaladas</b>. Com isso, ao instalar o express em seguida, um diretório chamado 'node_modules' também vai aparecer dentro do diretório com todos os módulos que compõe o Express.</p>
+
+        <p>E por falar em Express...</p>
+
+<pre>
+<code>
+<span class="tBranco">npm install express --save</span>
+</code> 
+</pre>
+
+        <p>Esse é um processo à ser repetido <b>cada vez que iremos iniciar uma aplicação com Express</b>, bom lembrar.</p>
+
+        <p>Na pasta do projeto teremos a pasta node_modules bem como o — ou os — arquivo .json referente às dependências e configurações de desenvolvimento. Até aqui, está tudo pronto para criarmos o nosso arquivo 'server.js' e incluir toda a lógica de servidor dentro dele utilizando o Express, e nada muito diferente do processo de quando usamos o módulo nativo do Node para isso.</p>
+
+        <p>Para esta aula, vamos criar também <b>uma pasta chamada 'html' com um arquivo chamado index.html</b> dentro da pasta principal. Até agora, tudo o que estávamos fazendo era retornar uma mensagem simples como resposta à requisição, mas retornando <b>uma página html com links que podem ser acessados e que levam para outras rotas dentro do site</b> exclui esse processo chato de fazer acessos pela URL — e torna nossa pequena aplicação web um pouco mais com cara de aplicação web xDD.</p>
+
+        <p>Deixando o HTML de lado por enquanto, vamos conhecer como <b>uma estrutura de servidor feito com Express é estruturado</b>. Eis as primeiras linhas de código no arquivo 'server.js', que criamos anteriormente:</p>
+
+<pre>
+<code>
+var <span class="tBranco">express</span> = require(<span class="tLaranja">"express"</span>)
+var <span class="tBranco">app</span> = <span class="tBranco">express</span>()
+</code>
+</pre>
+
+        <p>A primeira linha, como já sabemos, <b>se refere à incluir todos os componentes do módulo em uma variável</b>, neste caso, incluindo o Express e suas funcionalidades para dentro do nosso arquivo-fonte. Porém, contudo, todavia, <b>a segunda linha é o que devidamente faz esse papel</b>. A variável <span class="tCodigo"><span class="tBranco">express</span></span> nada mais é do que o módulo importado pelo <em>require</em>, que atribuímos em outra variável, chamado <span class="tCodigo"><span class="tBranco">app</span></span>, a função que inicializa o framework de fato. É é à partir da variável 'app' que temos acesso <b>à todas as propriedades e métodos que compõe o framework para criar nosso servidor devidamente</b>. <b>Note como utilizamos <span class="tCodigo"><span class="tBranco">express</span></span> como método para inicializar a outra variável em seguida</b>.</p>
+
+        <p>Este é o procedimento padrão para inicializar um servidor com Express. E além do Express, para ajudar a gente no papel <b>de enviar páginas HTML como resposta à uma requisição</b>, utilizamos outro módulo nativo do Node chamado 'path'.</p>
+
+<pre>
+<code>
+var <span class="tBranco">express</span> = require(<span class="tLaranja">"express"</span>)
+var <span class="tBranco">app</span> = <span class="tBranco">express</span>()
+var <span class="tBranco">path</span> = require(<span class="tLaranja">"path"</span>)
+</code>
+</pre>
+
+        <p>O módulo 'path', como é de se imaginar, <b>dá uma série de utilitários para manipulação de diretórios e arquivos</b>. É através dele que vamos informar em algum momento do nosso código, referente à responder uma requisição, <b>o caminho do arquivo .html à ser exibido no momento em que acessarmos uma rota definida na lógica do nosso servidor</b>. Mas, por enquanto, prosseguimos conhecendo o Express.</p>
+
+        <br><br>
+
+        <h1>Criando rotas — agora com <em>Express</em>!</h1>
+        <p>Com a variável <span class="tCodigo"><span class="tBranco">app</span></span> inicializada com todos os componentes, vamos com ela <b>criar toda a lógica do nosso servidor</b>, e claro, conhecer os principais métodos para isso.</p>
+
+        <p>Mas antes vamos lembrar de quando fizemos isso sem <em>framework</em> nenhum: uma das formas que pensamos em estruturar todas as rotas da nossa aplicação foi testar a variável de URL dentro de um <em>switch case</em>, e claro, utilizando as variáveis de parâmetro de callback em respeito à requisição e resposta. Para essa atividade em específico, tendo uma base principiante em JavaScript, sabemos que não foi tão difícil.</p>
+
+        <p>Com o <em>Express</em>, num primeiro momento, <b>não precisamos disso</b>. Basta utilizar o método 'get()' para definir uma rota diretamente. Observe:</p>
+
+<pre>
+<code>
+...
+
+<span class="tBranco">app</span>.<span class="span tRosa">get</span>(<span class="tLaranja">"/"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tVerde">//Bloco de código a ser executado quando acessar '/'.</span>
+})
+</code>
+</pre>
+
+        <p><span class="tCodigo"><span class="span tRosa">get</span>()</span> recebe dois argumentos: uma string <b>referente à rota que vai existir dentro do servidor e que pode ser acessada</b> e uma função callback com os parâmetros <span class="tCodigo"><span class="tBranco">req</span></span> e <span class="tCodigo"><span class="tBranco">res</span></span>, já bem conhecidos das aulas anteriores, que basicamente se <b>referem às propriedades de requisição e resposta</b>, respectivamente.</p>
+
+        <p>E dentro da função callback, irá <b>todo o bloco de código que executará toda vez que acessarmos 'localhost:xxxx/' ou somente 'localhost:xxxx'</b>. É aqui que vamos fazer com que o servidor retorne nosso .html como resposta.</p>
+
+        <p>Então, no arquivo 'index.html' na pasta html do nosso projeto (considerando que, na pasta do projeto, temos o arquivo-fonte do nosso servidor e um diretório 'html/index.html') temos este pequeno trecho de código:</p>
+
+<pre>
+<code>
+<span class="tVerde">&lt;!--html da página principal--&gt;</span>
+&lt;!DOCTYPE html&gt;
+&lt;html lang="pt-BR"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;title&gt;<span class="tBranco">Página Principal</span>&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;<span class="tBranco">Seja bem vindo!</span>&lt;/h1&gt;
+    &lt;p&gt;<span class="tBranco">Você está na página principal do site.</span>&lt;/p&gt;
+
+    &lt;br&gt;
+
+    &lt;p&gt;<span class="tBranco">Outros links:</span> &lt;a href="/"&gt;<span class="tBranco">Página Principal</span>&lt;/a&gt; <span class="tBranco">|</span> &lt;a href="sobre"&gt;<span class="tBranco">Sobre</span>&lt;/a&gt;&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code>
+</pre>
+
+        <p>E antes de voltar ao código do nosso servidor, vamos reparar na última tag de parágrafo do nosso HTML:</p>
+
+<pre>
+<code>
+&lt;p&gt;<span class="tBranco">Outros links:</span> &lt;a href="/"&gt;<span class="tBranco">Página Principal</span>&lt;/a&gt; <span class="tBranco">|</span> &lt;a href="sobre"&gt;<span class="tBranco">Sobre</span>&lt;/a&gt;&lt;/p&gt;
+</code>
+</pre>
+
+        <p>Temos duas tags de âncora — ou tags de link — que vai redirecionar <b>para outra página no momento em que clicarmos nela</b>. Sabemos que, interagindo com tags de link, a URL atual vai mudar: já que isso é indicativo de que estamos indo de um lugar para outro no contexto de navegar entre páginas, e é o que vai <b>poupar nosso trabalho de fazer isso diretamente pela URL para toda vez que testarmos uma rota definida no servidor</b>.</p>
+
+        <p>Repare nosso primeiro link: <span class="tCodigo">&lt;a href="/"&gt;<span class="tBranco">Página Principal</span>&lt;/a&gt;</span>. Perceba que ele vai redirecionar para um endereço '/', como consta no <span class="tCodigo">href</span>. Na verdade, ele vai fazer o papel manual de indicar o acesso à rota da qual estipulamos no arquivo-fonte do nosso servidor! Ou seja, quando rodarmos o servidor e acessar o localhost, a idéia é que a página aberta seja o index.html, que criamos. Então, ao clicar neste link em questão, ele vai rdirecionar para a mesma página, já que é referente à esta rota dentro do servidor. É óbvio que isso não vai provar, visualmente falando, que estamos nos movimentando entre rotas pelos links do HTML, já que <b>criamos apenas um HTML para uma rota apenas e associando em uma tag de link que redireciona para a mesma página</b>.</p> 
+        
+        <p>Então, vamos criar um segundo arquivo html chamado 'sobre.html' para o segundo link referente à página 'Sobre', mantendo o último parágrafo referente aos links de navegação:</p>
+
+<pre>
+<code>
+<span class="tVerde">&lt;!--html da página 'sobre'--&gt;</span>
+&lt;!DOCTYPE html&gt;
+&lt;html lang="pt-BR"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;title&gt;<span class="tBranco">Sobre</span>&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;<span class="tBranco">Sobre esta página</span>&lt;/h1&gt;
+    &lt;p&gt;<span class="tBranco">Estou testando a navegação entre páginas.</span>&lt;/p&gt;
+
+    &lt;br&gt;
+
+    &lt;p&gt;<span class="tBranco">Outros links:</span> &lt;a href="/"&gt;<span class="tBranco">Página Principal</span>&lt;/a&gt; <span class="tBranco">|</span> &lt;a href="sobre"&gt;<span class="tBranco">Sobre</span>&lt;/a&gt;&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code>
+</pre>
+
+        <p>Com isso, vamos finalmente voltar à criar a lógica do nosso servidor e criar o redirecionamento para essas duas páginas na medida em que clicamos nos links.</p>
+
+        <p>...</p>
+
+        <p>...</p>
+
+        <p>De volta ao 'server.js', onde está o nosso servidor com Express, temos todo esse código até agora:</p>
+
+<pre>
+<code>
+var <span class="tBranco">express</span> = require(<span class="tLaranja">"express"</span>)
+var <span class="tBranco">app</span> = <span class="tBranco">express</span>()
+var <span class="tBranco">path</span> = require(<span class="tLaranja">"path"</span>)
+
+<span class="tBranco">app</span>.<span class="span tRosa">get</span>(<span class="tLaranja">"/"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tVerde">//Bloco de código a ser executado quando acessar '/'.</span>
+})
+</code>
+</pre>
+
+        <p>Como percebemos, <b>paramos justamente na parte em que criamos uma rota para '/'</b>, a rota referente à página principal do nosso site. Vamos continuar <b>descrevendo o que vai acontecer quando acessarmos essa rota em especifico</b>, que seria retornar o index.html. Veja:</p>
+
+<pre>
+<code>
+...
+
+<span class="tBranco">app</span>.<span class="span tRosa">get</span>(<span class="tLaranja">"/"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">res</span>.<span class="tRosa">sendFile</span>(<span class="tBranco">path</span>.<span class="tRosa">join</span>(<span class="tBranco">__dirname</span>, <span class="tLaranja">"/html/index.html"</span>))
+})
+</code>
+</pre>
+
+        <p><span class="tCodigo"><span class="tBranco">res</span>.<span class="tRosa">sendFile</span>()</span> é o método do parâmetro de resposta do servidor que,  <b>como o nome já diz, retorna um arquivo</b>. à princípio, ele recebe um argumento string que se refere <b>ao caminho absoluto até o arquivo em questão</b>, e não, ponto barra não funciona aqui, já que se trata do caminho desde o começo, lá na unidade do dispositivo, ou na raiz de seja lá qual a pasta do projeto está. Isso é importante para entender os próximos elementos desta linha de código...</p>
+
+        <p>É óbvio que <b>não vamos incluir o endereço completo aqui em formato de string</b>, pois como foi dito antes e dado a entender, <b>este endereço pode variar se a pasta for movida, ou melhor, se estiver hospedada</b>. Neste último caso, é óbvio de se pensar que o servidor não vai retornar nada de um caminho local se o projeto não estiver rodando localmente, na nossa máquina.</p>
+
+        <p>E é aqui que começamos a entender o método que passamos dentro de <span class="tCodigo"><span class="tRosa">sendFile</span>()</span>. <span class="tCodigo"><span class="tBranco">path</span>.<span class="tRosa">join</span>()</span> retorna uma string, que é o que requisita o sendFile, e nele dois argumentos importantes: <span class="tCodigo"><span class="tBranco">__dirname</span></span> é uma variável que fica disponível após importar o módulo 'path' <b>que resolve a problemática anterior. Ela obtém uma string completa do caminho absoluto até a pasta do projeto principal</b>, independente de onde a pasta do projeto estiver. E o segundo argumento, é uma string literal <b>do caminho da pasta onde o nosso html está</b>, que deve estar imediatamente dentro da pasta do projeto. Em suma, o método <span class="tCodigo"><span class="tRosa">join</span>()</span> de 'path' vai concatenar essas duas strings em uma.</p>
+
+        <p>Feito isso, podemos testar a nossa aplicação e ver se o nosso html da página principal é exibido <b>rodando o servidor e acessando o endereço no navegador</b>. Note que este processo também é parecido — se não idêntico — a como fizemos utilizando apenas o módulo 'http' do Node: passamos número da porta; o nome do provedor de hospedagem — nesse caso localhost, e uma função anônima com tudo o que vai executar se a execução do arquivo do servidor for bem sucedida.</p>
+
+<pre>
+<code>
+...
+
+<span class="tBranco">app</span>.<span class="tRosa">listen</span>(<span class="tLaranja">8081</span>, <span class="tLaranja">"localhost"</span>, () => {
+    console.log(<span class="tLaranja">"Servidor rodando em 'localhost:8081/'. CTRL+C para encerrar."</span>)
+})
+</code>
+</pre>
+
+        <p>Uma vez que a página foi exibida, é sinal de o servidor está de pé e funcionando. Tente interagir com o link referente à página principal, e você verá que página só irá recarregar na mesma página. A este ponto, <b>é possível presumir que, ao clicar em 'Sobre', uma página de erro será exibida</b>. Isso porque não <b>definimos a rota para a página sobre, como fizemos com a página principal</b>.</p>
+
+        <p>Com isso, é só chamar a função 'get()' novamente imediatamente a baixo da rota principal, utilizando os métodos de enviar o arquivo html assim que acessamos uma rota, neste caso, a rota '/sobre'.</p>
+
+        <p>O código inteiro do nosso servidor então ficou assim:</p>
+
+<pre>
+<code>
+<span class="tVerde">//Importando os módulos e inicializando o express.</span>
+var <span class="tBranco">express</span> = require(<span class="tLaranja">"express"</span>)
+var <span class="tBranco">app</span> = <span class="tBranco">express</span>()
+var <span class="tBranco">path</span> = require(<span class="tLaranja">"path"</span>)
+
+<span class="tVerde">//Rota de acesso à página principal.</span>
+<span class="tBranco">app</span>.<span class="span tRosa">get</span>(<span class="tLaranja">"/"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">res</span>.<span class="tRosa">sendFile</span>(<span class="tBranco">path</span>.<span class="tRosa">join</span>(<span class="tBranco">__dirname</span>, <span class="tLaranja">"/html/index.html"</span>))
+})
+
+<span class="tVerde">//Rota de acesso à página 'Sobre'.</span>
+<span class="tBranco">app</span>.<span class="span tRosa">get</span>(<span class="tLaranja">"/sobre"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">res</span>.<span class="tRosa">sendFile</span>(<span class="tBranco">path</span>.<span class="tRosa">join</span>(<span class="tBranco">__dirname</span>, <span class="tLaranja">"/html/sobre.html"</span>))
+})
+
+<span class="tVerde">//Rodando o servidor.</span>
+<span class="tBranco">app</span>.<span class="tRosa">listen</span>(<span class="tLaranja">8081</span>, <span class="tLaranja">"localhost"</span>, () => {
+    console.log(<span class="tLaranja">"Servidor rodando em 'localhost:8081/'. CTRL+C para encerrar."</span>)
+})
+</code>
+</pre>
+
+        <p>Note que a rota referente à página 'Sobre' deve constar exatamente igual ao valor do 'href' na tag de link, que é 'sobre'. Isso se aplica para todas as outras rotas e redirecionamentos futuros.</p>
+
+        <footer>
+            <a href="../a06/a06.html">Página Anterior</a>
+            <a href="../a07-2/a07-2.html">Próxima Página</a>
+        </footer>
+    </main>
+</body>
+</html>

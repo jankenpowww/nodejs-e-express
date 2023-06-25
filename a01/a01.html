@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../stemp-css/stemp.css" type="text/css">
+    <title>01</title>
+</head>
+<body>
+    <h1>#01 - O que é NodeJS?</h1>
+
+    <main>
+        <p>O NodeJS, ainda Node.js ou somente Node <b>é um interpretador de JavaScript que permite programas escritos na linguagem rodarem em ambientes fora do navegador</b>. Como sabemos, JavaScript é uma linguagem interpretada, o que significa que ela não depende de um compilador para rodar um código assim como a grande maioria das outras linguagens como Python ou Java, por exemplo. <b>Um interpretador de JavaScript que roda fora dos navegadores dá a linguagem a capacidade de ser utilizada para outros fins além das interações e da sua função de ser uma lingua propriamente feita para o front-end</b>, e é isso o que o NodeJS faz.</p>
+
+        <p>O NodeJS ainda possui seu próprio gerenciador de pacotes, assim como o Python possui o pip e o C# possui o NuGet: <b>o npm</b>. Através do npm, você consegue baixar e instalar soluções prontas e implementá-las no seu aplicativo de forma significativamente fácil, através de poucos digitos no terminal. Em resumo, com o NodeJS e o npm será possível adicionar mais artifícios e recursos para seu projeto e permitir você desenvolver a parte backend de uma aplicações utilizando JavaScript! <a href="https://nodejs.org/en/download">Eis o link para baixar o NodeJS</a>.</p>
+
+        <br><br>
+
+        <p class="alerta">Aviso para o eu do futuro: aparentemente as versões do node acima de 17 tão com uns erro bizarro doido, então eu estou usando a versão 17 para este amontoado de aulinhas sobre nodejs (ai como eu amo quando as coisas dão bug ><') então prestenção!</p>
+
+        <br><br>
+
+        <h1>O NodeJS</h1>
+        <p>O NodeJS nada mais é do que <b>um ambiente de terminal que roda JavaScript</b>. Sendo assim, você pode <b>escrever "pequenos trechos de JavaScript" no terminal e até testar alguns métodos conhecidos, como o famigerado <span class="tCodigo">console.log()</span></b>. Quem sabe, declarar variáveis no processo? Tudo isso é possível no terminal do Node e comprovar que sim, estamos rodando JavaScript fora do navegador!</p>
+
+<pre>
+<code>
+<span class="tBranco">&gt; console.log("Olá, mundo!")
+Olá, mundo!
+
+&gt; let nome = "Júlio"
+<span class="tCinza">undefined</span>
+
+&gt; console.log("Meu nome é " + nome + ".")
+Meu nome é Júlio.</span>
+</code>
+</pre>
+
+        <p>Perceba que o ambiente de terminal acima <b>descreve todas as entradas de comando e saída dentro do terminal do node</b>. Sempre que quisermos iniciar um novo terminal do node, escrevemos 'node' e apertamos enter em seguida.</p>
+
+        <p>É importante ressaltar isso quando quisermos verificar algumas coisas a respeito do próprio node instalado na máquina, então o comando 'node' não vai existir dentro do próprio terminal do Node.</p>
+
+        <p><b>No prompt de comando/cmd, se quisermos verificar a versão atual instalada do Node</b>, utilizamos o seguinte comando: 'node -v'.</p>
+
+        <p>Mas, se quisermos fazer essa verificação dentro do terminal do Node, digitamos o seguinte:</p>
+
+<pre>
+<code>
+<span class="tBranco">&gt; process.version</span>
+<span class="tVerde">'v17.0.0'</span>
+</code>
+</pre>
+
+        <p><span class="tCodigo"><span class="tBranco">process</span></span> nada mais é que um objeto que contém <b>todas as informações à respeito da versão atual do NodeJS instalada na máquina</b>.</p>
+
+        <footer>
+            <a href="../a03/a03.html">Próxima Página</a>
+        </footer>
+    </main>
+</body>
+</html>
