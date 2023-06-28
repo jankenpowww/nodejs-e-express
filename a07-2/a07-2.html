@@ -8,14 +8,14 @@
 
     <style>
         body, html{
-            background-image: linear-gradient(to bottom, rgb(111, 255, 0), rgb(53, 137, 255));
+            background-image: linear-gradient(to bottom, rgb(111, 255, 0), rgb(99, 232, 255));
         }
     </style>
 
     <title>Extra!</title>
 </head>
 <body>
-    <h1>Extra! - o <em>back-end</em> e seus conceitos</h1>
+    <h1>Extra! - NodeJS, <em>back-end</em> e seus conceitos</h1>
 
     <main>
         <h1>E pra começar, um pouco mais de HTTP...</h1>
@@ -29,7 +29,7 @@
 
         <br><br>
 
-        <h1>GET e POST</h1>
+        <h1>Método GET</h1>
         <p>Até o momento, quando utilizamos o módulo nativo do NodeJS e avançamos para desenvolver com o Express, criar a primeira estrutura lógica do nosso servidor envolvendo o acesso de rotas e definir a resposta de uma requisição quando acessamos uma das rotas definidas foi bastante fácil. Entender e associar essa abordagem de "enviar uma requisição e receber um retorno do servidor" com "acessar uma seção de página" e começar a entender os termos e processos mais tecnicos também foi muito fácil, apesar de ser uma atividade bastante simplória e que só compõe uma pequena parte de uma aplicação completa.</p>
 
         <p>E embora simples até aqui, é super importante, como desenvolvedor <em>back-end</em>, começar ou pelo menos ter uma noção de <b>como o HTTP está por trás disso</b>. Especificamente, que métodos estão associados com essa atividade.</p>
@@ -41,15 +41,89 @@
 <span class="tVerde">//Definindo uma rota e resposta para quando o usuário
 //acessar localhost:XXXX/contato</span>
 
-<span class="tBranco">app</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/cadastro"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+<span class="tBranco">app</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/contato"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
     <span class="tBranco">res</span>.<span class="tRosa">send</span>(<span class="tLaranja">"&lt;h1&gt;Olá, mundo!&lt/h1&gt;"</span>)
 })
 </code>
 </pre>
 
-        <p>O método GET, se referindo agora ao método HTTP, <b>é utilizado para definir a captura de um recurso por parte do servidor</b>. Em questão de código, como no exemplo acima, definimos uma possibilidade de rota dentro do nosso servidor que pode ser acessado pelo usuário, esse acesso é capturado (ou "get-ado" xD) pelo servidor, como está definido na lógica de servidor, que retorna uma resposta.</p>
+        <p>O método GET, se referindo agora ao método HTTP, <b>é utilizado para definir a captura de um recurso por parte do servidor</b>. Em questão de código, como no exemplo acima, definimos uma possibilidade de rota dentro do nosso servidor que pode ser acessado pelo usuário, que retorna uma resposta.</p>
 
-        <p>Para a questão do GET, tanto como método HTTP quanto método do Express, essa de "definir a captura de recurso por parte do servidor" faz mais sentido <b>quando falamos sobre passagem de parâmetros</b>. Tanto como o acesso para uma rota definida na URL quanto acessar uma rota definida por parâmetros é abordada sempre pelo método GET, ainda mais <b>quando falamos por solicitar uma requisição via URL</b>: seja tentando acessar uma rota definida pelo servidor, seja passando valores de parâmetro também definida pelo servidor.</p>
+        <p>Para a questão do GET, tanto como método HTTP quanto método do Express, essa de "definir a captura de recurso por parte do servidor" faz mais sentido <b>quando falamos sobre passagem de parâmetros que recebem um valor</b>. Tanto o acesso para uma rota definida na URL quanto acessar uma rota definida por parâmetros é abordada sempre pelo método GET, até porque estamos <b> falamos de solicitações e processos que ocorrem na URL diretamente</b>: seja tentando acessar uma rota definida pelo servidor, seja passando valores de parâmetro também definida pelo servidor para acessar um conteúdo enquanto usuário.</p>
+
+        <p>E para a questão dos parâmetros, há dois tipos de rotas de parâmetros interessantes que podemos experimentar utilizando o Express...</p>
+
+        <p><b>Route Parameters:</b> ou parâmetros de rota, no Express, é literalmente passar uma URL como rota dentro de um GET <b>com vários parâmetros em forma de caminhos</b>, que vai ser identificado pelo servidor quando o usuário acessar passando os valores "personalizados" para cada parâmetro.</p>
+
+<pre>
+<code>
+<span class="tVerde">//Definindo uma rota com parâmetros.</span>
+
+<span class="tBranco">app</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/:nomeDeUsuario/:corFavorita"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">res</span>.<span class="tRosa">send</span>(
+        <span class="tLaranja">`&lt;p&gt;Seu nome é ${<span class="tBranco">req.params.nomeDeUsuario</span>}.&lt;/p&gt;</span>
+        <span class="tLaranja"> &lt;p&gt;Sua cor favorita é ${<span class="tBranco">req.params.corFavorita</span>}.&lt;/p&gt;`</span>
+    )
+})
+</code>
+</pre>
+
+        <p>Veja que <b>definimos um parâmetro de rota colocando dois-pontos + o nome do parâmetro</b>. É necessário notar que para o usuário obter a resposta do servidor definida nesse tipo de rota, ele deve acessar o endereço passando todos os valores definidos pela rota no servidor, que vai através do GET obter esses valores.</p>
+
+        <p>O <span class="tCodigo"><span class="tBranco">req.params</span></span>, é uma propriedade da variável 'req', referente à requisição, que armazena as variáveis passadas dentro da string que compõe o endereço de rota. Isso significa que podemos acessar ambos <span class="tCodigo"><span class="tBranco">nomeDeUsuario</span></span> e <span class="tCodigo"><span class="tBranco">corFavorita</span></span>. Podemos testar essa rota simplesmente acessando o endereço e passando os valores de parâmetro necessários.</p>
+
+<pre>
+<code>
+<span class="tCinza">Ao acessar o endereço passando os valores definido anteriormente, a ideia é a mensagem com os valores personalizados serem exibidos na tela em um html.</span>
+<span class="tBranco">localhost:5353/Felipe/laranja</span>
+</code>
+</pre>
+
+        <br><br>
+
+        <p><b>Query Strings:</b> diferentemente do "Route Parameters", em questão de código, <b>não é necessário defini-lo, à princípio, como rota dentro da string do método get()</b>. Na verdade, os valores e parâmetros de uma Query String são passados diretamente na URL, quando o servidor já está no ar. O ponto é se os valores de Query String passados pelo usuário dentro de uma rota está definida dentro da lógica de resposta ou não.</p>
+
+        <p>O código abaixo define um caminho de rota comum para quando o usuário acessar a rota referente ao 'Perfil'. Perceba que é na resposta do servidor que é requerido que esperamos que os valores passados por uma Query String, uma vez que o usuário acessa a rota em questão.</p>
+
+<pre>
+<code>
+<span class="tBranco">app</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/perfil"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+
+    let <span class="tBranco">nome</span> = <span class="tBranco">req.query.nomeUsuario</span> ?? <span class="tLaranja">"[Não informado]"</span>
+    let <span class="tBranco">idade</span> = <span class="tBranco">req.query.idadeUsuario</span> ?? <span class="tLaranja">"[Não informado]"</span>
+
+    <span class="tBranco">res</span>.<span class="tRosa">send</span>(
+        <span class="tLaranja">`&lt;h3&gt;Informações do Perfil&lt;/h3&gt;
+         &lt;li&gt;Nome: ${<span class="tBranco">nome</span>}
+         &lt;li&gt;Idade: ${<span class="tBranco">idade</span>}`</span>
+    )
+})
+</code>
+</pre>
+
+        <p>Veja que ao acessar a rota '/perfil' no navegador, uma vez que executamos a aplicação no terminal, uma resposta do servidor será enviada à tela em formato de html, <b>mesmo que não tenhamos passado nenhum valor para às variáveis com Query String ainda</b>. Como é de esperar, para este caso em que não passamos nenhum valor para ambos as variáveis, o valor estará setado como "[Não informado]".</p>
+
+        <p>E é aí que utilizamos as Query Strings. Veja que a propriedade <span class="tCodigo"><span class="tBranco">req.query</span></span> refere-se ao objeto que guarda os valores definidos nessas variáveis que são identificadas nas Query Strings quando o usuário insere essas informações. Então, lá na URL, para passar um valor para o nome, temos que atribuir um valor para <span class="tCodigo"><span class="tBranco">nomeUsuario</span></span>, certo?</p>
+
+        <p>Sim, e é dessa forma que fazemos para passar um valor para nome, como consta no código:</p>
+
+<pre>
+<code>
+<span class="tBranco">localhost:5353/perfil<span class="tLaranja">?nomeUsuario=João</span></span>
+</code>
+</pre>
+
+        <p>Ao pressionar enter, a página recarregará e o nome passado na Query String referente ao nome será exibido no HTML. E antes de passar um valor para idade, vamos dar uma atenção <b>a Query String passada</b>...</p>
+
+        <p><span class="tCodigo"><span class="tLaranja">?</span></span> é o sinal de que <b>começaremos à passar os valores</b>. Iniciamos passando a primeira chave referente ao nome, <b>e que deve constar exatamente como à variável dentro de 'req.query'</b>. Neste caso, a primeira chave seria 'nomeUsuario' e depois atribuímos um valor com o sinal de igual, neste caso, "João". Para atribuir mais uma chave e valor, <b>utilizamos um "E" comercial (&) e iniciamos outra chave referente ao valor</b>, e assim sequencialmente para todas as chaves e seus valores seguintes.</p>
+
+        <p>Neste caso, acessarámos a rota de perfil, <b>da qual definimos as variáveis que armazenariam os valores referentes à nome e idade e que retornariam os resultados de uma Query String passada pelo usuário</b>, e passaríamos os respectivos valores. Um exemplo completo seria:</p>
+
+<pre>
+<code>
+<span class="tBranco">localhost:5353/perfil<span class="tLaranja">?nomeUsuario=João&idadeUsuario=22</span></span>
+</code>
+</pre>
 
         <footer>
             <a href="../a07/a07.html">Página Anterior</a>
