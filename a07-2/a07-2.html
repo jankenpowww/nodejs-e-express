@@ -12,10 +12,10 @@
         }
     </style>
 
-    <title>Extra!</title>
+    <title>a07-2</title>
 </head>
 <body>
-    <h1>Extra! - NodeJS, <em>back-end</em> e seus conceitos</h1>
+    <h1>a07-2 - NodeJS, <em>back-end</em> e seus conceitos (parte 01)</h1>
 
     <main>
         <h1>E pra começar, um pouco mais de HTTP...</h1>
@@ -117,13 +117,117 @@
 
         <p><span class="tCodigo"><span class="tLaranja">?</span></span> é o sinal de que <b>começaremos à passar os valores</b>. Iniciamos passando a primeira chave referente ao nome, <b>e que deve constar exatamente como à variável dentro de 'req.query'</b>. Neste caso, a primeira chave seria 'nomeUsuario' e depois atribuímos um valor com o sinal de igual, neste caso, "João". Para atribuir mais uma chave e valor, <b>utilizamos um "E" comercial (&) e iniciamos outra chave referente ao valor</b>, e assim sequencialmente para todas as chaves e seus valores seguintes.</p>
 
-        <p>Neste caso, acessarámos a rota de perfil, <b>da qual definimos as variáveis que armazenariam os valores referentes à nome e idade e que retornariam os resultados de uma Query String passada pelo usuário</b>, e passaríamos os respectivos valores. Um exemplo completo seria:</p>
+        <p>Neste caso, acessaríamos a rota de perfil, <b>da qual definimos as variáveis que armazenariam os valores referentes à nome e idade e que retornariam os resultados de uma Query String passada pelo usuário</b>, e passaríamos os respectivos valores. Um exemplo completo seria:</p>
 
 <pre>
 <code>
 <span class="tBranco">localhost:5353/perfil<span class="tLaranja">?nomeUsuario=João&idadeUsuario=22</span></span>
 </code>
 </pre>
+
+        <br>
+
+        <p>Podemos concluir que o método GET, como método HTTP, <b>é uma forma de definir a requisição/envio de informações do navegador para o servidor</b>, que possui dentro da lógica de servidor a tratativa dessas informações e determinar a resposta de volta. Antes de compará-lo com o próximo método HTTP, vamos conhecê-lo primeiro, com base nas características <b>de uma solicitação com o método GET</b>.</p>
+
+        <br><br>
+
+        <h1>Método POST</h1>
+        <p>Assim como a descrição do método anterior, <b>também é utilizado para definir a captura de um recurso por parte do servidor</b>, mas em questão de código, utilizando o Express, <b>seu uso define diretamente uma resposta com os dados capturados</b>.</p> 
+        
+        <p>A diferença primordial deste método em relação ao método GET é <b>a forma de como a captura dos recursos são feitas</b>. Vimos que, com o método GET, uma das formas de se fazer isso <b>se dá pela passagem constante de parâmetros ou de chave e valor na URL</b>. Com o método POST, a captura dos valores não são passadas diretamente pela URL, <b>o que dá um nível de segurança maior em relação ao método anterior, se parar para pensar</b>. <em>"Mas, se os valores eram passados anteriormente pela URL com o método anterior, como fazemos isso com o método POST?"</em>, e é aí que entramos com <b>as interações do usuário com inputs</b>. Dados de formulários de cadastro que contém dados mais sensíveis como senhas <b>não podem estarem visíveis</b>, e o motivo não poderia ser mais óbvio. Com o método POST, vamos garantir que as informações transitadas do cliente para o servidor, em forma de requisição, <b>sejam enviadas de forma mais discreta do que o método GET</b>, e isso significa 'de forma com que os dados enviados não estejam visíveis'.</p>
+
+        <p>Em questão de código utilizando o Express, <b>o método POST, assim como o GET, também é nome de método de roteamento que define uma rota de requisição e estrutura de resposta</b>. <b>A diferença é que não definimos uma rota de acesso para o usuário aqui</b>, e sim, <b>uma rota de redirecionamento</b>. Lembre-se que o método GET define as requisições feitas por URL, e isso não só inclui a passagem de parâmetros ou chave e valor, mas também <b>a simples atividade de se acessar uma rota</b>. O método GET ingloba <b>toda requisição feita por URL</b>, seja acesso de uma rota, seja passando um valor definido dentro da lógica de servidor: é tudo o que vai imediatamente na URL. Por ser uma rota de redirecionamento, e não de acesso, <b>ao tentar acessar a rota definida com o método POST diretamente, seremos apresentados à uma página de erro, informando que "a rota informada na URL não existe", </b>isso porque não foi definida utilizando GET, mas sim, POST.</p>
+
+        <p>O método POST define <b>a rota de redirecionamento para onde um usuário vai após validar informações em uma outra rota</b>, por exemplo. É a forma definida para quando, por exemplo, clicamos no botão de login de um formulário, <b>após passar todas as informações de um input</b>. A rota definida vai ser para onde o usuário cairá com o redirecionamento, exibindo as informações do usuário logado.</p>
+
+        <p>Vamos ver na prática como isso funciona. Considere o HTML do nosso formulário de cadastro que recebe nome e idade do usuário, localizado, dentro da pasta do projeto, <b>no diretório html/index.html</b>. A ideia é que, quando o usuário acessar o endereço no navegador, ou seja, <b>fazer uma requisição de acesso para servidor no endereço onde está disponível</b>, este retorne o HTML do formulário em questão. Com isso vamos conhecer mais sobre a estrutura em si <b>e como ela é importante e conversa com o servidor, unindo front-end e back-end</b>.</p>
+
+<pre>
+<code>
+<span class="tVerde">&lt;!--HTML de cadastro de usuário.--&gt;</span>
+&lt;!DOCTYPE html&gt;
+&lt;html lang="pt-BR"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;title&gt;<span class="tBranco">Cadastro</span>&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+    &lt;form <span class="tBranco">method</span>=<span class="tLaranja">"post"</span> <span class="tBranco">action</span>=<span class="tLaranja">"/informacoes-cadastro"</span>&gt;
+
+        &lt;label&gt;<span class="tBranco">Nome:</span>&lt;/label&gt;
+        &lt;input <span class="tBranco">type</span>=<span class="tLaranja">"text"</span> <span class="tBranco">name</span>=<span class="tLaranja">"nomeUsuario"</span>&gt;
+
+        &lt;br&gt;&lt;br&gt;
+
+        &lt;label&gt;<span class="tBranco">Idade:</span>&lt;/label&gt;
+        &lt;input <span class="tBranco">type</span>=<span class="tLaranja">"text"</span> <span class="tBranco">name</span>=<span class="tLaranja">"idadeUsuario"</span>&gt;
+
+        &lt;br&gt;&lt;br&gt;
+
+        &lt;button <span class="tBranco">type</span>=<span class="tLaranja">"submit"</span>&gt;<span class="tBranco">Cadastrar</span>&lt;/button&gt;
+
+    &lt;/form&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+</code>
+</pre>
+
+        <p>A tag &lt;form&gt;, do HTML, não é utilizada apenas para fins de manter uma estrutura semântica, <b>mas também é uma forma de definir que aquele formulário vai possibilitar o envio dos dados dos inputs para algum lugar</b>, mais especificamente nesse caso, para a nossa rota de redirecionamento. Note que o parâmetro <span class="tCodigo"><span class="tBranco">action</span>=<span class="tLaranja">"/informacoes-cadastro"</span></span> define justamente, entre aspas, <b>uma rota de redirecionamento no momento em que o usuário interagir com o botão de cadastrar</b>. Embora o servidor ainda não esteja feito, podemos confirmar um pouco mais <b>como o método POST se comporta em relação ao GET</b>, em relação ao acesso de rotas. Confirmamos isso ainda mais porque, <b>quando estamos estruturando um formulário no HTML</b>, informamos outro parâmetro importante que determina o método de envio dessas informações. E é isso que <span class="tCodigo"><span class="tBranco">method</span>=<span class="tLaranja">"post"</span></span> define. Só acessaremos a rota de redirecionamento pelo formulário, e que é de onde as informações serão enviadas para o servidor.</p>
+
+        <p>Atente-se também aos inputs onde inseriremos as informações de cadastro. Para cada input, temos um <span class="tCodigo"><span class="tBranco">name</span></span> que recebe e define <b>o nome da variável responsável por armazenar esse valor</b>.</p>
+
+        <p>E para que o botão de cadastro realmente esteja definido como gatilho de envio das informações do input para o servidor, informamos o parâmetro <span class="tCodigo"><span class="tBranco">type</span>=<span class="tLaranja">"submit"</span></span>.</p>
+
+        <p>E antes de começar a criar a lógica de servidor, considerando que o arquivo-fonte do servidor esteja criado, devemos definir uma coisa importante <b>quando estamos falando em transmitir informações do cliente para o servidor</b>. Observe:</p>
+
+<pre>
+<code>
+var <span class="tBranco">express</span> = require("express")
+var <span class="tBranco">app</span> = <span class="tBranco">express</span>()
+var <span class="tBranco">path</span> = require("path")
+
+<span class="tBranco">app</span>.<span class="tRosa">use</span>(<span class="tBranco">express</span>.<span class="tRosa">urlencoded</span>({<span class="tBranco">extended</span>: <span class="tLaranja">true</span>})
+</code>
+</pre>
+
+        <p><span class="tCodigo"><span class="tBranco">app</span>.<span class="tRosa">use</span>()</span> é utilizado para informar o uso de <em>middlewares</em>, que em termos muito simples e que por agora não convém um aprofundamento, <b>são funções executadas através do acesso de rotas, que executam primeiro antes do bloco de código definido numa rota em si</b>. O que estamos fazendo acima é utilizar (no sentido mais adequado da palavra) um <em>middleware</em> geral que se aplica em todas as rotas que vamos definir até então. Este <em>middleware</em> é a função acessada de <span class="tCodigo"><span class="tBranco">express</span></span> chamada <span class="tCodigo"><span class="tRosa">urlencoded</span>()</span>, que define que, em todas as rotas, <b>os dados poderão ser transitados, do cliente para o servidor, de uma página para outra, no corpo da requisição, se utilizado o método POST</b>. A opção <span class="tCodigo"><span class="tBranco">extended</span></span> define apenas se as informações capturadas devem se tratadas e estruturadas como JSON ou não, dependendo do booleano passado como valor. De qualquer forma, essa linha de código permite a transição das informações passadas no corpo de uma página do nosso servidor de forma correta.</p>
+
+        <p>Para acessar a página de formulário, temos que definir a rota de acesso. E para isso, utilizamos um GET, nada muito convencional. E então definimos a rota de redirecionamento com POST, que receberá as informações enviadas da página de formulário.</p>
+
+<pre>
+<code>
+...
+
+<span class="tVerde">//Ao acessar a página principal.</span>
+<span class="tBranco">app</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">res</span>.<span class="tRosa">sendFile</span>(<span class="tBranco">path</span>.<span class="tRosa">join</span>(<span class="tBranco">__dirname</span> + <span class="tLaranja">"/html/index.html"</span>))
+})
+
+<span class="tVerde">//A rota de redirecionamento quando o usuário fazer o cadastro.</span>
+<span class="tVerde">//Lembrando que é o mesmo caminho passado no action do formulário.</span>
+<span class="tBranco">app</span>.<span class="tRosa">post</span>(<span class="tLaranja">"/informacoes-cadastro"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    let <span class="tBranco">nome</span> = <span class="tBranco">req.body.nomeUsuario</span> ?? <span class="tLaranja">"[Não informado]</span>
+    let <span class="tBranco">idade</span> = <span class="tBranco">req.body.idadeUsuario</span> ?? <span class="tLaranja">"[Não informado]"</span>
+
+    <span class="tBranco">res</span>.<span class="tRosa">send</span>(
+        <span class="tLaranja">`&lt;h3&gt;Informações do Perfil&lt;/h3&gt;
+         &lt;li&gt;Nome: ${<span class="tBranco">nome</span>}
+         &lt;li&gt;Idade: ${<span class="tBranco">idade</span>}`</span>
+    )
+})
+
+...
+</code>
+</pre>
+
+        <p>Note que, o valor que definimos na propriedade 'name' para cada input, dentro do formulário, <b>é o mesmo que corresponde como valor dentro da variável</b>, na propriedade <span class="tCodigo"><span class="tBranco">req.body</span></span>, semelhante às outras propriedades utilizadas quando passávamos valores com o método GET. <span class="tCodigo"><span class="tBranco">req.body</span></span> <b>nada mais é do que as variáveis de valores do input passados pelo corpo da requisição</b>, como consta no nome. Isso significa, além de tudo, que a forma de como os valores foram transmitidos não é a mesma de quando fizemos utilizando o método GET. E como dito antes, em questão de código, o método de roteamento <span class="tCodigo"><span class="tRosa">post</span>()</span> não define uma rota de acesso, e sim de redirecionamento. A única forma possível de se acessar uma rota definida pelo método POST aqui é interagindo diretamente com o botão de cadastro do formulário, que é de onde também as informações serão enviadas e tratadas pelo servidor, assim como foi feito acima.</p>
+
+        <br><br>
+
+        <h1>Conclusões</h1>
+        <p>Note que, apesar de termos ressaltado e comparado a questão de segurança, <b>um método não anula o uso do outro</b>. Apenas com o <b>GET</b>, em questão de código, que conseguimos tornar uma rota acessível, e já pensando na questão da passagem de parâmetros e valores, <b>utilizá-lo para passar apenas os não sensíveis</b>, como já ressaltado antes. O método GET torna possível, antes de tudo, o acesso às páginas e seções de nível público do site, de forma com que qualquer pessoa consiga acessar por visualização, por exemplo. E já o método POST, que define rotas de acesso de uma maneira mais segura e restrita em relação ao anterior, tanto em forma de envio de informações quanto de acessar uma rota definida neste tipo de método, <b>utilizamos pensando no tratamento de informações sensíveis e, sobretudo, uma rota de tratamento dessas informações que obtemos e onde determinamos um resultado de resposta</b>. Com GET e POST combinados, <b>podemos tracejar mais ou menos o funcionamento de uma aplicação, suas rotas e formas de respostas para cada tipo de requisição</b>, seja ela enviada pelo corpo ou através de parâmetros e valores passados na URL.</p>
 
         <footer>
             <a href="../a07/a07.html">Página Anterior</a>
