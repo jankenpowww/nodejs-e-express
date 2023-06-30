@@ -1,0 +1,16 @@
+{
+  "name": "teste-nodemon",
+  "version": "1.0.0",
+  "description": "Testando o Nodemon.",
+  "main": "index.js",
+  "scripts": {
+    "teste-nodemon": "nodemon index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "nodemon": "^2.0.22"
+  }
+}

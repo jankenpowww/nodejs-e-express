@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../stemp-css/stemp.css" type="text/css">
+
+    <style>
+        body, html{
+            background-image: linear-gradient(to bottom, rgb(99, 232, 255), rgb(111, 255, 0));
+        }
+    </style>
+
+    <title>a07-2</title>
+</head>
+<body>
+    <h1>a07-3 - NodeJS, <em>back-end</em> e seus conceitos (parte 02)</h1>
+
+    <main>
+        <h1>Por dentro do <span class="tCodigo"><span class="tBranco">npm init</span></span></h1>
+        <p>Vimos que, com uso da flag <span class="tCodigo"><span class="tBranco">-y</span></span>, podemos criar <b>um projeto com Node sem passar por toda aquela "burocracia" de informar alguns daqueles campos</b>. O que a gente não espera é que tanto o arquivo 'package.json', <b>da qual sabemos que registra as informações do nosso projeto e qual as dependências utilizadas</b>, como arquivos JSON por si só quando estamos trabalhando com Node, tem um papel fundamental e que não deve ser tratado como mera "burocracia". Seja como arquivo de desenvolvimento prático, seja para fins de registro. E O JSON, sigla para <em>JavaScript Object Notation</em>, nada mais e do que <b>objetos JavaScript que armazenam dados e informações, seguindo o padrão de chave-valor</b>. Eis um exemplo de 'package.json' gerado ao "initarmos" nosso projeto...</p>
+
+<pre>
+<code>
+{
+  <span class="tBranco">"name"</span>: <span class="tLaranja">"projeto-node"</span>,
+  <span class="tBranco">"version"</span>: <span class="tLaranja">"1.0.0"</span>,
+  <span class="tBranco">"description"</span>: <span class="tLaranja">"Projeto de teste com NodeJS"</span>,
+  <span class="tBranco">"main"</span>: <span class="tLaranja">"index.js"</span>,
+  <span class="tBranco">"scripts"</span>: {
+    <span class="tBranco">"teste-script"</span>: <span class="tLaranja">"echo <span class="tBranco">\"</span>Isso é um teste de script.<span class="tBranco">\"</span>"</span>
+  },
+  <span class="tBranco">"keywords"</span>: [
+    <span class="tLaranja">"Teste"</span>,
+    <span class="tLaranja">"NodeJS"</span>,
+    <span class="tLaranja">"Olá"</span>,
+    <span class="tLaranja">"Mundo"</span>
+  ],
+  <span class="tBranco">"author"</span>: <span class="tLaranja">"jankenpowww"</span>,
+  <span class="tBranco">"license"</span>: <span class="tLaranja">"MIT"</span>,
+  <span class="tBranco">"dependencies"</span>: {
+    <span class="tBranco">"express"</span>: <span class="tLaranja">"^4.18.2"</span>
+  }
+}
+</code>
+</pre>
+
+        <p>O JSON <b>é um tipo de arquivo-fonte que utiliza a sintaxe de objeto do JavaScript para o envio e armazenamento rápido de dados</b>. Note que o arquivo JSON gerado <b>é um objeto grande que armazena chaves, que por sua vez podem armazenar valores, ou 'sub-objetos' com suas chaves e valores, ou até mesmo Arrays com valores</b>. Note que não há a possibilidade de comentar em um arquivo JSON, <b>uma vez que a estruturação das informações nesse tipo de arquivo foi pensada para ser legível por qualquer um</b>. E apesar de ter sido baseado em JavaScript, mais especificamente em como objetos funcionam na linguagem, o JSON é utilizado como arquivo de transmissão de dados em projetos utilizando outras linguagens de base, em específico para armazenar informações à respeito <b>das configurações de projeto em si</b>, assim como o XML ou YAML.</p>
+
+        <p>E veja que esse arquivo é constantemente alterado automaticamente para cada vez que adicionamos uma dependência, por exemplo. Essas informações são transmitidas para o .json no momento em que fazemos alguma alteração.</p>
+
+        <p>Note que a estrutura de objeto em JavaScript segue um padrão chave-valor, como mencionado antes. No arquivo-fonte acima, a string que representa o valor está em branco, enquanto os valores, também string, são representados pela cor laranja. As vezes, <b>o valor de uma chave pode ser um novo objeto com chaves e valores, que podem se aninhar n vezes</b>, como vemos na chave relacionada às dependências do projeto, <span class="tCodigo"><span class="tBranco">"dependencies"</span></span>, que armazena outro objeto com a chave e valor referente ao nome da dependência e sua versão respectivamente. O valor de uma chave pode se referir também à um <b>array</b>, como vemos em <span class="tCodigo"><span class="tBranco">"keywords"</span></span>.</p>
+
+        <p>O fato é que JSON também é utilizado de forma prática, além do papel de registrar as informações de determinada coisa.</p>
+
+        <br><br>
+
+        <h1>Nodemon</h1>
+        <p>Deixando de lado por enquanto como o JSON funciona, vamos voltar e entender uma parte importante desse arquivo gerado para o projeto. Em especial, uma chave importante dentro desse JSON.</p>
+
+<pre>
+<code>
+...
+
+<span class="tBranco">"scripts"</span>: {
+    <span class="tBranco">"teste-script"</span>: <span class="tLaranja">"echo <span class="tBranco">\"</span>Isso é um teste de script.<span class="tBranco">\"</span>"</span>
+},
+
+...
+</code>
+</pre>
+
+        <p><span class="tCodigo"><span class="tBranco">scripts</span></span> é a seção do package.json <b>que armazena os scripts de linha de comando a serem executados</b>. A seção de scripts <b>é associada a parte de debug do projeto</b>, e como podemos executar comandos da linha de comando, isso inclui <b>executar outros arquivos Node</b>, a execução desses comandos inclui associar uma chave, que é um nome associado ao script, ao valor que é o comando determinado pela string...</p>
+
+        <p>É possível executar o comando acima simplesmente abrindo o projeto no servidor e executando <span class="tCodigo"><span class="tBranco">npm run teste-script</span></span>. Isso vai printar no console a mensagem com o comando echo.</p>
+
+        <p>E para facilitar o processo de testar o nosso servidor no navegador e fazer com que a execução de cada mudança reflita automaticamente, utilizamos o Nodemon. O Nodemon é uma dependência instalada via npm que permite o auto-reload da servidor que está rodando à cada alteração feita no código do projeto. Para instalar o Nodemon como dependência, rodamos <span class="tCodigo"><span class="tBranco">npm install nodemon</span></span>.</p>
+
+        <p>E depois disso, <b>só precisamos incluir ele como valor de mais uma chave dentro do objeto de scripts. Dessa forma:</b></p>
+
+<pre>
+<code>
+...
+
+<span class="tBranco">"scripts"</span>: {
+    <span class="tBranco">"teste-script"</span>: <span class="tLaranja">"echo <span class="tBranco">\"</span>Isso é um teste de script.<span class="tBranco">\"</span>"</span>
+    <span class="tBranco">"teste-nodemon"</span>: <span class="tLaranja">"nodemon index.js"</span>
+},
+
+...
+</code>
+</pre>
+
+        <p>Observe que o valor para o novo script que criamos para executar o nosso servidor com Nodemon recebe o verbo de comando + o arquivo-fonte principal que está dentro da chave <span class="tCodigo"><span class="tBranco">"main"</span></span> do 'package.json'. Então, assim como fizemos com o script anterior, é só utilizar o comando <span class="tCodigo"><span class="tBranco">npm run</span></span> para rodar o script associado ao Nodemon. Com isso, todas as alterações feitas serão atualizadas automaticamente sem ter que derrubar o servidor e executar novamente para cada alteração feita. A única coisa a ser feita, uma vez que nosso servidor está rodando com Nodemon, é dar um <em>refresh</em> na página em questão.</p>
+
+        <footer>
+            <a href="../a07-2/a07-2.html">Página Anterior</a>
+            <a href="#">Próxima Página</a>
+        </footer>
+    </main>
+</body>
+</html>
