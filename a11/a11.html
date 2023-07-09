@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../stemp-css/stemp.css" type="text/css">
+    <title>a11</title>
+</head>
+<body>
+    <h1>a11 - MySQL (parte 01)</h1>
+
+    <main>
+        <h1>O que é o MySQL?</h1>
+        <p>É uma ferramenta de definição e manipulação de bancos de dados relacionais mais conhecido quando falamos em bancos de dados relacionais utilizando a linguagem SQL. Um banco de dados nada mais é do que a <b>parte estrutural de uma aplicação onde os dados registrados podem ser armazenados</b>. No contexto de cadastro de um usuário, por exemplo, essas informações <b>são armazenadas em um banco de dados</b> e que define o acesso do usuário cadastrado em questão na aplicação devidamente.</p>
+
+        <p>Note que o MySQL <b>é o SGBD da qual criaremos a estrutura de bancos de dados e SQL é a linguagem em questão que utilizaremos para tal</b>.</p>
+
+        <p>A versão utilizada do MySQL é a distribuição gratuita chamada de MySQL Community Server, encontrada <a href="https://dev.mysql.com/downloads/mysql/" target="_blank" rel="external">aqui</a>.</p>
+
+        <br><br>
+
+        <h1>Instalando o MySQL</h1>
+        <p>Para essa série de tutoriais, vamos utilizar a "versão de servidor" do MySQL. Durante a instalação, algumas opções e definições serão pedidas conforme vamos avançando a instalação do MySQL na máquina. <b>Certifique-se por enquanto, em um primeiro momento, a assinalar as opções que indicam a instalação das versões "Server Only" e marcar a opção "Server Computer/Machine"</b>, para esta necessidade em específico. Todas as outras configurações e opções podem ser puladas. No fim da instalação, <b>uma senha de usuário 'root' vai ser requerida</b>. Esta é a senha mestre utilizada pelo administrador dos bancos de dados e suas estruturas na máquina, e a qual utilizaremos para acessar e utilizar o MySQL em si. Guarde essa senha em algum local seguro! (vamos precisar mais pra frente).</p>
+
+        <p>No Windows, muito provavelmente o uso do MySQL na linha de comando <b>não será reconhecida</b>, mesmo após a instalação. No diretório do MySQL (provavelmente em "Arquivos de Programas") temos a pasta 'bin', onde vamos <b>copiar seu caminho absoluto e adicioná-lo dentro do PATH do Windows</b>. A ideia é que, ao adicionar o novo caminho dentro das variáveis de ambiente, ao digitar 'mysql' no terminal de linha de comando, essa mensagem apareça, ao invés da mensagem clássica de que 'o Windows não reconhece o comando':</p>
+
+<pre>
+<code>
+<span class="tBranco">ERROR 1045 (28000): Access denied for user 'ODBC'@'localhost' (using password: NO)</span>
+</code>
+</pre>
+
+        <p>Apesar de ser uma mensagem de erro, isso sinaliza que o comando agora é reconhecido pelo Windows e que o MySQL está devidamente instalado na máquina. E para resolver esse "erro"/acessar o MySQL pela linha de comando, podemos entrar com o comando <span class="tCodigo"><span class="tBranco">mysql -h localhost -u root -p</span></span> OU abrimos uma outra aplicação de linha de comando instalado durante a instalação do MySQL chamado de 'MySQL Command Line Client'. Veja que agora, para ambas as formas de se acessar o MySQL, será requerida <b>a senha de usuário root que definimos durante a instalação do MySQL</b>.</p>
+
+        <p>Informando a senha. temos acesso ao MySQL e sua estrutura baseada em uma aplicação de banco de dados! A tela exibida no MySQL Command Line Client, ao informar a senha, é exatamente essa:</p>
+
+<pre>
+<code>
+<span class="tBranco">Enter password: **********
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 16
+Server version: 8.0.33 MySQL Community Server - GPL
+    
+Copyright (c) 2000, 2023, Oracle and/or its affiliates.
+    
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+    
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+    
+mysql></span>
+</code>
+</pre>
+
+        <p>A partir daqui, <b>podemos experimentar alguns comandos do prompt do MySQL ou até começar a executar os próprios comandos SQL efetivamente</b>.</p>
+
+        <br><br>
+
+        <h1>Utilizando o MySQL</h1>
+        <p>Como dito antes, o MySQL é <b>o SGBD, ou Sistema de Gerenciamento de Banco de Dados, onde criaremos o nosso banco de dados e suas estruturas</b>, baseando-se, óbvio, no modelo relacional. O SQL é a linguagem que permite a manipulação e estruturação de banco de dados, e a linguagem da qual vamos utilizar para integrar nossa aplicação na prática.</p>
+
+        <p>E antes de começar, é preciso nos interar desse ambiente de linha de comando que pode ser um pouco confuso. Todo comando SQL aqui termina com ';', que é regra de síntaxe básica do próprio SQL, ou <span class="tCodigo"><span class="tBranco">\g</span></span> no contexto de linha de comando. Experimentamos então listar todos os bancos de dados estruturados até então digitando <span class="tCodigo"><span class="tBranco">SHOW DATABASES;</span></span></p>
+
+<pre>
+<code>
+<span class="tBranco">mysql> SHOW DATABASES;
+
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+4 rows in set (0.00 sec)</span>
+</code>
+</pre>
+
+        <p>Perceba que ele <b>retorna um pequeno esquema mostrando todos os bancos de dados existentes até aqui</b>, mesmo que não tenhamos criado nada a princípio. Esses são os bancos de dados criados por padrão durante a instalação do banco de dados.</p>
+
+        <p>Assim como podemos listar todos os bancos de dados no sistema, também podemos <b>selecioná-los e utilizar outros comandos dentro da sua estrutura</b>. Para isso, utilizamos <span class="tCodigo"><span class="tBranco">USE <span class="tCinza">&lt;nome_do_banco&gt;</span>;</span></span></p>
+
+        <p><span class="tCodigo"><span class="tCinza">&lt;nome_do_banco&gt;</span></span> se refere justamente ao nome de um banco de dados existente. Neste exemplo, vamos informar que vamos utilizar o banco de dados chamado de 'mysql'.</p>
+
+<pre>
+<code>
+<span class="tBranco">mysql> USE mysql;
+Database changed
+
+mysql></span>
+</code>
+</pre>
+
+        <p>Note que <b>foi informado que o banco de dados foi trocado.</b> É importante checar sempre se o banco de dados em questão, durante o desenvolvimento prático, é o correto.</p>
+
+        <p>Um banco de dados relacional comum <b>possui várias tabelas diferentes</b>, que num contexto geral se relacionam de alguma maneira, como prevê o paradigma do modelo relacional. <b>Uma tabela possui várias colunas diferentes</b>, que são os campos que descrevem uma informação e seu tipo, enquanto que as linhas dessa coluna são preenchidas com as informações definidas por ela com dados reais.</p> 
+        
+        <p>Imaginemos por um momento em que temos um banco de dados chamado 'sistema'. No banco de dados 'sistema', temos uma tabela chamada 'usuario'. A tabela 'usuario', responsável por armazenar informações de usuário dentro do sistema, se divide nas seguintes colunas: 'nome', 'email' e 'telefone', por exemplo. Uma tabela podem ter vários registros baseado nessa estrutura de tabela que imaginamos agora. Essa visualização vai ser mais fácil <b>quando fazermos esse exemplo na prática</b>.</p>
+
+        <p>De qualquer forma, podemos visualizar <b>todas as tabelas do banco de dados 'mysql' que selecionamos com o <span class="tCodigo"><span class="tBranco">USE</span></span> até então</b>. E assim como fizemos para mostrar todos os bancos de dados existentes, <b>fazemos quase a mesma coisa para listar as tabelas de um banco de dados</b>. <b>O que muda é o substantivo</b>, o que queremos que seja listado, no caso, as tabelas...</p>
+
+<pre>
+<code>
+<span class="tBranco">mysql> SHOW TABLES;
+
++------------------------------------------------------+
+| Tables_in_mysql                                      |
++------------------------------------------------------+
+| columns_priv                                         |
+| component                                            |
+| db                                                   |
+| default_roles                                        |
+| engine_cost                                          |
+
+...</span>
+</code>
+</pre>
+
+        <p>Utilizando <span class="tCodigo"><span class="tBranco">SHOW TABLES;</span></span> <b>em um banco de dados que selecionamos</b>, vai mostrar todas as tabelas desse banco de dados em questão. E note que, para o banco de dados 'mysql' que selecionamos, o comando vai retornar uma porrada de tabela (que eu julgo ser muito importante pro funcionamento disso tudo, então melhor não mexer, né?)</p>
+
+        <p>Se lembra do exemplo do banco de dados de sistema anterior? Vamos criá-lo na prática e finalmente aprender...</p>
+
+        <br><br>
+
+        <h1>... a como criar um banco de dados!</h1>
+        <p>Note que, à primeira vista, os comandos SQL que utilizamos <b>são bem descritivos e intuitivos</b>. É como se você escrevesse literalmente o que você quer fazer ou retornar de um banco de dados colocando em palavras literais. É claro que em blocos de comandos maiores, isso dá um nível à mais de complexidade para a linguagem SQL, embora não seja o caso nesse primeiro momento.</p>
+
+        <p>Para criar um banco de dados, executamos <span class="tCodigo"><span class="tBranco">CREATE DATABASE </span><span class="tCinza">&lt;nome_do_banco&gt;</span></span>. Para seguir a premissa do exemplo anterior, vamos nomear de 'sistema'.</p>
+
+<pre>
+<code>
+<span class="tBranco">mysql> CREATE DATABASE sistema;
+Query OK, 1 row affected (0.05 sec)
+
+mysql></span>
+</code>
+</pre>
+
+        <p>Utilizando o comando de mostrar todos os bancos de dados existentes, você verá que, naquela lista retornada, terá o nosso banco de dados recém-criado incluído.</p>
+
+        <p>E antes de começar a mexer com a estrutura em si, lembre-se de selecionar o banco de dados criado. Para este exemplo, entramos como <span class="tCodigo"><span class="tBranco">USE sistema;</span></span>.</p>
+        
+        <p>O banco de dados 'sistema' precisa registrar usuarios com as seguintes informações: nome, telefone e endereço. A tabela em questão a ser criada aqui é 'usuario', e fazemos dessa forma, informando também as suas devidas colunas e tipos:</p>
+
+<pre>
+<code>
+<span class="tBranco">mysql> CREATE TABLE usuario (nome VARCHAR(100), email VARCHAR(100), telefone VARCHAR(15));
+Query OK, 0 rows affected (0.05 sec)</span>
+</code>
+</pre>
+
+        <p>Ao executar <span class="tCodigo"><span class="tBranco">SHOW TABLES;</span></span>, temos o seguinte resultado:</p>
+
+<pre>
+<code>
+<span class="tBranco">mysql> SHOW TABLES;
+
++-------------------+
+| Tables_in_sistema |
++-------------------+
+| usuario           |
++-------------------+
+1 row in set (0.00 sec)</span>
+</code>
+</pre>
+
+        <p>Veja que foi retornado, como esperado, a tabela que criamos para os usuarios registrados no banco de dados. E para visualizar a estrutura da tabela em si, com todas as colunas, tipos e outros detalhes estrturais, executamos <span class="tCodigo"><span class="tBranco">DESCRIBE <span class="tCinza">&lt;nome_tabela&gt;</span></span></span>.</p>
+
+<pre>
+<code>
+<span class="tBranco">mysql> DESCRIBE usuario;
+
++----------+--------------+------+-----+---------+-------+
+| Field    | Type         | Null | Key | Default | Extra |
++----------+--------------+------+-----+---------+-------+
+| nome     | varchar(100) | YES  |     | NULL    |       |
+| email    | varchar(100) | YES  |     | NULL    |       |
+| telefone | varchar(15)  | YES  |     | NULL    |       |
++----------+--------------+------+-----+---------+-------+
+3 rows in set (0.01 sec)</span>
+</code>
+</pre>
+
+        <p>Em seguida, vamos <b>inserir um registro na tabela</b>, preenchendo os campos respectivamente às colunas definidas na tabela (nome, e-mail e telefone), utilizando o comando <span class="tCodigo"><span class="tBranco">INSERT INTO <span class="tCinza">&lt;nome_tabela&gt;</span> VALUES (...);</span></span>.</p>
+
+<pre>
+<code>
+<span class="tBranco">mysql> INSERT INTO usuario VALUES ("Janken", "janken@pow.com", "11987653453");
+Query OK, 1 row affected (0.02 sec)</span>
+</code>
+</pre>
+
+        <p>E por fim, damos um <span class="tCodigo"><span class="tBranco">SELECT * FROM <span class="tCinza">&lt;nome_tabela&gt;</span>;</span></span> para retornar <b>todos os registros de uma tabela.</b></p>
+
+<pre>
+<code>
+<span class="tBranco">mysql> SELECT * FROM usuario;
+
++--------+----------------+-------------+
+| nome   | email          | telefone    |
++--------+----------------+-------------+
+| Janken | janken@pow.com | 11987653453 |
++--------+----------------+-------------+
+1 row in set (0.00 sec)</span>
+</code>
+</pre>
+
+        <p>E lá está o nosso primeiro registro de usuário no nosso banco de dados!</p>
+
+        <footer>
+            <a href="../a07-3/a07-3.html">Página Anterior</a>
+            <a href="#">Próxima Página</a>
+        </footer>
+    </main>
+</body>
+</html>
