@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../stemp-css/stemp.css" type="text/css">
+    <title>a11</title>
+</head>
+<body>
+    <h1>a13 - MySQL (parte 02)</h1>
+
+    <main>
+        <p>Na aula anterior, vimos como baixamos o MySQL e demos inicio na aplicação baseada em prompt do MySQL em si, além de testar os primeiros comandos SQL efetivamente, como listar e visualizar bancos de dados e suas estruturas e também <b>como criamos um banco de dados, tabelas e como registrar e listar essas informações</b>.</p>
+
+        <p>Saber a linguagem SQL e como manipular e administrar bancos de dados é muito importante quando estamos falando de aplicações web na prática que envolvam o cadastro e utilização de dados. Com isso em mente, vamos aprofundar nossos conhecimento "<em>SQLíticos</em>".</p>
+
+        <br><br>
+
+        <h1>ALTERando a estrutura</h1>
+        <p>Vamos considerar o banco de dados anterior, que chamamos de 'sistema'. O banco de dados em questão possui uma tabela chamada de 'usuario'. Um usuário cadastrado dispõe as seguintes informações, que são colunas da tabela: 'nome', 'email' e 'telefone', e só um registro até agora.</p>
+
+        <p>Mas para testar mais comandos utilizando o SELECT e ver como funciona retornar informações de um banco na prática, precisamos antes de mais nada — até mesmo antes de inserir novos usuários no banco — adicionar mais uma coluna no nosso banco de dados, e que vai ser importante para esses testes.</p>
+
+        <p>Veja que com o SQL é <b>totalmente possível mexer com a estrutura de tabelas de bancos de dados mesmo depois de definirmos ela</b>, já que, num desenvolvimento prático de aplicações que utilizam bancos de dados, é totalmente possível a adição ou adaptação da estruturas de bancos de dados conforme o projeto ganha novas funcionalidades e outras adições. E para assimilar isso melhor, <b>a nossa tabela de usuários registrados vai ganhar mais uma coluna</b>.</p>
+
+        <p>A coluna em questão que vamos adicionar estrutura da tabela 'usuario' vai ser chamada de 'estado'. Aqui, o usuário vai informar a sigla do estado em que nasceu. À partir daqui, já podemos ir pensando em como definir a coluna e seu tipo em si.</p>
+
+        <p>E para fazer isso, utilizamos o comando chamado de <span class="tCodigo"><span class="tBranco">ALTER TABLE</span></span>. O comando 'ALTER', assim como o <span class="tCodigo"><span class="tBranco">CREATE</span></span>, se subdivide dentro de uma categoria de comandos do SQL chamada de DDL, ou <em>Data Definition Language</em>, que são os <b>comandos que mexem diretamente com as estruturas dentro de um banco de dados</b>, seja criar, adicionar, remover ou atualizar componentes de uma estrutura, no caso as tabelas.</p>
+
+        <p>Vamos então adicionar o campo 'estado' na nossa tabela de usuários...</p>
+
+<pre>
+<code>
+<span class="tBranco">mysql> ALTER TABLE usuario ADD COLUMN estado CHAR(2);
+
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0</span>
+</code>
+</pre>
+
+        <p>A primeira parte do comando inteiro, <span class="tCodigo"><span class="tBranco">ALTER TABLE <span class="tCinza">&lt;nome_tabela&gt;</span></span></span> sinaliza que vamos <b>alterar/manipular/atualizar/deletar a estrutura de colunas de uma tabela.</b> E para essa intenção, o comando é o mesmo.</p>
+
+        <p>Note que queremos <b>adicionar um novo campo na tabela 'usuario' do nosso banco</b>, então, completamos o comando com <span class="tCodigo"><span class="tBranco">ADD COLUMN</span> <span class="tCinza">&lt;nome_coluna&gt; &lt;tipo_coluna&gt;</span></span>. Lembre-se que o novo campo vai receber uma informação que é <b>uma sigla de dois caracteres</b> (ex. SP, RJ, MG, etc.) e é conveniente que esta coluna tenha essa especificação, embora pudesse ser de um tipo VARCHAR normalmente.</p>
+
+        <p>Podemos conferir a estrutura da nossa tabela que acabamos de modificar adicionando mais uma coluna com <span class="tCodigo"><span class="tBranco">DESCRIBE</span></span>, e temos isso:</p>
+
+<pre>
+<code>
+<span class="tBranco">mysql> DESCRIBE usuario;
++----------+--------------+------+-----+---------+-------+
+| Field    | Type         | Null | Key | Default | Extra |
++----------+--------------+------+-----+---------+-------+
+| nome     | varchar(200) | YES  |     | NULL    |       |
+| email    | varchar(200) | YES  |     | NULL    |       |
+| telefone | varchar(15)  | YES  |     | NULL    |       |
+| estado   | char(2)      | YES  |     | NULL    |       |
++----------+--------------+------+-----+---------+-------+</span>
+</code>
+</pre>
+
+        <p>Exatamente como especificamos...</p>
+
+        <p>E antes de partir pros selects, vamos adicionar mais 5 usuários no sistema. Ao todo, teremos 6 usuários registrados. Será mais do que o suficiente para visualizar algumas coisas.</p>
+
+        <p>Podemos adicionar mais de um usuário no banco de dados em um linha de comando só como feito abaixo. Lembrando que um comando SQL só executa no prompt quando finalizamos com ';'.</p>
+
+<pre>
+<code>
+<span class="tBranco">mysql> INSERT INTO usuario VALUES ("Júlia", "ju@lia.com", "11942355343", "RJ"),
+-> ("Marcos", "marcos@gmail.com", "40028922", "MG"),
+-> ("Victor", "victor@hotmail.com", "11932434243", "ES"),
+-> ("Fernanda", "fernanda@yahoo.com", "11944433234", "MG"),
+-> ("Jorge", "jorge@outlook.com", "11986545555", "PE");</span>
+</code>
+</pre>
+
+        <p>Pressionando ENTER para executar, adicionamos com sucesso mais usuários no nosso sistema. Lembrando que, com o registro feito na página anterior, somamos exatamente 6 registros de usuário. E que tal <b>listar todos dessa vez</b>, agora com novos registros e com a tabela de usuários alterada?</p>
+
+<pre>
+<code>
+<span class="tBranco">mysql> SELECT * FROM usuario;
+
++----------+--------------------+-------------+--------+
+| nome     | email              | telefone    | estado |
++----------+--------------------+-------------+--------+
+| Janken   | janken@pow.com     | 11987653453 | NULL   |
+| Júlia    | ju@lia.com         | 11942355343 | RJ     |
+| Marcos   | marcos@gmail.com   | 40028922    | MG     |
+| Victor   | victor@hotmail.com | 11932434243 | ES     |
+| Fernanda | fernanda@yahoo.com | 11944433234 | MG     |
+| Jorge    | jorge@outlook.com  | 11986545555 | PE     |
++----------+--------------------+-------------+--------+</span>
+</code>
+</pre>
+
+        <p>E lá está, <b>todos os registros de usuários que fizemos até agora</b>. Note que o nosso primeiro registro possui NULL como informação referente à coluna 'estado', isso porque <b>este registro já estava no banco de dados ANTES de alterarmos a estrutura da nossa tabela inserindo um novo campo</b>. E por isso, o valor de campo deste registro está como NULL, pois como não há nada definido dentro do nosso banco de dados para preencher este valor automaticamente, o valor de campo é vazio por padrão, nulo.</p>
+
+        <p>"E como fazemos pra resolver isso?!", você pergunta. E a resposta é...</p>
+
+        <br><br>
+
+        <h1>... atualizando a informação de um registro.</h1>
+        <p>Perceba que 'alterar estrutura de um banco de dados' é totalmente diferente de 'alterar dados de um banco de dados', que é o que estamos prestes à fazer. Não vamos mexer em colunas de uma tabela dessa vez, mas sim <b>nos registros que temos no banco de dados até agora</b>. O comando <span class="tCodigo"><span class="tBranco">UPDATE</span></span>, em conjunto com outros parâmetros, faz parte de outro subconjunto de comandos SQL utilizados para lidar com registros de banco de dados: o DML, ou <em>Data Manipulation Language</em>, que como o nome bem diz, refere-se aos comandos de manipulação de dados. O UPDATE é apenas uma delas.</p>
+
+        <p>E para atualizar a informação de registro com SQL, precisamos <b>especificar a tabela de onde o registro está armazenado, qual registro será atualizado, e que informação queremos atualizar</b>. Lembrando que as informações atualizadas devem condizer diretamente da forma que elas foram estruturadas, respeitando o tipo primitivo e outras especificações.</p>
+
+        <p>Para este caso em específico, queremos mudar <b>a informação de um usuário específico</b>, então no comando em que vamos fazer isso, precisamos informar como parâmetro de filtro <b>um valor único referente ao registro que queremos alterar</b>. É claro que não definimos uma coluna de chave primária que serve justamente para identificar um registro como único na nossa estrutura da tabela, mas para o que temos até agora, isso é totalmente possível e vai ser um bom exemplo de como atualizar registros funcionam na prática. Observe:</p>
+
+<pre>
+<code>
+<span class="tBranco">mysql> UPDATE usuario SET estado = "SP" WHERE nome = "Janken";</span>
+</code>
+</pre>
+
+        <p>A primeira parte do comando, <span class="tCodigo"><span class="tBranco">UPDATE usuario</span></span>, diz que <b>vamos alterar um registro de uma tabela, nesse caso, da tabela de usuários</b>. Depois, vamos com <span class="tCodigo"><span class="tBranco">SET</span> <span class="tCinza">&lt;nome_coluna&gt;</span><span class="tBranco"> =</span> <span class="tCinza">&lt;informacao&gt;</span></span> que a parte que <b>informa qual coluna queremos atualizar com uma nova informação do registro em questão</b>. A última parte, <span class="tCodigo"><span class="tBranco">WHERE</span> <span class="tCinza">&lt;nome_coluna&gt;</span> <span class="tBranco">= </span><span class="tCinza">&lt;informacao&gt;</span><span class="tBranco">;</span></span> é o parâmetro de filtro que utilizamos <b>para identificar o registro que queremos atualizar o campo</b>, informando um dado de uma coluna existente no registro.</p>
+
+        <p>Veja que "Janken" é o único com esse nome registrado na lista de usuários do banco, e foi o que utilizamos de parâmetro para identificá-lo e alterar uma informação de registro. <b>com SET informamos que coluna do registro queremos alterar a informação, e com WHERE informamos uma informação do registro para identificar o registro que queríamos alterar</b>.</p>
+
+        <p>Listando todos os usuários registrados novamente, podemos ver as alterações para aquele registro em especial: de NULL, o registro agora possui uma informação referente à coluna 'estado'.</p>
+
+<pre>
+<code>
+<span class="tBranco">mysql> SELECT * FROM usuario;
++----------+--------------------+-------------+--------+
+| nome     | email              | telefone    | estado |
++----------+--------------------+-------------+--------+
+| Janken   | janken@pow.com     | 11987653453 | SP     |
+| Júlia    | ju@lia.com         | 11942355343 | RJ     |
+| Marcos   | marcos@gmail.com   | 40028922    | MG     |
+| Victor   | victor@hotmail.com | 11932434243 | ES     |
+| Fernanda | fernanda@yahoo.com | 11944433234 | MG     |
+| Jorge    | jorge@outlook.com  | 11986545555 | PE     |
++----------+--------------------+-------------+--------+</span>
+</code>
+</pre>
+
+        <p>É bom enfatizar que, se houvessem dois registros iguais no nosso banco de dados, <b>as informações trocadas no comando UPDATE iriam afetar os dois registros</b>! Eis a importância de sempre criar uma coluna de chave primária para suas tabelas, que consigam diferenciar os registros um dos outros e que permita você realizar alterações/inserções em um registro sem a possibilidade de ter conflitos.</p>
+
+        <p>Então, vamos inserir com ALTER TABLE + os comandos para inserir uma nova coluna na tabela a nossa coluna de chave primária chamada de 'idUsuario'. Observe:</p>
+
+<pre>
+<code>
+<span class="tBranco">mysql> ALTER TABLE usuario ADD COLUMN idUsuario INT NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST;</span>
+</code>
+</pre>
+
+        <p>Como sabemos, <span class="tCodigo"><span class="tBranco">ALTER TABLE usuario</span></span> diz que vamos <b>alterar a estrutura de uma tabela no banco de dados</b>, especificamente a tabela de usuários. E então entramos com o que vamos fazer na tabela, que é adicionar uma nova coluna, chamada de 'idUsuario' de tipo numérico inteiro.</p>
+
+        <p><span class="tCodigo"><span class="tBranco">NOT NULL</span></span> especifica que o valor preenchido com os dados de um registro para essa coluna <b>não seja um valor nulo</b>. No banco de dados, essa informação não pode estar nula. Seguimos com <span class="tCodigo"><span class="tBranco">AUTO_INCREMENT</span></span>, que, se tratando de um campo de valor numérico inteiro, esse parÂmetro define que o valor vai se incrementar à cada registro. <span class="tCodigo"><span class="tBranco">PRIMARY KEY</span></span> define, obviamente, que o campo é uma coluna de chave primária da tabela e por fim temos um campo "opcional" chamado <span class="tCodigo"><span class="tBranco">FIRST</span></span>, que organiza a nova coluna como sendo a primeira da estrutura.</p>
+
+        <p>Podemos observar a nova mudança listando todos os usuários novamente...</p>
+
+<pre>
+<code>
+<span class="tBranco">mysql> SELECT * FROM usuario;
++-----------+----------+--------------------+-------------+--------+
+| idUsuario | nome     | email              | telefone    | estado |
++-----------+----------+--------------------+-------------+--------+
+|         1 | Janken   | janken@pow.com     | 11987653453 | SP     |
+|         2 | Júlia    | ju@lia.com         | 11942355343 | RJ     |
+|         3 | Marcos   | marcos@gmail.com   | 40028922    | MG     |
+|         4 | Victor   | victor@hotmail.com | 11932434243 | ES     |
+|         5 | Fernanda | fernanda@yahoo.com | 11944433234 | MG     |
+|         6 | Jorge    | jorge@outlook.com  | 11986545555 | PE     |
++-----------+----------+--------------------+-------------+--------+</span>
+</code>
+</pre>
+
+        <p>Veja que o novo campo de chave primária aparece primeiro, como especificamos no ALTER TABLE. E seus valores preenchidos sequencialmente de 1 até o último registro, especificado também com o parâmetro <span class="tCodigo"><span class="tBranco">AUTO_INCREMENT</span></span>. Note que agora, como todos os registros são únicos de acordo com o seu valor de chave primária, não corremos mais o risco de alterar outra informação de outro registro por estarmos usando um valor que pode existir em vários outros, como é o caso do campo de nome. E isso considerando que queremos alterar um valor de campo de um registro, claro. Note que essa especificação de retornar informações ou até de alterar outras torna a linguagem SQL muito complexa.</p>
+
+        <br><br>
+
+        <h1>Mais de <em>selects</em>...</h1>
+        <p>Uma aplicação que aplica na prática conceitos de CRUD, especificamente em <b>retornar todos os registros de uma tabela</b>, por exemplo, não para somente em retornar todos os dados da tabela, e utilizando o comando SELECT com outros conjuntos de outros comandos para tornar essas <em>queries</em> mais complexas e objetivas. Como dito antes e até visto em exemplos anteriores, podemos especificar com parâmetros de filtro dentro dos comandos SQL alguma coisa que queremos fazer, seja alterar informações, seja inserir informações, seja consultar informações. E isso para qualquer atividade fora deste escopo também.</p>
+
+        <p>Vamos selecionar todos os usuários da nossa tabela e ver o que temos até agora.</p>
+
+<pre>
+<code>
+<span class="tBranco">mysql> SELECT * FROM usuario;
++-----------+----------+--------------------+-------------+--------+
+| idUsuario | nome     | email              | telefone    | estado |
++-----------+----------+--------------------+-------------+--------+
+|         1 | Janken   | janken@pow.com     | 11987653453 | SP     |
+|         2 | Júlia    | ju@lia.com         | 11942355343 | RJ     |
+|         3 | Marcos   | marcos@gmail.com   | 40028922    | MG     |
+|         4 | Victor   | victor@hotmail.com | 11932434243 | ES     |
+|         5 | Fernanda | fernanda@yahoo.com | 11944433234 | MG     |
+|         6 | Jorge    | jorge@outlook.com  | 11986545555 | PE     |
++-----------+----------+--------------------+-------------+--------+</span>
+</code>
+</pre>
+
+        <p>Em <em>selects</em> mais complexos, e que é amplamente utilizado em aplicações reais, podemos filtrar registros com base em alguma coisa específica compartilhada entre registros distintos. Retornar registros com essa intenção não é muito diferente de quando especificamos a alteração de dados de um registro anteriormente, lembra?</p>
+
+        <p>Veja que, embora tenhamos uma amostragem pequena de registros, podemos ver isso funcionar na prática, de forma beeeem simples do que se acontece na prática, mas funcional para este exemplo. Na coluna de estado, que adicionamos anteriormente, temos um valor de coluna, em relação aos registros, que aparecem duas vezes: há dois usuários residentes do estado de minas gerais! E veja que, num banco de dados semelhante que tenham milhares de usuários que dispõe dessa informação, certamente haveriam grupos de usuários que poderiam ser organizados com base no estado que eles nasceram, por exemplo.</p>
+
+        <p>E se quisermos retornar todos os usuários do nosso banco de dados que nasceram em minas gerais? Fazemos da seguinte forma:</p>
+
+<pre>
+<code>
+<span class="tBranco">mysql> SELECT * FROM usuario WHERE estado = "MG";
++-----------+----------+--------------------+-------------+--------+
+| idUsuario | nome     | email              | telefone    | estado |
++-----------+----------+--------------------+-------------+--------+
+|         3 | Marcos   | marcos@gmail.com   | 40028922    | MG     |
+|         5 | Fernanda | fernanda@yahoo.com | 11944433234 | MG     |
++-----------+----------+--------------------+-------------+--------+</span>
+</code>
+</pre>
+
+        <p>Veja que o WHERE, assim como fizemos para alterar registros anteriormente, também aparece como "parâmetro de filtro" para a nossa consulta no banco de dados.E lá está, os dois únicos usuários que residem no estado de minas gerais registrados no nosso banco.</p>
+
+        <br><br>
+
+        <h1>Excluindo tudo!</h1>
+        <p>E agora que já demos uma olhada bem por cima sobre os comandos acerca da manipulaçao de bancos de dados e seus dados, vamos terminar isso tudo excluindo coisas do banco de dados!</p>
+
+        <p>Para remover um registro, utilizamos <span class="tCodigo"><span class="tBranco">DELETE FROM <span class="tCinza">&lt;nome_tabela&gt;</span></span></span>. Aqui, tanto podemos especificar todos os usuários diretamente (*), como podemos utilizar os parâmetros e comandos de filtro para identificar um registro especifico. E para esta última, vamos apagar o usuário "Victor", passando como parâmetro seu valor de chave primária (considerando que poderiam haver vários "Victores" no nosso banco de dados).</p>
+
+<pre>
+<code>
+<span class="tBranco">mysql> DELETE FROM usuario WHERE idUsuario = 4;</span>
+</code>
+</pre>
+
+        <p>Ao listar todos os usuários novamente, vemos que há um registro a menos:</p>
+
+<pre>
+<code>
+<span class="tBranco">mysql> SELECT * FROM usuario;
++-----------+----------+--------------------+-------------+--------+
+| idUsuario | nome     | email              | telefone    | estado |
++-----------+----------+--------------------+-------------+--------+
+|         1 | Janken   | janken@pow.com     | 11987653453 | SP     |
+|         2 | Júlia    | ju@lia.com         | 11942355343 | RJ     |
+|         3 | Marcos   | marcos@gmail.com   | 40028922    | MG     |
+|         5 | Fernanda | fernanda@yahoo.com | 11944433234 | MG     |
+|         6 | Jorge    | jorge@outlook.com  | 11986545555 | PE     |
++-----------+----------+--------------------+-------------+--------+</span>
+</code>
+</pre>
+
+        <p>E por fim, o comando <span class="tCodigo"><span class="tBranco">DROP</span></span>. Este comando literalmente apaga coisas relacionadas à estrutura do banco de dados, bem como o banco de dados em si, assim como o exemplo abaixo:</p>
+
+        <p>Rodando <span class="tCodigo"><span class="tBranco">SHOW DATABASES;</span></span>, vamos ver que o banco de dados 'sistema' não existe mais, pois foi apagado.</p>
+
+<pre>
+<code>
+<span class="tBranco">mysql> DROP DATABASE sistema;</span>
+</code>
+</pre>
+
+        <footer>
+            <a href="../a11/a11.html">Página Anterior</a>
+            <a href="#">Próxima Página</a>
+        </footer>
+    </main>
+</body>
+</html>
