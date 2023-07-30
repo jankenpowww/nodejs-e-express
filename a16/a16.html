@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../stemp-css/stemp.css" type="text/css">
+    <title>a16</title>
+</head>
+<body>
+    <h1>a16 - Sequelize + MySQL</h1>
+
+    <main>
+        <h1>O que é Sequelize?</h1>
+        <p>Sequelize é um ORM, ou <em>Object Relational Mapper</em> (ainda "Mapeador de Objeto Relacional"), baseado em TypeScript/NodeJS que vem pra facilitar a utilização pratica de bancos de dados relacionais em aplicações. Em relação ao próprio NodeJS, o Sequelize é um módulo baixável via npm do NodeJS em que podemos fazer essa integração com uma aplicação que utiliza bancos de dados.</p>
+
+        <p>Junto disso, também temos que instalar o MySQL como dependência do nosso projeto, já que é o sistema de bancos de dados que vamos fazer a conexão as nossas aplicações. Na pasta do projeto:</p>
+
+        <p>Para instalar o Sequelize:</p>
+
+<pre>
+<code>
+<span class="tBranco">npm install --save sequelize</span>
+</code>
+</pre>
+
+        <p>... e o MySql:</p>
+
+<pre>
+<code>
+<span class="tBranco">npm install --save mysql2</span>
+</code>
+</pre>
+
+        <p>Feito isso, temos todos os módulos necessários para integrar nossa aplicação com um banco de dados MySQL. E não só isso: finalmente, temos todo o conhecimento e ferramentas necessárias para pôr em prática os primeiros projetos!</p>
+
+        <br><br>
+
+        <h1>Conectando a aplicação com o banco de dados</h1>
+        <p>Como dito antes, o Sequelize permite e facilita a integração de aplicações com bancos de dados, e é com ele que fazemos essa conexão.</p>
+
+        <p>Para conectar uma aplicação com o banco de dados, vamos precisar obviamente de um banco de dados. "banco_teste" é o nome do banco de dados vazio utilizado para este exemplo.</p>
+
+        <p>Em seguida, inicializamos um projeto com Node. E dentro dele, um arquivo chamado de "db.js". É neste arquivo que vamos <b>inicializar o Sequelize no nosso projeto e se conectar com um banco de dados MySQL</b>.</p>
+
+<pre>
+<span class="arquivo">db.js</span>
+<code>
+const { <span class="tBranco">Sequelize</span> } = require(<span class="tLaranja">"sequelize"</span>) <span class="tVerde">//Importando o módulo.</span>
+
+const <span class="tBranco">conexao</span> = new <span class="tBranco">Sequelize</span>(<span class="tLaranja">"banco_teste"</span>, <span class="tLaranja">"root"</span>, <span class="tLaranja">"senha_mysql"</span>, {})
+</code>
+</pre>
+
+        <p>Na primeira linha temos <b>uma importação do método construtor do Sequelize</b>. Isso significa que é através da constante <span class="tCodigo"><span class="tBranco">Sequelize</span></span> que vamos instanciá-la para o nosso projeto passando alguns parâmetros importantes.</p>
+
+        <p>E passando para a última linha, temos justamente <b>a instanciação do Sequelize para outra variável</b>. Para a instanciação, temos que passar alguns parâmetros importantes: o primeiro argumento é <b>o nome do banco de dados que queremos conectar à aplicação</b>, neste caso, "banco_teste". A segunda e a terceira são usuário e senha respectivamente que utilizamos para ter acesso ao MySQL, 'root' e a senha de acesso ao SGBD, e por fim, temos o último argumento que é <b>um objeto de outros elementos de inicialização importantes</b>, que [e o que vamos ver a seguir...</p>
+
+<pre>
+<span class="arquivo">db.js</span>
+<code>
+const { <span class="tBranco">Sequelize</span> } = require(<span class="tLaranja">"sequelize"</span>) <span class="tVerde">//Importando o módulo.</span>
+
+const <span class="tBranco">conexao</span> = new <span class="tBranco">Sequelize</span>(<span class="tLaranja">"banco_teste"</span>, <span class="tLaranja">"root"</span>, <span class="tLaranja">"senha_mysql"</span>, {
+    <span class="tBranco">host</span>: <span class="tLaranja">"localhost"</span>,
+    <span class="tBranco">dialect</span>: <span class="tLaranja">"mysql"</span>
+})
+</code>
+</pre>
+
+        <p><span class="tCodigo"><span class="tBranco">host</span></span> recebe um valor em string para <b>a hospedagem do banco de dados utilizado</b>, neste caso 'localhost' para toda vez que formos nos referir à nossa própria máquina local. <span class="tCodigo"><span class="tBranco">dialect</span></span> recebe qual SGBD estamos utilizando, uma vez que o Sequelize consegue trabalhar com várias SGBDs diferentes, e informamos 'mysql' como o SGBD que estamos utilizando.</p>
+
+        <p>Com a configuração feita, podemos <b>testar se o banco de dados realmente está conectado na nossa aplicação</b>, com um pouco mais de código. Observe:</p>
+
+<pre>
+<span class="arquivo">db.js</span>
+<code>
+...
+
+<span class="tBranco">conexao</span>.<span class="tRosa">authenticate</span>().then().catch()
+</code>
+</pre>
+
+        <p>O método <span class="tCodigo"><span class="tRosa">authenticate</span></span> prevê justamente se a <b>conexão com um banco de dados realmente foi feita com sucesso com não</b>, utilizando das estruturas de programação assíncrona do JavaScript (<span class="tCodigo">then</span> e <span class="tCodigo">catch</span>). Ambas recebem um função callback que executa um bloco dependendo do resultado. Na primeira estrutura, podemos exibir uma mensagem de sucesso para caso a conexão for bem-sucedida, e uma mensagem de erro na outra para caso não.</p>
+
+<pre>
+<span class="arquivo">db.js</span>
+<code>
+...
+
+<span class="tBranco">conexao</span>.<span class="tRosa">authenticate</span>().then(() => {
+    console.log(<span class="tLaranja">"Conexão feita com sucesso!"</span>)
+}).catch((<span class="tBranco">erro</span>) => {
+    console.log(<span class="tLaranja">"Erro na conexão: "</span> + <span class="tBranco">erro</span>)
+})
+</code>
+</pre>
+
+        <p>Rodando o arquivo 'db.js' com <span class="tCodigo"><span class="tBranco">node db.js</span></span> podemos ver que, se tudo estiver certo, a mensagem de "conexão feita com sucesso" surgirá no console. Isso significa que a integração do banco de dados com a aplicação foi feita sem problemas.</p>
+
+        <footer>
+            <a href="../a13/a13.html">Página Anterior</a>
+            <a href="../a18/a18.html">Próxima Página</a>
+        </footer>
+    </main>
+</body>
+</html>

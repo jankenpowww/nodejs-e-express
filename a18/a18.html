@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../stemp-css/stemp.css" type="text/css">
+    <title>a18</title>
+</head>
+<body>
+    <h1>a18 - Models no Sequelize</h1>
+
+    <main>
+        <h1>O que é um Model?</h1>
+        <p>Um <em>Model</em>, dentro do Sequelize, é a referência para a sua tabela do seu banco de dados no código. É referenciando uma tabela dessa forma que podemos ter acesso aos dados de um banco de dados referente à uma tabela específica. Um <em>Model</em> é definido como uma constante que recebe um objeto no molde chave-valor referente aos campos e valores de uma tabela.</p>
+
+        <p>É com um <em>Model</em> que também podemos <b>dinamizar a criação de uma tabela via código</b>, sem precisar do SQL diretamente para isso.</p>
+
+        <br><br>
+
+        <h1><em>Sequelizing</em>...</h1>
+        <p>Criaremos um arquivo chamado 'db.js' onde vamos instanciar o Sequelize e criar os primeiros Models. Vamos considerar um banco de dados vazio chamado 'bd_teste' para este exemplo. E como visto anteriormente, temos essa configuração inicial (podemos utilizar a estrutura do authenticate para verificar a conexão também, se for o caso):</p>
+
+<pre>
+<span class="arquivo">db.js</span>
+<code>
+const { <span class="tBranco">Sequelize</span> } = require(<span class="tLaranja">"sequelize"</span>)
+
+const <span class="tBranco">db</span> = new <span class="tBranco">Sequelize</span>(<span class="tLaranja">"bd_teste"</span>, <span class="tLaranja">"root"</span>, <span class="tLaranja">"senha_sql"</span>, {
+    <span class="tBranco">host</span>: <span class="tLaranja">"localhost"</span>,
+    <span class="tBranco">dialect</span>: <span class="tLaranja">"mysql"</span>,
+
+    <span class="tBranco">define</span>: {
+        <span class="tBranco">freezeTableName</span>: <span class="tLaranja">true</span>
+    }
+})
+</code>
+</pre>
+
+        <p>Note que há uma chave nova adicionada: <span class="tCodigo"><span class="tBranco">define</span></span> recebe outro objeto com alguns valores definidos pelo próprio Sequelize à respeito das configurações do banco de dados. Uma dessas configurações é o <span class="tCodigo"><span class="tBranco">freezeTableName</span></span>, que ao receber <span class="tCodigo"><span class="tLaranja">true</span></span> vai <b>impedir do Sequelize, por padrão, criar as tabelas dentro do MySQL com nome no plural</b>.</p>
+
+        <p>Feito isso, vamos imaginar a seguinte aplicação para o nosso banco de dados: vamos criar dois <em>models</em> com Sequelize referente às tabelas 'Postagem' e 'Usuario'. A tabela de postagens teria, imaginando que esse tipo de coisa também pode ser feito utilizando o SQL, as colunas de 'título', pro título da postagem, e 'descrição' que carrega uma breve legenda. Ambos título e descrição seriam do tipo de conteúdo de caracteres. Aqui, no Sequelize, <b>um componente chamado de 'DataTypes' pode ser importada junto do import do Sequelize, que prevê a definição de tipos desses campos</b>. Veja:</p>
+
+<pre>
+<span class="arquivo">db.js</span>
+<code>
+const { <span class="tBranco">Sequelize</span>, <span class="tBranco">DataTypes</span> } = require(<span class="tLaranja">"sequelize"</span>)
+
+...
+
+const <span class="tBranco">Postagem</span> = <span class="tBranco">db</span>.<span class="tRosa">define</span>(<span class="tLaranja">"Postagem"</span>, {
+    <span class="tVerde">// Coluna/campo referente ao título.</span>
+    <span class="tBranco">titulo</span>: {
+        <span class="tBranco">type</span>: <span class="tBranco">DataTypes</span>.<span class="tBranco">STRING</span> <span class="tVerde">//Tipo de valor que o campo deve receber.</span>
+    }
+
+    <span class="tVerde">// Coluna/campo referente à descrição.</span>
+    <span class="tBranco">descricao</span>: {
+        <span class="tBranco">type</span>: <span class="tBranco">DataTypes</span>.<span class="tBranco">TEXT</span> <span class="tVerde">//Tipo de valor que o campo deve receber.</span>
+    }
+})
+</code>
+</pre>
+
+        <p><span class="tCodigo"><span class="tRosa">define</span>()</span> é o método <b>que define uma model/tabela à ser utilizada</b>. Ele recebe uma string <b>com o nome da tabela</b> e em seguida <b>um objeto de atributos onde vamos mapear todos os campos, tipos de valores e outras configurações específicas</b>. Toda chave aqui representa um campo/coluna possível que compõe as características de uma tabela, que por sua vez recebe outro conjunto de valores organizados em objetos que descrevem essas características. 'Postagem' possui <span class="tCodigo"><span class="tBranco">titulo</span></span>, que por sua vez é descrito suas características dentro de outro conjunto de objetos. <span class="tCodigo"><span class="tBranco">titulo</span></span> possui o tipo, ou <span class="tCodigo"><span class="tBranco">type</span></span> definido do tipo <span class="tCodigo"><span class="tBranco">STRING</span></span> (equivalente ao VARCHAR) através do componente importável do módulo de Sequelize chamado <span class="tCodigo"><span class="tBranco">DataTypes</span></span>, <b>utilizado para definir tipos de valores referentes às colunas de uma tabela</b>. Note que essa estrutura é padrão dentro do próprio Sequelize: as colunas ou campos de tabelas são organizados dentro de um conjunto de objetos com chave e valor, e seus tipos e configurações específicas definidos através de componentes importáveis do próprio Sequelize.</p> 
+        
+        <p>Veja que a mesma estrutura é quase a mesma para o campo de <span class="tCodigo"><span class="tBranco">descricao</span></span>. O que muda <b>é a definição de seus tipos</b>, e isso é importante de se notar. O tipo <span class="tCodigo"><span class="tBranco">STRING</span></span> não generaliza todos os tipos de campos que recebem valor de texto por igual. <span class="tCodigo"><span class="tBranco">STRING</span></span> define tipo de texto de até 255 caracteres, enquanto que o tipo <span class="tCodigo"><span class="tBranco">TEXT</span></span>, que também define um valor do tipo de texto, define um comprimento muito maior do que o tipo STRING: algo até 30.000 caracteres, o que é mais do que adequado para o campo de descrição.</p>
+
+        <p>...</p>
+
+        <p>E então vamos criar a tabela referente ao usuário, com base no que fizemos anteriormente. Usuário terá os seguintes campos: nome, sobrenome, idade e e-mail. A estrutura inteira do arquivo db.js fica assim:</p>
+
+<pre>
+<span class="arquivo">db.js</span>
+<code>
+const { <span class="tBranco">Sequelize</span>, <span class="tBranco">DataTypes</span> } = require(<span class="tLaranja">"sequelize"</span>)
+
+const <span class="tBranco">db</span> = new <span class="tBranco">Sequelize</span>(<span class="tLaranja">"bd_teste"</span>, <span class="tLaranja">"root"</span>, <span class="tLaranja">"senha_sql"</span>, {
+    <span class="tBranco">host</span>: <span class="tLaranja">"localhost"</span>,
+    <span class="tBranco">dialect</span>: <span class="tLaranja">"mysql"</span>,
+
+    <span class="tBranco">define</span>: {
+        <span class="tBranco">freezeTableName</span>: <span class="tLaranja">true</span>
+    }
+})
+
+<span class="tVerde">//Model para a tabela de postagens.</span>
+const <span class="tBranco">Postagem</span> = <span class="tBranco">db</span>.<span class="tRosa">define</span>(<span class="tLaranja">"Postagem"</span>, {
+    <span class="tVerde">// Coluna/campo referente ao título.</span>
+    <span class="tBranco">titulo</span>: {
+        <span class="tBranco">type</span>: <span class="tBranco">DataTypes</span>.<span class="tBranco">STRING</span> <span class="tVerde">//Tipo de valor que o campo deve receber.</span>
+    },
+
+    <span class="tVerde">// Coluna/campo referente à descrição.</span>
+    <span class="tBranco">descricao</span>: {
+        <span class="tBranco">type</span>: <span class="tBranco">DataTypes</span>.<span class="tBranco">TEXT</span> <span class="tVerde">//Tipo de valor que o campo deve receber.</span>
+    }
+})
+
+<span class="tVerde">//Model para a tabela de usuários.</span>
+const <span class="tBranco">Usuario</span> = <span class="tBranco">db</span>.<span class="tRosa">define</span>(<span class="tLaranja">"Usuario"</span>, {
+    <span class="tBranco">nome</span>: {
+        <span class="tBranco">type</span>: <span class="tBranco">DataTypes</span>.<span class="tBranco">STRING</span>
+    },
+
+    <span class="tBranco">sobrenome</span>: {
+        <span class="tBranco">type</span>: <span class="tBranco">DataTypes</span>.<span class="tBranco">STRING</span>
+    },
+
+    <span class="tBranco">idade</span>: {
+        <span class="tBranco">type</span>: <span class="tBranco">DataTypes</span>.<span class="tBranco">INTEGER</span> <span class="tVerde">//INTEGER para valores inteiros! ;)</span>
+    },
+
+    <span class="tBranco">email</span>: {
+        <span class="tBranco">type</span>: <span class="tBranco">DataTypes</span>.<span class="tBranco">STRING</span>
+    }
+})
+</code>
+</pre>
+
+        <br><br>
+
+        <h1>Tá, e no MySQL? Como fica?</h1>
+        <p>Veja que tudo o que fizemos até agora foi <b>definir e mapear as tabelas do nosso banco de dados de teste</b>, mas não <b>fizemos a comunicação e sincronização das tabelas com o banco de dados realmente</b>. Lembre-se que todo o código acima <b>prevê a criação dinâmica das tabelas no nosso banco de dados</b>, o que significa que, de algum jeito quando executarmos db.js, o Sequelize que intermedia a comunicação entre o código e o banco de dados, vai justamente executar um comando SQL, traduzindo todo o código fonte acima para um comando SQL que vai criar as tabelas efetivamente dentro do banco de dados selecionado.</p>
+
+        <p>Para isso, antes temos que inclur mais duas linhas de códigos no final do arquivo 'db.js'. Veja:</p>
+
+<pre>
+<span class="arquivo">db.js</span>
+<code>
+...
+
+<span class="tBranco">Postagem</span>.<span class="tRosa">sync</span>({<span class="tBranco">force</span>: <span class="tLaranja">false</span>})
+<span class="tBranco">Usuario</span>.<span class="tRosa">sync</span>({<span class="tBranco">force</span>: <span class="tLaranja">false</span>})
+</code>
+</pre>
+
+        <p>O método <span class="tCodigo"><span class="tRosa">sync</span>()</span>, acessado <b>das constantes que atribuímos os <em>models</em> de cada tabela, quando executado, faz a sincronização e traduz todo o código acima para um comando SQL dentro do nosso banco</b>. Isso significa que toda a estrutura acima será convertida em tabelas iguais às especificações que fizemos ao criar os <em>models</em> referentes.</p>
+
+        <p>Note que o parâmetro opcional, <span class="tCodigo">{<span class="tBranco">force</span>: <span class="tLaranja">false</span>}</span>, cria a tabela dentro do banco de dados APENAS se a tabela não existir dentro do banco de dados. Isso significa que, quando o arquivo db.js for executado novamente por algum motivo, <b>a tabela não será criada novamente</b>, então todos os registros feitos se manterão. Quando a opção é marcada como <span class="tCodigo"><span class="tLaranja">true</span></span>, o Sequelize vai <b>apagar a estrutura da tabela do banco, se não existir, e criar uma igual</b>, mas sem preservar os registros feitos.</p>
+
+        <p>Com isso, podemos executar o arquivo db.js no terminal e ver o que conseguimos...</p>
+
+<pre>
+<span class="arquivo">cmd</span>
+<code>
+<span class="tBranco">> node db.js
+
+Executing (default): SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME = 'Postagem' AND TABLE_SCHEMA = 'bd_teste'
+Executing (default): CREATE TABLE IF NOT EXISTS `Postagem` (`id` INTEGER NOT NULL auto_increment , `titulo` VARCHAR(255), `descricao` TEXT, `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB;
+Executing (default): SHOW INDEX FROM `Postagem`</span>
+</code>
+</pre>
+
+        <p>Muito comando SQL sendo executado, e é o que ORMs como o próprio Sequelize fazem de forma à se adaptar na linguagem em que desenvolvemos. No client do MySQL, podemos verificar <b>se as tabelas realmente foram criadas e com os campos que definimos, selecionando o banco de dados e dando um DESCRIBE em uma das tabelas</b>. Vamos ver a estrutura da tabela de usuários como ficou, por exemplo...</p>
+
+<pre>
+<span class="arquivo">cmd</span>
+<code>
+<span class="tBranco">mysql> DESCRIBE usuario;
+
++-----------+--------------+------+-----+---------+----------------+
+| Field     | Type         | Null | Key | Default | Extra          |
++-----------+--------------+------+-----+---------+----------------+
+| id        | int          | NO   | PRI | NULL    | auto_increment |
+| nome      | varchar(255) | YES  |     | NULL    |                |
+| sobrenome | varchar(255) | YES  |     | NULL    |                |
+| idade     | int          | YES  |     | NULL    |                |
+| email     | varchar(255) | YES  |     | NULL    |                |
+| createdAt | datetime     | NO   |     | NULL    |                |
+| updatedAt | datetime     | NO   |     | NULL    |                |
++-----------+--------------+------+-----+---------+----------------+
+7 rows in set (0.00 sec)</span>
+</code>
+</pre>
+
+        <p>Note que, além dos campos que definimos, <b>temos outros campos adicionados pelo próprio Sequelize ao executar a criação das tabelas que não precisamos especificar</b>. A primeira coluna gerada pelo próprio Sequelize é o de <span class="tCodigo"><span class="tBranco">id</span></span>, <b>que é a coluna de chave primária que torna único um registro dentro do banco de dados</b>. E por fim, temos <span class="tCodigo"><span class="tBranco">createdAt</span></span> e <span class="tCodigo"><span class="tBranco">updatedAt</span></span>, que respectivamente <b>define a data de criação e de atualização de um registro no banco de dados</b>, e que pode ser bastante útil dentro de uma aplicação como funcionalidade.</p>
+
+        <br><br>
+
+        <h1>O primeiro registro!</h1>
+        <p>Criar usuário através do INSERT com SQL fica bem mais complicado <b>do que fazer isso via JavaScript, utilizando o Sequelize</b>. Como vimos, quase tudo que definimos aqui, em relação à estrutura de banco de dados e tabelas <b>foram feitas inteiramente organizando valores em chaves de objetos</b>, e para inserir novos registros no banco de dados não é diferente.</p>
+
+        <p>Para criar uma nova postagem, acessamos o método <span class="tCodigo"><span class="tRosa">create</span>()</span> da constante que criamos a <em>model</em> de uma tabela. E dentro de um objeto, referenciando chave e valor para os campos que definimos na estrutura antes, podemos criar nosso primeiro registro!</p>
+
+        <p>Vamos criar nossa primeira postagem então:</p>
+
+<pre>
+<span class="arquivo">db.js</span>
+<code>
+...
+
+<span class="tVerde">//Model para a tabela de postagens.</span>
+const <span class="tBranco">Postagem</span> = <span class="tBranco">db</span>.<span class="tRosa">define</span>(<span class="tLaranja">"Postagem"</span>, {
+    <span class="tVerde">// Coluna/campo referente ao título.</span>
+    <span class="tBranco">titulo</span>: {
+        <span class="tBranco">type</span>: <span class="tBranco">DataTypes</span>.<span class="tBranco">STRING</span> <span class="tVerde">//Tipo de valor que o campo deve receber.</span>
+    },
+
+    <span class="tVerde">// Coluna/campo referente à descrição.</span>
+    <span class="tBranco">descricao</span>: {
+        <span class="tBranco">type</span>: <span class="tBranco">DataTypes</span>.<span class="tBranco">TEXT</span> <span class="tVerde">//Tipo de valor que o campo deve receber.</span>
+    }
+})
+
+<span class="tBranco">Postagem</span>.<span class="tRosa">create</span>({
+    <span class="tBranco">titulo</span>: <span class="tLaranja">"Primeira Postagem!"</span>,
+    <span class="tBranco">descricao</span>: <span class="tLaranja">"Essa é a primeira postagem registrada no banco de dados!</span>
+})</span>
+
+...
+</code>
+</pre>
+
+        <p>Executando o arquivo com Node mais uma vez e desta vez <b>selecionando os registros da tabela de postagens, conseguiríamos ver a postagem lá como um registro da tabela</b>.</p>
+
+<pre>
+<span class="arquivo">cmd</span>
+<code>
+<span class="tBranco">mysql> SELECT * FROM postagem;
++----+--------------------+--------------------------------+---------------------+---------------------+
+| id | titulo             | descricao                      | createdAt           | updatedAt           |
++----+--------------------+------------------------------------------------------+---------------------+
+|  1 | Primeira postagem! | Essa é a primeira postagem ... | 2023-07-30 15:29:28 | 2023-07-30 15:29:28 |
++----+--------------------+------------------------------------------------------+---------------------+
+1 row in set (0.00 sec)</span>
+</code>
+</pre>
+
+        <p>Dando ênfase para as colunas de 'id', 'createdAt' e 'updatedAt', veja que <b>eles foram preenchidos de acordo com o insert do registro no banco de dados: a chave primária foi atribuída um valor crescente e os campos de criação e atualização do registro também receberam um valor de acordo com o que foi executado.</b></p>
+
+        <footer>
+            <a href="../a16/a16.html">Página Anterior</a>
+            <a href="#">Próxima Página</a>
+        </footer>
+    </main>
+</body>
+</html>
