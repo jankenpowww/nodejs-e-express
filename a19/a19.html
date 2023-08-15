@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../stemp-css/stemp.css" type="text/css">
+    <title>a19</title>
+</head>
+<body>
+    <h1>a19 - Handlebars + Começando um projeto</h1>
+
+    <main>
+        <h1><em>Template Engines</em></h1>
+        <p>Uma <em>Template Engine</em> nada mais é do que um <b>um gerador de conteúdo em formato HTML ou outros tipos de formato de texto</b>. O Handlebars, que se encaixa muito bem nessa descrição, permite que geremos pedaços de HTML, por exemplo, com expressões do próprio Handlebars, <b>da qual podemos passar valores de variáveis</b>. Esses 'pedaços de HTML' nada mais é do que <b>os próprios templates, ou 'modelos'</b>, dos quais podemos gerar e chamar uma estrutura de template de HTML passando informações de variáveis. O próprio Handlebars possui <b>uma versão de módulo baixado via npm para ser utilizado em conjunto com o Express</b>.</p>
+
+        <p>E para baixar a versão do Handlebars para uso com o Express como dependência...</p>
+
+<pre>
+<code>
+<span class="tBranco">npm install --save express-handlebars</span>
+</code>
+</pre>
+
+        <p>O objetivo à a partir daqui é <b>construir uma aplicação na prática de cadastro de postagens</b>, então, reuniremos todos os conceitos básicos e os módulos aprendidos para utilizá-los em breve. E antes de mais nada, vamos montar uma estrutura básica de servidor utilizando o express, com todas as dependências instaladas antes de configurarmos o Handlebars.</p>
+
+        <br><br>
+
+        <h1>Esquematização e primeiros <em>setups</em></h1>
+        <p>Vamos considerar primeiramente <b>toda a estrutura de banco de dados que criamos anteriormente com o Sequelize</b>, bem como o próprio banco de dados criado no MySQL. Essa estrutura, como bem sabemos, estará configurada e inicializada em um arquivo chamado de 'db.js'. Podemos <b>apagar os trechos de código de criação de registros da aula anterior</b>, e fazendo isso, teremos o seguinte arquivo 'db.js' para este projeto:</p>
+
+<pre>
+<span class="arquivo">db.js</span>
+<code>
+const { <span class="tBranco">Sequelize</span>, <span class="tBranco">DataTypes</span> } = require(<span class="tLaranja">"sequelize"</span>)
+
+const <span class="tBranco">db</span> = new <span class="tBranco">Sequelize</span>(<span class="tLaranja">"bd_teste"</span>, <span class="tLaranja">"root"</span>, <span class="tLaranja">"senha_sql"</span>, {
+    <span class="tBranco">host</span>: <span class="tLaranja">"localhost"</span>,
+    <span class="tBranco">dialect</span>: <span class="tLaranja">"mysql"</span>,
+
+    <span class="tBranco">define</span>: {
+        <span class="tBranco">freezeTableName</span>: <span class="tLaranja">true</span>
+    }
+})
+
+<span class="tVerde">//Model para a tabela de postagens.</span>
+const <span class="tBranco">Postagem</span> = <span class="tBranco">db</span>.<span class="tRosa">define</span>(<span class="tLaranja">"Postagem"</span>, {
+    <span class="tVerde">// Coluna/campo referente ao título.</span>
+    <span class="tBranco">titulo</span>: {
+        <span class="tBranco">type</span>: <span class="tBranco">DataTypes</span>.<span class="tBranco">STRING</span> <span class="tVerde">//Tipo de valor que o campo deve receber.</span>
+    },
+
+    <span class="tVerde">// Coluna/campo referente à descrição.</span>
+    <span class="tBranco">descricao</span>: {
+        <span class="tBranco">type</span>: <span class="tBranco">DataTypes</span>.<span class="tBranco">TEXT</span> <span class="tVerde">//Tipo de valor que o campo deve receber.</span>
+    }
+})
+
+<span class="tVerde">//Model para a tabela de usuários.</span>
+const <span class="tBranco">Usuario</span> = <span class="tBranco">db</span>.<span class="tRosa">define</span>(<span class="tLaranja">"Usuario"</span>, {
+    <span class="tBranco">nome</span>: {
+        <span class="tBranco">type</span>: <span class="tBranco">DataTypes</span>.<span class="tBranco">STRING</span>
+    },
+
+    <span class="tBranco">sobrenome</span>: {
+        <span class="tBranco">type</span>: <span class="tBranco">DataTypes</span>.<span class="tBranco">STRING</span>
+    },
+
+    <span class="tBranco">idade</span>: {
+        <span class="tBranco">type</span>: <span class="tBranco">DataTypes</span>.<span class="tBranco">INTEGER</span> <span class="tVerde">//INTEGER para valores inteiros! ;)</span>
+    },
+
+    <span class="tBranco">email</span>: {
+        <span class="tBranco">type</span>: <span class="tBranco">DataTypes</span>.<span class="tBranco">STRING</span>
+    }
+})
+
+<span class="tBranco">Postagem</span>.<span class="tRosa">sync</span>({<span class="tBranco">force</span>: <span class="tLaranja">false</span>})
+<span class="tBranco">Usuario</span>.<span class="tRosa">sync</span>({<span class="tBranco">force</span>: <span class="tLaranja">false</span>})
+</code>
+</pre>
+
+        <p>E antes de mais nada, vamos exportar <b>essa configuração para importar no arquivo do nosso servidor</b>. Isso vai garantir a organização do nosso código, separando arquivo de banco de dados com arquivo de servidor.</p>
+
+<pre>
+<span class="arquivo">db.js</span>
+<code>
+...
+
+<span class="tBranco">module</span>.<span class="tBranco">exports</span> = <span class="tBranco">db</span>
+</code>
+</pre>
+
+        <p>Finalmente, podemos criar o arquivo do servidor, instanciando os módulos do Express e agora, de uma template engine que é o Handlebars.</p>
+
+<pre>
+<span class="arquivo">server.js</span>
+<code>
+<span class="tVerde">//Importando o banco de dados para o servidor.</span>
+const <span class="tBranco">db</span> = require(<span class="tLaranja">"./db"</span>)
+
+<span class="tVerde">//Express e Handlebars</span>
+const <span class="tBranco">express</span> = require(<span class="tLaranja">"express"</span>)
+const <span class="tBranco">handlebars</span> = require(<span class="tLaranja">"express-handlebars"</span>)
+
+<span class="tVerde">//Lógica do servidor</span>
+const <span class="tBranco">app = <span class="tBranco">express</span>()</span>
+
+<span class="tBranco">app</span>.<span class="tRosa">use</span>(<span class="tBranco">express</span>.<span class="tRosa">urlencoded</span>({ <span class="tBranco">extended</span>: <span class="tLaranja">true</span> })
+
+<span class="tBranco">app</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">res</span>.<span class="tRosa">send</span>(<span class="tLaranja">"&lt;h1&gt;Seja bem vindo!&lt;/h1&gt;"</span>)
+})
+
+<span class="tBranco">app</span>.<span class="tRosa">listen</span>(<span class="tLaranja">8081</span>, <span class="tLaranja">"localhost"</span>, () => {
+    console.log(<span class="tLaranja">"Servidor aberto em 'localhost:8081'. Ctrl+C para encerrar."</span>)
+})
+</code>
+</pre>
+
+        <p>E falando nisso...</p>
+
+        <br><br>
+
+        <h1>Configurando o Handlebars</h1>
+        <p>O próprio Express <b>possui dois métodos importantes para trabalhar em conjunto com template engines</b>. E para informar qual template engine vamos trabalhar em conjunto com o Express, digitamos o seguinte trecho de código...</p>
+
+<pre>
+<span class="arquivo">server.js</span>
+<code>
+<span class="tVerde">//Importando o banco de dados para o servidor.</span>
+const <span class="tBranco">db</span> = require(<span class="tLaranja">"./db"</span>)
+
+<span class="tVerde">//Express e Handlebars</span>
+const <span class="tBranco">express</span> = require(<span class="tLaranja">"express"</span>)
+const <span class="tBranco">handlebars</span> = require(<span class="tLaranja">"express-handlebars"</span>)
+
+<span class="tVerde">//Lógica do servidor</span>
+const <span class="tBranco">app = <span class="tBranco">express</span>()</span>
+
+<span class="tVerde">//Configuração do Handlebars</span>
+<span class="tBranco">app</span>.<span class="tRosa">engine</span>(<span class="tLaranja">"handlebars"</span>, <span class="tBranco">handlebars</span>.<span class="tRosa">engine</span>({ <span class="tBranco">defaultLayout</span>: <span class="tLaranja">"main"</span> }))
+<span class="tBranco">app</span>.<span class="tRosa">set</span>(<span class="tLaranja">"view engine"</span>, <span class="tLaranja">"handlebars"</span>)
+
+...
+</code>
+</pre>
+
+        <p>Após instanciar a variável <span class="tCodigo"><span class="tBranco">app</span></span>, temos acesso aos métodos <span class="tCodigo"><span class="tRosa">engine</span>()</span> e <span class="tCodigo"><span class="tRosa">set</span>()</span>. Com a primeira, <b>definimos o uso do Handlebars como template engine principal dentro do servidor</b>.</p>
+
+        <p>Este é o processo padrão para a utilização do Handlebars ou de outros template engines com Express. Mas, por hora, notemos o trecho <span class="tCodigo"><span class="tBranco">defaultLayout</span>: <span class="tLaranja">"main"</span></span>. Essa configuração define um layout padrão à ser utilizado para a renderização HTML dos conteúdos, e o nome deste layout dentro <b>de uma hierarquia de pastas que vamos criar agora</b>.</p>
+
+        <p>Na pasta do projeto, vamos criar os seguintes diretórios e o arquivo 'main' referenciado anteriormente: <b>'views/layouts/'</b>. E dentro da pasta layouts, <b>um arquivo de nome 'main.handlebars'</b>. Este arquivo conterá nada mais nada menos do que HTML dentro onde será possível utilizar tags do Handlebars para referenciar variáveis dentro de HTMLs, que renderizará esses valores.</p>
+
+        <p>E aviso: os arquivos e diretórios devem ter exatamente esses nomes para que funcionem devidamente.</p>
+
+        <br><br>
+
+        <h1>Criando um formulário de cadastro de postagens</h1>
+        <p>E para criar um formulário de cadastro de postagens, o procedimento será um pouco diferente do que vimos anteriormente. Agora que temos o Handlebars e a capacidade de utilizar template engines para criar a parte front-end da nossa aplicação, vamos justamente utilizá-lo para tal. Dentro da pasta 'views', que criamos anteriormente, <b>podemos criar outro arquivo .handlebars que conterá todos os HTMLs, ou views, da nossa aplicação</b>, que se referem justamente à parte visual: o que o usuário vai ver e interagir no tempo em que ele estiver utilizando.</p>
+
+        <p>O arquivo criado dentro do diretório 'views' para o nosso formulário será nomeado de 'cadastro-de-postagem.handlebars'. Não há nome mais justo ;p</p>
+
+<pre>
+<span class="arquivo">cadastro-de-postagem.handlebars</span>
+<code>
+&lt;form <span class="tRosa">action</span>=<span class="tLaranja">"/postagem-adicionada"</span> <span class="tRosa">method</span>=<span class="tLaranja">"post"</span>&gt;
+    &lt;label&gt;<span class="tBranco">Título:</span>&lt;/label&gt;
+    &lt;input type="text" <span class="tRosa">name</span>=<span class="tLaranja">"tituloPost"</span>&gt;
+
+    &lt;br&gt;&lt;br&gt;
+
+    &lt;label&gt;<span class="tBranco">Descrição/Legenda:</span>&lt;/label&gt;
+    &lt;textarea <span class="tRosa">name</span>=<span class="tLaranja">"descricaoPost"</span> style="resize: none;"&gt;&lt;/textarea&gt;
+
+    &lt;br>&lt;br&gt;
+
+    &lt;button <span class="tRosa">type</span>=<span class="tLaranja">"submit"</span>&gt;<span class="tBranco">Cadastrar</span>&lt;/button&gt;
+&lt;/form>
+</code>
+</pre>
+
+        <p>Atenção aos trechos destacados: lembrando que as informações enviadas de um formulário, neste caso, <b>são enviadas do método POST</b>, para uma rota que definiremos no Express futuramente de mesmo nome do valor de <span class="tCodigo"><span class="tRosa">action</span></span>. Cada <span class="tCodigo"><span class="tRosa">name</span></span> correspondente aos inputs do formulário são <b>as variáveis passadas pelo corpo da requisição</b>, e que acessamos seu valor dentro da rota de redirecionamento.</p>
+
+        <p>E agora, antes de qualquer coisa, precisamos voltar ao arquivo 'main.handlebars', na qual <b>referenciamos ser o arquivo principal e pôr em prática o uso de template engines no projeto devidamente</b>. No arquivo, vamos criar uma estrutura HTML padrão, <b>e utilizar as expressões do próprio Handlebars para fazer referência à um valor variável específico</b>. Observe:</p>
+
+<pre>
+<span class="arquivo">main.handlebars</span>
+<code>
+&lt;!DOCTYPE html&gt;
+&lt;html lang="pt-BR"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;<span class="tBranco">Projeto</span>&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    <span class="tBranco">{{{<span class="tRosa">body</span>}}}</span>
+&lt;/body&gt;
+&lt;/html&gt;
+</code>
+</pre>
+
+        <p>Voltando na parte em que falamos que este arquivo 'main' "define um layout padrão à ser utilizado para a renderização HTML dos conteúdos", veja que temos <b>uma expressão diferente ali dentro do &lt;body&gt; da estrutura do HTML. <span class="tCodigo"><span class="tBranco">{{{<span class="tRosa">body</span>}}}</span></span></b> nada mais é do que as expressões do template engine que 'renderizam' (é bom guardar essa palavra, por enquanto) um valor variável. É dentro dessa expressão que <b>vamos chamar o nosso outro arquivo referente ao cadastro de postagem</b>, então podemos encarar este arquivo 'main' como "um contâiner padrão onde vamos e podemos renderizar desde valores símples de texto, até 'pedaços de html' inteiros". E para essa última parte, é bom entender sobre como essas expressões e o próprio Handlebars, como template engine, funciona.</p>
+
+        <p>Embora na prática isso ainda não foi visto, dá pra <b>ter uma idéia de que essas expressões, que passamos um valor, é um modelo, ou template mesmo, que funciona como uma variável onde podemos renderizar valores</b>. E note que também podemos renderizar estruturas de HTML inteiras: o Handlebars foi feito originalmente para gerar HTML, então, na sua própria "regra de síntaxe", há como <b>informar se os valores passados em uma expressão devem ser considerados apenas conteúdo de texto (como valores de variáveis normais) ou escapados como estrutura que compõem elementos HTML renderizados na tela</b>.</p>
+
+        <p>Para o primeiro, utilizaremos <span class="tCodigo"><span class="tBranco">{{ }}</span></span> para envolver uma variável que queremos exibir como texto simples; e para o último, que é o que queremos para exibir o arquivo de cadastro de postagem, utlizamos três chaves envolvendo uma variável, ou <span class="tCodigo"><span class="tBranco">{{{ }}}</span></span>, assim como fizemos acima. Na prática, quando testarmos a aplicação, tanto o layout principal quanto o formulário de cadastro, que estão imediatamente em arquivos diferentes, apareceram em um arquivo HTML só, sendo o arquivo principal contendo o arquivo de formulário.</p>
+
+        <br><br>
+
+        <p>Com isso, podemos partir para o arquivo 'server.js', onde está a lógica do nosso servidor <b>e fazer com que a resposta de acesso à uma rota retorne a estrutura do nosso HTML.</b> E veja que, diferentemente da forma anterior que fizemos isso, sem utilizar nenhuma ferramenta específica, fazer com um template engine é até um tanto mais fácil.</p>
+
+        <p>Vamos definir uma rota '/cadastrar-postagem', onde o usuário terá acesso ao nosso formulário. Até aqui, nada de muito novo. E para fazer isso e <b>definir que a tela de formulário esteja lá realmente</b>, fazemos isso.</p>
+
+<pre>
+<span class="arquivo">server.js</span>
+<code>
+...
+
+<span class="tBranco">app</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">res</span>.<span class="tRosa">send</span>(<span class="tLaranja">"&lt;h1&gt;Seja bem vindo!&lt;/h1&gt;"</span>)
+})
+
+<span class="tVerde">//Renderizando a tela de cadastro de postagem ao acessar a rota /cadastrar-postagem</span>
+<span class="tBranco">app</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/cadastrar-postagem"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"cadastro-de-postagem"</span>)
+})
+
+<span class="tBranco">app</span>.<span class="tRosa">listen</span>(<span class="tLaranja">8081</span>, <span class="tLaranja">"localhost"</span>, () => {
+    console.log(<span class="tLaranja">"Servidor aberto em 'localhost:8081'. Ctrl+C para encerrar."</span>)
+})
+</code>
+</pre>
+
+        <p>Veja que, através do parâmetro de resposta, temos acesso ao método <span class="tCodigo"><span class="tRosa">render</span>()</span>, que recebe <b>um valor de string referente ao nome da view que criamos para ser o nosso formulário de cadastro</b>. E note que <b>não é necessário incluir a extensão nesse caso</b>.</p>
+
+        <p>Executando a aplicação, podemos acessar a rota de formulário de postagem <b>e visualizar o resultado</b>. Como dito antes, as expressões do Handlebars seguem uma síntaxe e há diferença quando utilizamos duas chaves ao invés de três chaves para envolver um valor variável que queremos renderizar na tela, <b>e se trocarmos o valor passado em <span class="tCodigo"><span class="tBranco">{{{<span class="tRosa">body</span>}}}</span></span></b> para ser envolto em duas chaves, <b>verá que a estrutura do formulário, literalmente, vai estar lá, só que não renderizado</b>. Ao invés disso, a estrutura do código fonte aparecerá escapado como texto literal, e não renderizado corretamente como HTML.</p>
+
+        <br><br>
+
+        <p>E agora, definimos <b>a rota de redirecionamento</b>, para onde os dados vão <b>quando finalizamos um formulário</b>. Veja:</p>
+
+<pre>
+<span class="arquivo">server.js</span>
+<code>
+...
+
+<span class="tVerde">//Renderizando a tela de cadastro de postagem ao acessar a rota /cadastrar-postagem</span>
+<span class="tBranco">app</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/cadastrar-postagem"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"cadastro-de-postagem"</span>)
+})
+
+<span class="tBranco">app</span>.<span class="tRosa">post</span>(<span class="tLaranja">"/postagem-adicionada"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    const <span class="tBranco">tituloPost</span> = <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">tituloPost</span>
+    const <span class="tBranco">descricaoPost</span> = <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">descricaoPost</span>
+
+    <span class="tBranco">res</span>.<span class="tRosa">send</span>(<span class="tLaranja">"&lt;h2&gt;Postagem adicionada com sucesso!&lt;/h2&gt;"</span>)
+})
+
+...
+</code>
+</pre>
+
+        <p>Lembrando que os valores passados pelo método POST, no Express, deve ser intermediado pelo uso de um Middleware específico do próprio Express, utilizado nas aulas anteriores (<span class="tCodigo"><span class="tBranco">app</span>.<span class="tRosa">use</span>(<span class="tBranco">express</span>.<span class="tRosa">urlencoded</span>({ <span class="tBranco">extended</span>: <span class="tLaranja">true</span> })</span>), que permite a leitura desses dados devidamente dentro de uma rota de redirecionamento, enviando os dados no corpo da requisição.</p>
+
+        <p>E com as variáveis que recebem esses valores devidamente definidas, <b>podemos, finalmente, armazenar todas as informações passadas pelo formulário dentro do nosso banco de dados!</b> Vimos anteriormente, na aula dedicada ao Sequelize e o uso de ORMs para simplicação de uso de bancos de dados em projetos, que fazemos a inserção de novos registros à partir de uma Model, que é a mesma coisa que uma tabela, através de um método específico. Veja que exportamos apenas nossa variável <span class="tCodigo"><span class="tBranco">db</span></span> para dentro do arquivo referente ao nosso servidor, <b>e não as Models que criamos</b>.</p>
+        <p>A boa notícia é que, uma vez que definimos uma Model, <b>podemos referenciá-la pela própria variável de conexão e definição de banco de dados</b>, e então acessar o método de criar um novo registro associada à Model referenciada. Para isso, utilizamos <span class="tCodigo"><span class="tBranco">db</span>.<span class="tRosa">model</span>()</span>, para referenciar o Model, e então entramos com o método <span class="tCodigo"><span class="tRosa">create</span>()</span>, passando os valores enviados do formulário no formato de objeto padrão do Sequelize, referenciando colunas e passando os valores recebidos.</p>
+
+<pre>
+<span class="arquivo">server.js</span>
+<code>
+...
+
+<span class="tBranco">app</span>.<span class="tRosa">post</span>(<span class="tLaranja">"/postagem-adicionada"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    const <span class="tBranco">tituloPost</span> = <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">tituloPost</span>
+    const <span class="tBranco">descricaoPost</span> = <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">descricaoPost</span>
+
+    <span class="tVerde">//Adicionando postagem no banco de dados!</span>
+    <span class="tBranco">db</span>.<span class="tRosa">model</span>(<span class="tLaranja">"Postagem"</span>).<span class="tRosa">create</span>({
+        <span class="tBranco">titulo</span>: <span class="tBranco">tituloPost</span>,
+        <span class="tBranco">descricao</span>: <span class="tBranco">descricaoPost</span>
+    })
+
+    <span class="tBranco">res</span>.<span class="tRosa">send</span>(<span class="tLaranja">"&lt;h2&gt;Postagem adicionada com sucesso!&lt;/h2&gt;"</span>)
+})
+
+...
+</code>
+</pre>
+
+        <p>Rodando a aplicação novamente e enviando os valores pelo formulário, somos levados à página de redirecionamento, definido pelo método POST, <b>onde as informações foram enviadas e processadas</b>, e depois armazenadas no nosso banco de dados.</p>
+
+        <footer>
+            <a href="../a18/a18.html">Página Anterior</a>
+            <a href="#">Próxima Página</a>
+        </footer>
+    </main>
+</body>
+</html>
