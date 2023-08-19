@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../stemp-css/stemp.css" type="text/css">
+    <title>a24</title>
+</head>
+<body>
+    <h1>a24 - Começando um projeto (parte 2)</h1>
+
+    <main>
+        <h1>Reestruturando o banco de dados no projeto + boas práticas</h1>
+        <p>Mais cedo, conhecemos um pouco sobre como o Handlebars funciona e sua função como template engine dentro de um projeto. Montamos um formulário e renderizamos como resposta à requisição de uma rota dentro da lógica do nosso servidor, e por fim, enviamos os dados enviados do formulário para o banco de dados.</p>
+
+        <p>Maaas, acontece que, a forma que fizemos <b>para adicionar a postagem no banco de dados anteriormente pode até funcionar, mas não é a forma mais esperta de se fazer isso</b>. Veja que, ao desenvolver um projeto com Node.js, temos a total liberdade (ou quase) de organizar hierarquicamente os arquivos que compõe o nosso projeto: separando os arquivos referentes às views, e então, um arquivo só com a lógica do servidor; outra com toda a estrutura e conexão com o banco de dados, etc. E então só saber <b>onde importar os módulos desses arquivos em outros para utilizá-los</b>. A estrutura do nosso banco de dados, com o Sequelize, <b>nos permitiu traduzir para o Javascript as tabelas do nosso banco de dados e suas colunas e linhas</b>, e além de tudo, temos os próprios artifícios e funcionalidades da linguagem para manipulá-lo.</p>
+
+        <p>E é justamente isso o que faremos agora: ao invés de se preocupar em "tentar acertar o nome de uma Model" para realizar uma inserção/busca, como fizemos anteriormente <b>passando o nome da Model que queríamos referenciar para cadastrar a postagem no banco de dados numa string literal</b>, podemos simplesmente <b>utilizar os objetos e variáveis que associamos às Models diretamente</b>. Isso não é só uma boa prática como também permite uma legibilidade maior do código do nosso projeto: saber onde cada coisa está e para o que ela está sendo utilizada de forma explicita.</p>
+
+        <p>Temos o seguinte arquivo 'db.js' com a conexão com o banco de dados da aula passada.</p>
+
+<pre>
+<span class="arquivo">db.js</span>
+<code>
+const { <span class="tBranco">Sequelize</span>, <span class="tBranco">DataTypes</span> } = require(<span class="tLaranja">"sequelize"</span>)
+
+const <span class="tBranco">db</span> = new <span class="tBranco">Sequelize</span>(<span class="tLaranja">"bd_teste"</span>, <span class="tLaranja">"root"</span>, <span class="tLaranja">"senha_sql"</span>, {
+    <span class="tBranco">host</span>: <span class="tLaranja">"localhost"</span>,
+    <span class="tBranco">dialect</span>: <span class="tLaranja">"mysql"</span>,
+
+    <span class="tBranco">define</span>: {
+        <span class="tBranco">freezeTableName</span>: <span class="tLaranja">true</span>
+    }
+})
+
+<span class="tVerde">//Model para a tabela de postagens.</span>
+const <span class="tBranco">Postagem</span> = <span class="tBranco">db</span>.<span class="tRosa">define</span>(<span class="tLaranja">"Postagem"</span>, {
+    <span class="tVerde">// Coluna/campo referente ao título.</span>
+    <span class="tBranco">titulo</span>: {
+        <span class="tBranco">type</span>: <span class="tBranco">DataTypes</span>.<span class="tBranco">STRING</span> <span class="tVerde">//Tipo de valor que o campo deve receber.</span>
+    },
+
+    <span class="tVerde">// Coluna/campo referente à descrição.</span>
+    <span class="tBranco">descricao</span>: {
+        <span class="tBranco">type</span>: <span class="tBranco">DataTypes</span>.<span class="tBranco">TEXT</span> <span class="tVerde">//Tipo de valor que o campo deve receber.</span>
+    }
+})
+
+<span class="tVerde">//Model para a tabela de usuários.</span>
+const <span class="tBranco">Usuario</span> = <span class="tBranco">db</span>.<span class="tRosa">define</span>(<span class="tLaranja">"Usuario"</span>, {
+    <span class="tBranco">nome</span>: {
+        <span class="tBranco">type</span>: <span class="tBranco">DataTypes</span>.<span class="tBranco">STRING</span>
+    },
+
+    <span class="tBranco">sobrenome</span>: {
+        <span class="tBranco">type</span>: <span class="tBranco">DataTypes</span>.<span class="tBranco">STRING</span>
+    },
+
+    <span class="tBranco">idade</span>: {
+        <span class="tBranco">type</span>: <span class="tBranco">DataTypes</span>.<span class="tBranco">INTEGER</span> <span class="tVerde">//INTEGER para valores inteiros! ;)</span>
+    },
+
+    <span class="tBranco">email</span>: {
+        <span class="tBranco">type</span>: <span class="tBranco">DataTypes</span>.<span class="tBranco">STRING</span>
+    }
+})
+
+<span class="tBranco">Postagem</span>.<span class="tRosa">sync</span>({<span class="tBranco">force</span>: <span class="tLaranja">false</span>})
+<span class="tBranco">Usuario</span>.<span class="tRosa">sync</span>({<span class="tBranco">force</span>: <span class="tLaranja">false</span>})
+
+<span class="tBranco">module</span>.<span class="tBranco">exports</span> = <span class="tBranco">db</span>
+</code>
+</pre>
+
+        <p>Na última linha, <b>fizemos a exportação da conexão com banco de dados para utilizá-la dentro do arquivo 'server.js'</b>, onde à partir dela fizemos o registro das informações passadas no formulário para o banco de dados.</p>
+
+
+        <p>E mais uma vez: a forma como que fizemos isso, acessando diretamente da variável de conexão, não foi uma das melhores. Por isso, por questões de boas práticas e organização, <b>vamos transformar as Models acima em módulos e utilizá-las explicitamente para este tipo de atividade dentro da sua tabela relacionada no banco de dados</b>. Para isso, <b>vamos colocar os arquivos, tanto 'db.js', quantos os arquivos de Models, dentro de um diretório chamado 'models'</b>. Isso significa que, no arquivo db.js, já que vamos tornar ambas as models, 'Postagem' e 'Usuario', em arquivos individuais, <b>podemos deixar apenas a parte em que iniciamos a conexão do banco de dados e exportamos a variável</b>, na qual vamos utilizar depois nos arquivos das models <b>para recriar, ou melhor, recortar a estrutura de cada uma no seu arquivo específico</b>. Removendo as estruturas de Models, temos apenas a configuração e conexão da aplicação com o banco de dados no MySQL.</p>
+
+<pre>
+<span class="arquivo">db.js</span>
+<code>
+const { <span class="tBranco">Sequelize</span>, <span class="tBranco">DataTypes</span> } = require(<span class="tLaranja">"sequelize"</span>)
+
+const <span class="tBranco">db</span> = new <span class="tBranco">Sequelize</span>(<span class="tLaranja">"bd_teste"</span>, <span class="tLaranja">"root"</span>, <span class="tLaranja">"senha_sql"</span>, {
+    <span class="tBranco">host</span>: <span class="tLaranja">"localhost"</span>,
+    <span class="tBranco">dialect</span>: <span class="tLaranja">"mysql"</span>,
+
+    <span class="tBranco">define</span>: {
+        <span class="tBranco">freezeTableName</span>: <span class="tLaranja">true</span>
+    }
+})
+
+<span class="tBranco">module</span>.<span class="tBranco">exports</span> = <span class="tBranco">db</span>
+</code>
+</pre>
+
+        <p>Feito isso, vamos recriar o arquivo do Model 'Postagem', com qual estamos trabalhando até agora, dentro do novo diretório 'models':</p>
+
+<pre>
+<span class="arquivo">Postagem.js</span>
+<code>
+const { <span class="tBranco">DataTypes</span> } = require(<span class="tLaranja">"sequelize"</span>)
+const <span class="tBranco">db</span> = require(<span class="tLaranja">"./db"</span>)
+
+const <span class="tBranco">Postagem</span> = <span class="tBranco">db</span>.<span class="tRosa">define</span>(<span class="tLaranja">"Postagem"</span>, {
+    <span class="tBranco">titulo</span>: {
+        <span class="tBranco">type</span>: <span class="tBranco">DataTypes</span>.<span class="tBranco">STRING</span>
+    },
+
+    <span class="tBranco">descricao</span>: {
+        <span class="tBranco">type</span>: <span class="tBranco">DataTypes</span>.<span class="tBranco">TEXT</span>
+    },
+})
+
+<span class="tBranco">module</span>.<span class="tBranco">exports</span> = <span class="tBranco">Postagem</span>
+</code>
+</pre>
+
+        <p>Exatamente a estrutura que tinhamos no arquivo 'db.js', só que agora muito mais organizado!</p>
+
+        <p>Agora finalmente podemos <b>importar nosso model, totalmente independente dessa vez, e utilizá-lo para toda vez que quisermos interagir com sua tabela associada no banco de dados</b>, de forma mais explícita em termos de legibilidade. Voltando para o arqivo 'server.js', tudo o que precisamos é <b>chamar o arquivo do Model em um <em>require</em></b>.</p>
+
+<pre>
+<span class="arquivo">server.js</span>
+<code>
+<span class="tVerde">//Importando o banco de dados e os Models.</span>
+const <span class="tBranco">db</span> = require(<span class="tLaranja">"./db"</span>)
+const <span class="tBranco">Postagem</span> = require(<span class="tLaranja">"./models/Postagem"</span>)
+
+<span class="tVerde">//Express e Handlebars</span>
+const <span class="tBranco">express</span> = require(<span class="tLaranja">"express"</span>)
+const <span class="tBranco">handlebars</span> = require(<span class="tLaranja">"express-handlebars"</span>)
+
+<span class="tVerde">//Lógica do servidor</span>
+const <span class="tBranco">app = <span class="tBranco">express</span>()</span>
+
+...
+</code>
+</pre>
+
+        <p>Podemos finalmente <b>melhorar o trecho em que processamos e cadastramos as informações enviadas do formulário utilizando a Model diretamente</b>. Na aula anterior, a solução pra isso está exatamente como o trecho de código abaixo:</p>
+
+<pre>
+<span class="arquivo">server.js</span>
+<code>
+...
+
+<span class="tBranco">app</span>.<span class="tRosa">post</span>(<span class="tLaranja">"/postagem-adicionada"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    const <span class="tBranco">tituloPost</span> = <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">tituloPost</span>
+    const <span class="tBranco">descricaoPost</span> = <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">descricaoPost</span>
+
+    <span class="tVerde">//Adicionando postagem no banco de dados!</span>
+    <span class="tBranco">db</span>.<span class="tRosa">model</span>(<span class="tLaranja">"Postagem"</span>).<span class="tRosa">create</span>({
+        <span class="tBranco">titulo</span>: <span class="tBranco">tituloPost</span>,
+        <span class="tBranco">descricao</span>: <span class="tBranco">descricaoPost</span>
+    })
+
+    <span class="tBranco">res</span>.<span class="tRosa">send</span>(<span class="tLaranja">"&lt;h2&gt;Postagem adicionada com sucesso!&lt;/h2&gt;"</span>)
+})
+
+...
+</code>
+</pre>
+
+        <p>Veja que tornar a model 'Postagem' <b>em um módulo/objeto utilizável e realizar o cadastro diretamente por ela</b>, ao invés de se referir pelo objeto de conexão do banco de dados, como fizemos em <span class="tCodigo"><span class="tBranco">db</span>.<span class="tRosa">model</span>(...</span>, <b>tornará o código mais legível e mais fácil de realizar manutenção</b>, visto que, primeiramente, é muito mais complicado ter que se referir às Models em uma string <b>do que simplesmente utilizá-las diretamente</b>. Alterando esse trecho, e adicionando e corrigindo mais algumas coisinhas, temos...</p>
+
+<pre>
+<span class="arquivo">server.js</span>
+<code>
+...
+
+<span class="tBranco">app</span>.<span class="tRosa">post</span>(<span class="tLaranja">"/postagem-adicionada"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    const <span class="tBranco">tituloPost</span> = <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">tituloPost</span>
+    const <span class="tBranco">descricaoPost</span> = <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">descricaoPost</span>
+
+    <span class="tVerde">//Adicionando postagem no banco de dados!</span>
+    <span class="tVerde">//Agora, estruturando dentro de um then/catch + utilizando Model.</span>
+    <span class="tBranco">Postagem</span>.<span class="tRosa">create</span>({
+        <span class="tBranco">titulo</span>: <span class="tBranco">tituloPost</span>,
+        <span class="tBranco">descricao</span>: <span class="tBranco">descricaoPost</span>
+
+    }).then(() => {
+        <span class="tBranco">res</span>.<span class="tRosa">redirect</span>(<span class="tLaranja">"/"</span>) <span class="tVerde">//Se a postagem foi registrada com sucesso, redireciona para a página principal.</span>
+
+    }).catch((<span class="tBranco">erro</span>) => {
+        res.<span class="tRosa">send</span>(<span class="tLaranja">"Um erro ocorreu ao realizar o cadastro.\n\n"</span> + <span class="tBranco">erro</span>) <span class="tVerde">//Se não foi, uma mensagem de aviso é mostrada.</span>
+    })
+})
+
+...
+</code>
+</pre>
+
+        <p>Lembre-se que <b>estamos lidando com requisições e respostas de um servidor</b>. Alguns métodos relacionados às Models e o próprio banco de dados <b>são considerados métodos de promessa, ou <em>promises</em></b>. Realizar atividades que exigem requisição e tempo de resposta são abordadas dentro da programação assíncrona: quando a execução de certas funções não ocorrem de imediato por aguardarem uma resposta ou sinal de que devem ser executados. E é exatamente por isso que <b>podemos e devemos utilizar as estruturas <span class="tCodigo">then</span> e <span class="tCodigo">catch</span></b>. Muitas vezes, enquanto utilizamos a internet, muitas coisas podem acarretar em erros durante alguma atividade que fazemos online, e isso se dá por n fatores, <b>muitas vezes, relacionado ao tempo de retorno de uma ação que demorou demais</b>, por exemplo. Cobrir esse tipo de erro dentro de uma estrutura que trata esse tipo de atividade como assíncrono pode impedir esse tipo de erro, e é justamente o que fazemos acima.</p>
+
+        <p>Note também que é dentro da estrutura de <span class="tCodigo">then</span>, <b>que é onde prevemos uma requisição bem sucedida</b>, que <b>redirecionamos o usuário para a rota/página principal</b>, em <span class="tCodigo"><span class="tBranco">res</span>.<span class="tRosa">redirect</span>(<span class="tLaranja">"/"</span>)</span>.</p> 
+        
+        <p>A idéia agora é que, uma vez que o usuário acesse a rota ou simplesmente tenha sido redirecionado para esta após ter cadastrado uma nova postagem, <b>essa mesma rota retorne na tela todas as postagens registradas no banco de dados</b>. Ou seja, a rota definida na home da nossa aplicação disponibilizará <b>todas as postagens cadastradas até então</b>.</p>
+
+        <p>E, para finalizar, <b>podemos sincronizar nossa Models e todas as outras posteriores através da variável <span class="tCodigo"><span class="tBranco">db</span></span></b>, que é responsável pela conexão do projeto com o banco de dados em si.</p>
+
+<pre>
+<span class="arquivo">server.js</span>
+<code>
+...
+
+<span class="tBranco">db</span>.<span class="tRosa">sync</span>({ <span class="tBranco">force</span>: <span class="tLaranja">false</span> })
+
+<span class="tBranco">app</span>.<span class="tRosa">listen</span>(<span class="tLaranja">8081</span>, <span class="tLaranja">"localhost"</span>, () => {
+    console.log(<span class="tLaranja">"Servidor aberto em 'localhost:8081'. Ctrl+C para encerrar."</span>)
+})
+</code>
+</pre>
+
+        <footer>
+            <a href="../a19/a19.html">Página Anterior</a>
+            <a href="../a25/a25.html">Próxima Página</a>
+        </footer>
+    </main>
+</body>
+</html>

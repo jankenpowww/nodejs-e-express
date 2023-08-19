@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../stemp-css/stemp.css" type="text/css">
+    <title>a25</title>
+</head>
+<body>
+    <h1>a25 - Manipulando informações do banco de dados</h1>
+
+    <main>
+        <h1>Listando informações</h1>
+        <p>Na última aula, <b>corrigimos a estrutura do banco de dados dentro do nosso arquivo de servidor, em relação ao cadastro de postagens no sistema</b> e também <b>começamos a trabalhar efetivamente com as models, independentemente da estrutura de banco de dados para realizar alguns processos</b>, separando e organizando esses componentes dentro do nosso projeto.</p>
+
+        <p>Nas últimas mudanças, <b>fizemos com que, caso o cadastro da postagem fosse bem-sucedido, o usuário seria redirecionado para a rota principal</b>. E é na rota principal que vamos listar todos os posts cadastrados até o momento.</p>
+
+        <p>Este é arquivo de servidor que temos, por enquanto:</p>
+
+<pre>
+<span class="arquivo">server.js</span>
+<code>
+<span class="tVerde">//Importando o banco de dados para o servidor.</span>
+const <span class="tBranco">db</span> = require(<span class="tLaranja">"./db"</span>)
+const <span class="tBranco">Postagem</span> = require(<span class="tLaranja">"./models/Postagem"</span>)
+
+<span class="tVerde">//Express e Handlebars</span>
+const <span class="tBranco">express</span> = require(<span class="tLaranja">"express"</span>)
+const <span class="tBranco">handlebars</span> = require(<span class="tLaranja">"express-handlebars"</span>)
+
+<span class="tVerde">//Lógica do servidor</span>
+const <span class="tBranco">app = <span class="tBranco">express</span>()</span>
+
+<span class="tVerde">//Configuração do Handlebars</span>
+<span class="tBranco">app</span>.<span class="tRosa">engine</span>(<span class="tLaranja">"handlebars"</span>, <span class="tBranco">handlebars</span>.<span class="tRosa">engine</span>({ <span class="tBranco">defaultLayout</span>: <span class="tLaranja">"main"</span> }))
+<span class="tBranco">app</span>.<span class="tRosa">set</span>(<span class="tLaranja">"view engine"</span>, <span class="tLaranja">"handlebars"</span>)
+
+<span class="tBranco">app</span>.<span class="tRosa">use</span>(<span class="tBranco">express</span>.<span class="tRosa">urlencoded</span>({ <span class="tBranco">extended</span>: <span class="tLaranja">true</span> })
+
+<span class="tBranco">app</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">res</span>.<span class="tRosa">send</span>(<span class="tLaranja">"&lt;h1&gt;Seja bem vindo!&lt;/h1&gt;"</span>)
+})
+
+<span class="tVerde">//Renderizando a tela de cadastro de postagem ao acessar a rota /cadastrar-postagem</span>
+<span class="tBranco">app</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/cadastrar-postagem"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"cadastro-de-postagem"</span>)
+})
+
+<span class="tBranco">app</span>.<span class="tRosa">post</span>(<span class="tLaranja">"/postagem-adicionada"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    const <span class="tBranco">tituloPost</span> = <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">tituloPost</span>
+    const <span class="tBranco">descricaoPost</span> = <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">descricaoPost</span>
+
+    <span class="tVerde">//Adicionando postagem no banco de dados!</span>
+    <span class="tVerde">//Agora, estruturando dentro de um then/catch + utilizando Model.</span>
+    <span class="tBranco">Postagem</span>.<span class="tRosa">create</span>({
+        <span class="tBranco">titulo</span>: <span class="tBranco">tituloPost</span>,
+        <span class="tBranco">descricao</span>: <span class="tBranco">descricaoPost</span>
+
+    }).then(() => {
+        <span class="tBranco">res</span>.<span class="tRosa">redirect</span>(<span class="tLaranja">"/"</span>) <span class="tVerde">//Se a postagem foi registrada com sucesso, redireciona para a página principal.</span>
+
+    }).catch((<span class="tBranco">erro</span>) => {
+        res.<span class="tRosa">send</span>(<span class="tLaranja">"Um erro ocorreu ao realizar o cadastro.\n\n"</span> + <span class="tBranco">erro</span>) <span class="tVerde">//Se não foi, uma mensagem de aviso é mostrada.</span>
+    })
+})
+
+<span class="tBranco">db</span>.<span class="tRosa">sync</span>({ <span class="tBranco">force</span>: <span class="tLaranja">false</span> })
+
+<span class="tBranco">app</span>.<span class="tRosa">listen</span>(<span class="tLaranja">8081</span>, <span class="tLaranja">"localhost"</span>, () => {
+    console.log(<span class="tLaranja">"Servidor aberto em 'localhost:8081'. Ctrl+C para encerrar."</span>)
+})
+</code>
+</pre>
+
+        <footer>
+            <a href="../a24/a24.html">Página Anterior</a>
+            <a href="#">Próxima Página</a>
+        </footer>
+    </main>
+</body>
+</html>
