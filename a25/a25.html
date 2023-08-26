@@ -73,6 +73,54 @@ const <span class="tBranco">app = <span class="tBranco">express</span>()</span>
 </code>
 </pre>
 
+        <p>Agora, precisamos de view à ser renderizada dentro da rota da nossa home, <b>onde vamos listar todos os posts feitos até então</b>. É aqui que vamos aprofundar o uso do Handlebars como template engine do nosso projeto, uma vez que foi mostrado de forma bem superficial como escapar valores ou estruturas inteiras dinamicamente com esse tipo de recurso. E note que o que vamos fazer cabe à primeira descrição: <b>é dentro de uma estrutura HTML que precisamos definir onde e como as informações do banco de dados serão devolvidas na tela</b>.</p>
+        
+        <p>Feito isso, criaremos o arquivo 'home.handlebars', dentro da pasta 'views'. A estrutura HTML aqui é simples e é onde vamos utilizar as expressões do Handlebars para renderizar os dados do banco junto com o HTML, por isso, vamos para a estrutura dentro do nosso arquivo de servidor primeiro e definir como fazemos para que os dados do banco de dados apareça juntamente dentro do HTML renderizado, assim que acessarmos a home.</p>
+
+        <p>Considerando que temos a model de postagens importada individualmente como módulo e é exatamente dela que extrairemos os registros relacionados à sua tabela no banco, vamos fazer a seguinte alteração dentro da lógica de rota de home (que está além de apenas renderizar sua view). Veja:</p>
+
+<pre>
+<span class="arquivo">server.js</span>
+<code>
+...
+
+<span class="tBranco">app</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+
+    <span class="tVerde">//Primeiro, capturamos todos os registros da tabela de postagens.</span>
+    <span class="tBranco">Postagem</span>.<span class="tRosa">findAll</span>().then((<span class="tBranco">post</span>) => {
+
+        <span class="tVerde">//E só então que renderizamos a view, com a possibilidade de renderizar
+        //também os registros recuperados (através do parâmetro 'post').</span>
+        <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"home"</span>, { <span class="tBranco">postagem</span>: <span class="tBranco">post</span> })
+    })
+})
+
+...
+</code>
+</pre>
+
+    <p>Note que estamos lidando com a requisição dentro de uma estrutura de promise, <b>onde prevemos que o servidor só vai renderizar nossa home apenas quando todos os registros forem recuperados do banco des dados</b>. Os registros estão dentro de um parâmetro de uma função anônima chamada <span class="tCodigo"><span class="tBranco">post</span></span>, na qual utilizamos dentro <b>de outro argumento do método <span class="tCodigo"><span class="tRosa">render</span></span></b>. Veja que, além de renderizar a página, <b>vamos também passar a variável de posts como chave de um objeto chamado <span class="tCodigo"><span class="tBranco">postagem</span></span></b>. Essa chave dentro do objeto passado como argumento poderá ser utilizada no arquivo 'home.handlebars', e dali, poderemos renderizar todos os dados renderizados trazidos pelo método <span class="tCodigo"><span class="tRosa">findAll</span></span>.</p>
+
+    <p>Já no arquivo 'home.handlebars', temos a seguinte estrutura <b>que renderizará todos os registros de postagens feitos até então</b>:</p>
+
+<pre>
+<span class="arquivo">home.handlebars</span>
+<code>
+&lt;h2&gt;<span class="tBranco">Todas as postagens:</span>&lt;/h2&gt;
+&lt;br&gt;
+
+<span class="tRosa">{{</span><span class="tLaranja">#each</span> <span class="tBranco">postagem</span><span class="tRosa">}}</span>
+    &lt;h4&gt;<span class="tBranco">Título: <span class="tRosa">{{ <span class="tBranco">titulo</span> }}</span></span>&lt;/h4&gt;
+    &lt;h4&gt;<span class="tBranco">Descrição: <span class="tRosa">{{ <span class="tBranco">descricao</span> }}</span></span>&lt;/h4&gt;
+    &lt;hr&gt;
+<span class="tRosa">{{</span><span class="tLaranja">/each</span><span class="tRosa">}}</span>
+</code>
+</pre>
+
+        <p>Aqui <b>avançamos mais na utilização do Handlebars como template engine</b>. Como dito anteriormente, template engines permite <b>a renderização de conteúdos dinâmicos dentro de um HTML</b>, e é justamente o que está acontecendo aqui. Veja que o handlbars <b>oferece uma espécie de "estrutura de repetição foreach", digamos assim, que permite selecionarmos um objeto com valores alocados em vários índices e daí fazer alguma coisa</b>, esse objeto é o que passamos como argumento na renderização da página 'home', e como sabemos, é dentro desse objeto que está cada registro de postagem até agora.</p>
+
+        <p>Iniciamos essa estrutura de repetição com o bloco <span class="tCodigo"><span class="tRosa">{{</span><span class="tLaranja">#each</span> <span class="tBranco"><em>objeto</em></span><span class="tRosa">}}</span></span>, sendo <span class="tCodigo"><span class="tBranco"><em>objeto</em></span></span> um valor passado na renderização da página dentro da lógica de servidor, e finalizamos com <span class="tCodigo"><span class="tRosa">{{</span><span class="tLaranja">/each</span><span class="tRosa">}}</span></span>. Delimitado o bloco de estrutura de repetição, incluiremos <b>o que queremos que renderize para cada registro dentro do objeto</b>, e nosso objetivo é justamente <b>renderizar cada postagem registrada</b>. Pensando assim, para cada postagem registrada, queremos que o Handlebars renderize um trecho de HTML contendo as informações de uma postagem, <b>título e descrição</b>. Essa estrutura se repetirá para cada registro dentro do objeto, e no fim, teremos todas as postagens listadas, com base no modelo de HTML que contruímos para que as informações sejam exibidas.</p>
+
         <footer>
             <a href="../a24/a24.html">Página Anterior</a>
             <a href="#">Próxima Página</a>

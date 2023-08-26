@@ -9,13 +9,24 @@ const handlebars = require("express-handlebars")
 //Lógica de servidor
 const app = express()
 
-app.engine("handlebars", handlebars.engine({defaultLayout: "main"})) //Configuração do Handlebars
+//Configuração do Handlebars
+app.engine("handlebars", handlebars.engine({
+    defaultLayout: "main", runtimeOptions: {
+        allowProtoPropertiesByDefault: true,
+        allowProtoMethodsByDefault: true
+    }
+}))
+
 app.set("view engine", "handlebars")
 
 app.use(express.urlencoded({extended: true}))
 
 app.get("/", (req, res) => {
-    res.send()
+    //Só renderiza a view quando todas as postagens forem capturadas do banco de dados.
+    Postagem.findAll().then((post) => {
+        res.render("home", {postagem: post}) //O HTML é renderizado junto do objeto com as postagens. É utilizado
+                                             //dentro das expressões do Handlebars.
+    })
 })
 
 //Definindo e renderizando HTML da rota de cadastro de postagem.
