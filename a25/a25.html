@@ -11,7 +11,7 @@
     <h1>a25 - Manipulando informações do banco de dados</h1>
 
     <main>
-        <h1>Listando informações</h1>
+        <h1>Listando postagens</h1>
         <p>Na última aula, <b>corrigimos a estrutura do banco de dados dentro do nosso arquivo de servidor, em relação ao cadastro de postagens no sistema</b> e também <b>começamos a trabalhar efetivamente com as models, independentemente da estrutura de banco de dados para realizar alguns processos</b>, separando e organizando esses componentes dentro do nosso projeto.</p>
 
         <p>Nas últimas mudanças, <b>fizemos com que, caso o cadastro da postagem fosse bem-sucedido, o usuário seria redirecionado para a rota principal</b>. E é na rota principal que vamos listar todos os posts cadastrados até o momento.</p>
@@ -120,6 +120,91 @@ const <span class="tBranco">app = <span class="tBranco">express</span>()</span>
         <p>Aqui <b>avançamos mais na utilização do Handlebars como template engine</b>. Como dito anteriormente, template engines permite <b>a renderização de conteúdos dinâmicos dentro de um HTML</b>, e é justamente o que está acontecendo aqui. Veja que o handlbars <b>oferece uma espécie de "estrutura de repetição foreach", digamos assim, que permite selecionarmos um objeto com valores alocados em vários índices e daí fazer alguma coisa</b>, esse objeto é o que passamos como argumento na renderização da página 'home', e como sabemos, é dentro desse objeto que está cada registro de postagem até agora.</p>
 
         <p>Iniciamos essa estrutura de repetição com o bloco <span class="tCodigo"><span class="tRosa">{{</span><span class="tLaranja">#each</span> <span class="tBranco"><em>objeto</em></span><span class="tRosa">}}</span></span>, sendo <span class="tCodigo"><span class="tBranco"><em>objeto</em></span></span> um valor passado na renderização da página dentro da lógica de servidor, e finalizamos com <span class="tCodigo"><span class="tRosa">{{</span><span class="tLaranja">/each</span><span class="tRosa">}}</span></span>. Delimitado o bloco de estrutura de repetição, incluiremos <b>o que queremos que renderize para cada registro dentro do objeto</b>, e nosso objetivo é justamente <b>renderizar cada postagem registrada</b>. Pensando assim, para cada postagem registrada, queremos que o Handlebars renderize um trecho de HTML contendo as informações de uma postagem, <b>título e descrição</b>. Essa estrutura se repetirá para cada registro dentro do objeto, e no fim, teremos todas as postagens listadas, com base no modelo de HTML que contruímos para que as informações sejam exibidas.</p>
+
+        <br><br>
+
+        <h1>Excluindo Postagens</h1>
+        <p>Antes de finalizar, vamos adicionar a <b>funcionalidade de deletar uma postagem da nossa aplicação</b>. Como isso poderia ser feito?</p>
+
+        <p><b>Vamos ao arquivo 'home.handlebars', onde temos o 'modelo' de HTML à ser gerado para cada registro de postagem no nosso banco de dados</b>. Pensando primeiro no usuário, é óbvio pensar que esse tipo de interação - para excluir uma postagem - seria feita interagindo em algum elemento na tela. No nosso arquivo, podemos incluir na lógica do modelo de HTML <b>um botão de excluir</b>. E para cada registro, um botão de excluir que vai deletar a própria postagem em si do nosso banco de dados. E então, ao atualizar a página principal, podemos ver que a postagem deletada não será mais incluída na lista de posts feitos.</p>
+
+        <p>E é o que fazemos aqui:</p>
+
+<pre>
+<span class="arquivo">home.handlebars</span>
+<code>
+&lt;h2&gt;<span class="tBranco">Todas as postagens:</span>&lt;/h2&gt;
+&lt;br&gt;
+
+<span class="tRosa">{{</span><span class="tLaranja">#each</span> <span class="tBranco">postagem</span><span class="tRosa">}}</span>
+    &lt;h4&gt;<span class="tBranco">Título: <span class="tRosa">{{ <span class="tBranco">titulo</span> }}</span></span>&lt;/h4&gt;
+    &lt;h4&gt;<span class="tBranco">Descrição: <span class="tRosa">{{ <span class="tBranco">descricao</span> }}</span></span>&lt;/h4&gt;
+
+    &lt;a href=<span class="tLaranja">"deletar/<span class="tRosa">{{<span class="tBranco">id</span>}}</span>"</span>&gt;&lt;button&gt;<span class="tBranco">Excluir Postagem</span>&lt;/button&gt;&lt;/a&gt;
+
+    &lt;hr&gt;
+<span class="tRosa">{{</span><span class="tLaranja">/each</span><span class="tRosa">}}</span>
+</code>
+</pre>
+
+        <p>Um &lt;button&gt; fora de uma estrutura de &lt;form&gt; <b>não é capaz de muita coisa, em relação à enviar dados de formulário para outra página/rota</b>, e sequer temos uma estrutura de formulário aqui. O segredo está <b>na tag &lt;a&gt; que o envolve</b>. O parâmetro <span class="tCodigo">href</span> especifica um link que nada mais é <b>do que uma rota que vamos mapear dentro da nossa lógica de servidor</b>, especifica para esse tipo de situação. Veja que no endereço do 'href' passamos um caminho que acessamos em 'deletar/' + <b>o número de id do registro no banco</b>. Isso significa que, <b>ao mapear essa rota, teremos que especificar e tratar o caminho passando o id como um valor de parâmetro</b>. Em questão de interação, <b>se o usuário clicar no botão de excluir do post de id 5, ele será redirecionado para o caminho 'deletar/5'</b>, e assim respectivamente para todos os registros.</p>
+
+        <p>Vamos então criar a rota de exclusão de postagem por um get comum:</p>
+
+<pre>
+<span class="arquivo">server.js</span>
+<code>
+...
+
+<span class="tBranco">app</span>.<span class="tRosa">post</span>(<span class="tLaranja">"/postagem-adicionada"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    const <span class="tBranco">tituloPost</span> = <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">tituloPost</span>
+    const <span class="tBranco">descricaoPost</span> = <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">descricaoPost</span>
+
+    <span class="tVerde">//Adicionando postagem no banco de dados!</span>
+    <span class="tBranco">db</span>.<span class="tRosa">model</span>(<span class="tLaranja">"Postagem"</span>).<span class="tRosa">create</span>({
+        <span class="tBranco">titulo</span>: <span class="tBranco">tituloPost</span>,
+        <span class="tBranco">descricao</span>: <span class="tBranco">descricaoPost</span>
+    })
+
+    <span class="tBranco">res</span>.<span class="tRosa">send</span>(<span class="tLaranja">"&lt;h2&gt;Postagem adicionada com sucesso!&lt;/h2&gt;"</span>)
+})
+
+<span class="tVerde">//Criando a rota de exclusão de postagem</span>
+<span class="tVerde">//'id' se refere ao valor de parâmetro da id da postagem à ser excluída.</span>
+<span class="tBranco">app</span>.<span class="tRosa">get</span>(<span class="tLaranja">"deletar/<span class="tBranco">:id</span></span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+
+})
+
+...
+</code>
+</pre>
+
+        <p>E veja que não estamos <b>falando de parâmetros à toa</b>. Vimos bem anteriormente como funciona e como utilizamos <b>route parameters</b>, que são <b>um tipo de valor variável passado como parâmetro dentro do caminho de rotas de um site</b>. <span class="tCodigo"><span class="tBranco">:id</span></span> é o parâmetro de rota que pode ser qualquer número de 'id' referente ao registro de postagem, passado dentro do acesso à rota. E ao acessá-la, o usuário poderá excluir a postagem referente. Acesso esse intermediado pela interação do botão de excluir que incluímos no nosso modelo de HTML mais tarde...</p>
+
+<pre>
+<span class="arquivo">server.js</span>
+<code>
+...
+
+<span class="tVerde">//Criando a rota de exclusão de postagem</span>
+<span class="tVerde">//'id' se refere ao valor de parâmetro da id da postagem à ser excluída.</span>
+<span class="tBranco">app</span>.<span class="tRosa">get</span>(<span class="tLaranja">"deletar/<span class="tBranco">:id</span></span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+
+    <span class="tBranco">Postagem</span>.<span class="tRosa">destroy</span>({
+        <span class="tBranco">where</span>: {
+            <span class="tLaranja">"id"</span>: <span class="tBranco">req</span>.<span class="tBranco">params</span>.<span class="tBranco">id</span>
+        }
+    }).then(() => {
+        <span class="tBranco">res</span>.<span class="tRosa">send</span>(<span class="tLaranja">"&lt;h3&gt;Postagem excluída com sucesso.&lt;/h3&gt;"</span>)
+    })
+
+})
+
+...
+</code>
+</pre>
+
+        <p>E assim como fizemos <b>para listar todos os registros</b>, também precisamos acessar da própria model referente às postagens <b>a função de excluir registros</b>. O método <span class="tCodigo"><span class="tRosa">destroy</span></span> executa um DELETE em um registro especificado no banco de dados. Essa especificação, como podemos ver, <b>acontece dentro da chave <span class="tCodigo"><span class="tBranco">where</span></span></b>, que recebe outro objeto onde especificamos os campos e seus valores referentes à postagem que será deletada. Essa especificação ocorre em <span class="tCodigo"><span class="tLaranja">"id"</span>: <span class="tBranco">req</span>.<span class="tBranco">params</span>.<span class="tBranco">id</span></span>, que pega o valor de id do parâmetro da rota que acessamos por meio do botão de excluir anexado à própria postagem que queremos deletar. Ao excluir, é exibido para nós <b>a mensagem de sucesso de exclusão da postagem</b>.</p>
 
         <footer>
             <a href="../a24/a24.html">Página Anterior</a>

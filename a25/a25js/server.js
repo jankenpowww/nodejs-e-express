@@ -1,4 +1,5 @@
 //Importando bancos de dados e models.
+const { where } = require("sequelize")
 const db = require("./models/db")
 const Postagem = require("./models/Postagem")
 
@@ -54,6 +55,21 @@ app.post("/postagem-adicionada", (req, res) => {
     })
 
     
+})
+
+//Definindo uma rota de acesso para quando o usuário quiser deletar uma postagem.
+//Utilizamos o método 'destroy' para deletar um registro associado ao Model.
+app.get("/deletar/:id", (req, res) => {
+    Postagem.destroy({
+        where: {
+            "id": req.params.id
+        }
+    }).then(() => {
+        res.send("<h3>Registro deletado com sucesso!<h3>")
+
+    }).catch((erro) => {
+        res.send(`<h3 style='color: red'>Um erro ocorreu ao deletar a postagem!</h3><br><p>${erro}</p>`)
+    })
 })
 
 db.sync({force: false}) //Sincronizando todas as tabelas com o banco de dados.
