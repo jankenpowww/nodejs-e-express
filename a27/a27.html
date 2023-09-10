@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../stemp-css/stemp.css" type="text/css">
+    <title>a27</title>
+</head>
+<body>
+    <h1>a27 - Introdução ao MongoDB</h1>
+
+    <main>
+        <h1>O que é?</h1>
+        <p>Assim como o MySQL, <b>o MongoDB também é um SGBD, ou banco de dados, orientado à documentos (sim, documentos)</b>, e sendo o fato de ser um banco de dados <b>a única semelhança característica com o MySQL</b>, uma vez que o MongoDB é um banco de dados <b>NoSQL</b>, ou seja, <b>não funciona como bancos de dados relacionais como o próprio MySQL</b>. E para este último, isso tem tudo à ver com ele ser "orientado à documentos", já que as estruturas de dados aqui, como não são organizadas no modelo relacional tradicionalmente, são apresentadas em formato JSON. Em c0njunto com o Mongoose, uma biblioteca disponível no npm, <b>podemos integrar aplicações web feitas com NodeJS com o MongoDB</b>.</p>
+
+        <p>"Documento", no contexto de banco de dados não relacional, <b>é equivalente aos registros que tinhamos no MySQL</b>. Cada documento é um registro individual dentro do modelo de orientação a documentos. E assim como os registros compartilhavam colunas e linhas descrevendo suas características em tabelas, aqui, <b>temos as 'collections', ou coleções</b>, que agora são descritas e estruturadas na clássica notação de chave e valor do JSON. Uma coleção reúne documentos em comum que compartilham de uma mesma caraterística - ter a tabela de postagens no MySQL é equivalente à ter uma coleção de postagens no MongoDB. A diferença aqui, fora um modelo ser relacional e o outro não, são a forma em que são denominados e de certa forma organizados.</p>
+
+        <p>Para esta série de exercícios e aulas, está sendo utilizado a versão Community do MongoDB + a ferramenta de CLI do MongoDB, o Mongosh (que é instalado separadamente do próprio MongoDB, <s>e que é um saco pra instalar e configurar, diga-se de passagem</s>).</p>
+
+        <br><br>
+
+        <h1>Configurações</h1>
+        <p>Primeiro, é necessário instalar <b>a versão Community do MongoDB</b> (e talvez incluir a porcaria do Compass na instalação, vai que, né?) e então instalar o Mongosh, que equivale ao client/cli do MySQL que estávamos utilizando (tirando toda a dor de cabeça que é fazer isso, claro). E não só isso: <b>depois, manualmente, incluir a pasta bin do diretório do MongoDB nas variáveis de ambiente</b>. Fazendo isso, <b>nos permitirá iniciar um servidor MongoDB pelo terminal através do comando <span class="tCodigo"><span class="tBranco">mongod</span></span></b>, que por hora não convém falar.</p>
+
+        <p>Em seguida, fazemos a instalação do Mongosh, que é a ferramenta de CLI do MongoDB onde basicamente fazemos o gerenciamento dos bancos de dados do MongoDB (provavelmente deve incluir a pasta do Mongosh instalado nas variáveis de ambiente também, mas não lembro se foi necessário kkkkkkkkkkkkk).</p>
+
+        <p>E por precaução, vamos criar o diretório 'data/db' dentro de C:/, embora é dito nos fóruns que, nas versões atuais do MongoDB, isso não é mais necessário.</p>
+
+        <p>Feito isso concluímos <s>que ser usuário de Windows é ser muito f*dido</s> as configurações iniciais do MongoDB.</p>
+
+        <br><br>
+
+        <h1>Indo para o que interessa...</h1>
+        <p>Podemos criar uma conexão da nossa aplicação com um banco de dados do MongoDB quase da mesma forma que fizemos com o Sequelize. E dessa vez, <b>utilizando um ORM dedicado para isso mencionado anteriormente: o Mongoose.</b></p>
+
+        <p>Na pasta do projeto, com o diretório aberto no terminal, basta com que digitemos:</p>
+
+<pre>
+<span class="arquivo">cmd</span>
+<code>
+<span class="tBranco">> npm install <span class="tCinza">--save</span> mongoose</span>
+</code>
+</pre>
+
+        <p>E o Mongoose será instalado como dependência do nosso projeto.</p>
+
+        <p>E antes de escrever qualquer código ainda, precisamos abrir dois terminais.</p>
+
+        <p>É...</p>
+
+        <p>Em um terminal, vamos rodar o comando <span class="tCodigo"><span class="tBranco">mongod</span></span>, que vai iniciar o servidor do MongoDB na nossa máquina. Enquanto estiver aberto, o servidor do MongoDB estará rodando, e é o que queremos.</p>
+
+        <p>No outro terminal, <b>vamos rodar o comando <span class="tCodigo"><span class="tBranco">Mongosh</span></span></b>, que é onde vamos passar a maior parte do tempo brincando. Ele é exatamente o que o Client do MySQL era para os testes anteriores, e de extrema importância para esse processo de conexão.</p>
+
+        <p>Rodando <span class="tCodigo"><span class="tBranco">Mongosh</span></span>, temos o seguinte:</p>
+
+<pre>
+<span class="arquivo">cmd</span>
+<code>
+<span class="tBranco">Current Mongosh Log ID: e4fd05b6e9e0b84f287746c8
+Connecting to:          <span class="tVerde">mongodb://127.0.0.1:24018/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.0</span>
+Using MongoDB:          7.0.1
+Using Mongosh:          2.0.0
+
+For mongosh info see: https://docs.mongodb.com/mongodb-shell/
+
+------
+   The server generated these startup warnings when booting
+   2023-09-08T20:21:36.356-03:00: Access control is not enabled for the database. Read and write access to data and configuration is unrestricted
+------
+
+test></span>
+</code>
+</pre>
+
+        <p>E então copiamos, do link destacado em verde, <b>apenas o seguinte abaixo</b>. Esse é parte do endereço da conexão com o nosso banco de dados que precisamos informar dentro do código.</p>
+
+<pre>
+<code>
+<span class="tVerde">mongodb://127.0.0.1:24018/</span>
+</code>
+</pre>
+
+        <p>O número da porta que segue acima (24018) pode ser diferente dependendo do caso, enquanto que o endereço que o antecede <b>refere-se à nossa máquina local, ou localhost</b>.</p>
+
+        <p>E finalmente, podemos ir pro código. Vamos escrever nossa conexão em um arquivo chamado 'teste.js'.</p>
+
+<pre>
+<span class="arquivo">teste.js</span>
+<code>
+const <span class="tBranco">mongoose</span> = require(<span class="tLaranja">"mongoose"</span>)
+
+<span class="tBranco">mongoose</span>.<span class="tRosa">connect</span>(<span class="tLaranja">"mongodb://127.0.0.1:24018/<span class="tBranco">bdteste</span>"</span>).then(() => {
+    console.log(<span class="tLaranja">"Aplicação conectada ao banco com sucesso."</span>)
+
+}).catch((<span class="tBranco">err</span>) => {
+    console.log(<span class="tLaranja">"Não foi possível se conectar.\n"</span> + <span class="tBranco">err</span>)
+    
+})
+</code>
+</pre>
+
+        <p>A conexão da aplicação com um banco de dados do MongoDB é feita através do método <span class="tCodigo"><span class="tRosa">connect</span></span>, que provê uma resposta, dependendo se a conexão foi bem sucedida ou não, em uma estrutura de promise.</p>
+
+        <p>O método <span class="tCodigo"><span class="tRosa">connect</span></span> recebe a string do endereço que tivemos acesso no Mongosh anteriormente, e lembra que este endereço era apenas <b>parte do endereço de conexão</b>? Isso porquê falta uma infomração crucial neste endereço, que é <b>o banco de dados que vamos utilizar</b>. Veja que, <b>destacado na string do endereço que passamos no parâmetro do método <span class="tCodigo"><span class="tRosa">connect</span></span>, temos <span class="tCodigo"><span class="tBranco">bdteste</span></span></b>, que nada mais é do que o nome do nosso banco de dados.</p>
+
+        <p><em>"Ué, mas sequer criamos qualquer banco de dados até agora..."</em>, e sim, <b>não precisamos criar um banco de dados previamente antes de passá-lo na configuração de conexão no código (?)</b>, o MongoDB vai automaticamente interpretar a URL e verificar se o tal banco passado existe ou não. Se caso não, <b>um banco de mesmo nome é criado automaticamente</b>, o que pode facilitar um pouco as coisas. Dito isso, é possível sim criar um banco de dados ou listar todos os bancos de dados normalmente pelo Mongosh, ao mesmo estilo do client do MySQL normalmente.</p>
+
+        <p>Finalizando isso, temos nossa URL de conexão com o banco de dados MongoDB completa, onde informamos: <b>1) o servidor MongoDB; 2) o endereço do host; 3) porta e por fim,  4) o nome do nosso banco de dados</b>. Rodando o arquivo, se tudo estiver de acordo com os três primeiros itens citados, a conexão será bem sucedida.</p>
+
+        <footer>
+            <a href="../a25/a25.html">Página Anterior</a>
+            <a href="#">Próxima Página</a>
+        </footer>
+    </main>
+</body>
+</html>
