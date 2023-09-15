@@ -56,7 +56,7 @@
         <p>Rodando <span class="tCodigo"><span class="tBranco">Mongosh</span></span>, temos o seguinte:</p>
 
 <pre>
-<span class="arquivo">cmd</span>
+<span class="arquivo">cmd - mongosh</span>
 <code>
 <span class="tBranco">Current Mongosh Log ID: e4fd05b6e9e0b84f287746c8
 Connecting to:          <span class="tVerde">mongodb://127.0.0.1:24018/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.0</span>
@@ -103,15 +103,179 @@ const <span class="tBranco">mongoose</span> = require(<span class="tLaranja">"mo
 
         <p>A conexão da aplicação com um banco de dados do MongoDB é feita através do método <span class="tCodigo"><span class="tRosa">connect</span></span>, que provê uma resposta, dependendo se a conexão foi bem sucedida ou não, em uma estrutura de promise.</p>
 
-        <p>O método <span class="tCodigo"><span class="tRosa">connect</span></span> recebe a string do endereço que tivemos acesso no Mongosh anteriormente, e lembra que este endereço era apenas <b>parte do endereço de conexão</b>? Isso porquê falta uma infomração crucial neste endereço, que é <b>o banco de dados que vamos utilizar</b>. Veja que, <b>destacado na string do endereço que passamos no parâmetro do método <span class="tCodigo"><span class="tRosa">connect</span></span>, temos <span class="tCodigo"><span class="tBranco">bdteste</span></span></b>, que nada mais é do que o nome do nosso banco de dados.</p>
+        <p>O método <span class="tCodigo"><span class="tRosa">connect</span></span> recebe a string do endereço que tivemos acesso no Mongosh anteriormente, e lembra que este endereço era apenas <b>parte do endereço de conexão</b>? Isso porquê falta uma informação crucial neste endereço, que é <b>o banco de dados que vamos utilizar</b>. Veja que, <b>destacado na string do endereço que passamos no parâmetro do método <span class="tCodigo"><span class="tRosa">connect</span></span>, temos <span class="tCodigo"><span class="tBranco">bdteste</span></span></b>, que nada mais é do que o nome do nosso banco de dados.</p>
 
         <p><em>"Ué, mas sequer criamos qualquer banco de dados até agora..."</em>, e sim, <b>não precisamos criar um banco de dados previamente antes de passá-lo na configuração de conexão no código (?)</b>, o MongoDB vai automaticamente interpretar a URL e verificar se o tal banco passado existe ou não. Se caso não, <b>um banco de mesmo nome é criado automaticamente</b>, o que pode facilitar um pouco as coisas. Dito isso, é possível sim criar um banco de dados ou listar todos os bancos de dados normalmente pelo Mongosh, ao mesmo estilo do client do MySQL normalmente.</p>
 
         <p>Finalizando isso, temos nossa URL de conexão com o banco de dados MongoDB completa, onde informamos: <b>1) o servidor MongoDB; 2) o endereço do host; 3) porta e por fim,  4) o nome do nosso banco de dados</b>. Rodando o arquivo, se tudo estiver de acordo com os três primeiros itens citados, a conexão será bem sucedida.</p>
 
+        <br><br>
+
+        <h1>Esquemas, coleções e documentos</h1>
+        <p>Com parte do setup inicial já funcionando e se conectando ao banco de dados, <b>podemos começar a estruturar nossas models das nossas coleções</b>, ou meio que isso. O que faziamos no Sequelize não é muito diferente daqui, já que ambos <b>possuem a tarefa de abstrair ao máximo a utilização do banco de dados utilizado aqui</b>. Mas pro caso do MongoDB precisamos entender o que são e como funcionam esses novos termos.</p>
+
+        <p>Como dito antes, <b>'coleção', para banco de dados NoSQL (e orientado a documentos), é o que equivale às 'tabelas' para bancos de dados SQL</b>, que como sabemos bem <b>é onde descrevem-se características de alguma coisa</b>, esse 'alguma coisa' é um registro, que aqui chamamos de 'documento'. <b>Cada documento pertence à uma coleção de documentos em comum</b>. Nas abstrações que encontramos tanto no Sequelize quanto no Mongoose, podemos chamar as estruturas de tabelas/coleções de 'Models'.</p>
+
+        <p>E aí é que está: há uma pequena diferença nessa comparação entre os ORMs que utilizamos até agora. Com Mongoose, <b>estruturamos uma coleção e depois "registramos" como um Model</b>. É desse Model que <b>utilizamos como elemento de instanciamento para criação de novos documentos, dentro da coleção criada de um banco de dados do MongoDB</b>. E é o que vamos fazer agora...</p>
+
+<pre>
+<span class="arquivo">teste.js</span>
+<code>
+const <span class="tBranco">mongoose</span> = require(<span class="tLaranja">"mongoose"</span>)
+const { <span class="tBranco">Schema</span> } = require(<span class="tLaranja">"mongoose"</span>)
+
+...
+</code>
+</pre>
+
+        <p><span class="tCodigo"><span class="tBranco">Schema</span></span> nada mais é do que <b>um construtor de coleções</b>. Na verdade, como o próprio nome sugere, <b>utilizamos para esquematizar a estrutura da nossa coleção</b>, que conterá todas as informações e características necessárias que documentos em comum terão.</p>
+
+        <p>Após importá-lo separadamente do módulo, <b>vamos utilizá-lo para criar o esquema da estrutura da nossa coleção.</b></p>
+
+<pre>
+<span class="arquivo">teste.js</span>
+<code>
+const <span class="tBranco">mongoose</span> = require(<span class="tLaranja">"mongoose"</span>)
+const { <span class="tBranco">Schema</span> } = require(<span class="tLaranja">"mongoose"</span>)
+
+<span class="tBranco">mongoose</span>.<span class="tRosa">connect</span>(<span class="tLaranja">"mongodb://127.0.0.1:24018/<span class="tBranco">bdteste</span>"</span>).then(() => {
+    console.log(<span class="tLaranja">"Aplicação conectada ao banco com sucesso."</span>)
+
+}).catch((<span class="tBranco">err</span>) => {
+    console.log(<span class="tLaranja">"Não foi possível se conectar.\n"</span> + <span class="tBranco">err</span>)
+    
+})
+
+const <span class="tBranco">UsuarioSchema</span> = new <span class="tBranco">Schema</span>({
+    <span class="tBranco">nome</span>: { <span class="tBranco">type</span>: <span class="tBranco">String</span>, <span class="tBranco">require</span>: <span class="tLaranja">true</span> },
+    <span class="tBranco">sobrenome</span>: { <span class="tBranco">type</span>: <span class="tBranco">String</span>, <span class="tBranco">require</span>: <span class="tLaranja">true</span> },
+    <span class="tBranco">idade</span>: { <span class="tBranco">type</span>: <span class="tBranco">Number</span>, <span class="tBranco">require</span>: <span class="tLaranja">true</span> },
+    <span class="tBranco">email</span>: { <span class="tBranco">type</span>: <span class="tBranco">String</span>, <span class="tBranco">require</span>: <span class="tLaranja">true</span> },
+    <span class="tBranco">pais</span>: { <span class="tBranco">type</span>: <span class="tBranco">String</span>, <span class="tBranco">require</span>: <span class="tLaranja">false</span>, <span class="tBranco">default</span>: <span class="tLaranja">"Brasil"</span> }
+})
+</code>
+</pre>
+
+        <p>Veja que no Mongoose, para definir tipos de dados, <b>não precisamos importar módulos específicos para isso</b>, como fazíamos anteriormente utilizando o Sequelize. Podemos simplesmente informar o tipo de dado à partir do que já temos como tipos primitivos no JavaScript: 'String' para todo tipo de texto ou representação de caracteres, 'Number' para toda representação de número, e por aí vai. Além de <span class="tCodigo"><span class="tBranco">type</span></span> para definir tipos de dados, temos outros parâmetros presentes aqui: <span class="tCodigo"><span class="tBranco">require</span></span> é definido por um booleano se <b>o tipo de dado precisa ser informado ou não</b>, para o último caso, não há a necessidade de incluí-lo. Também temos <span class="tCodigo"><span class="tBranco">default</span></span>, que pra quem lembra desse mesmo parâmetro na linguagem SQL, <b>define um valor padrão para o campo, caso nenhum seja informado</b>.</p>
+
+        <p>Atribuímos uma nova instância de <span class="tCodigo"><span class="tBranco">Schema</span></span> <b>para iniciar o esquema da nossa coleção</b>, porque é justamente isso o que ela é. Veja que é uma convenção da própria utilização do Mongoose para definição de coleções de <b>identificar as variáveis que recebem as estruturas de coleções como um esquema</b>, como vemos na própria variável <span class="tCodigo"><span class="tBranco">UsuarioSchema</span></span>. Veja que vai ser mais fácil identificar o que é esquema e o que passa a se tornar a model propriamente dita daqui a pouco...</p>
+
+        <p>E é o que justamente vai acontecer: vamos registrar essa estrutura de coleção que temos para o usuário como uma Model definidamente.</p>
+
+<pre>
+<span class="arquivo">teste.js</span>
+<code>
+...
+
+const <span class="tBranco">UsuarioSchema</span> = new <span class="tBranco">Schema</span>({
+    <span class="tBranco">nome</span>: { <span class="tBranco">type</span>: <span class="tBranco">String</span>, <span class="tBranco">require</span>: <span class="tLaranja">true</span> },
+    <span class="tBranco">sobrenome</span>: { <span class="tBranco">type</span>: <span class="tBranco">String</span>, <span class="tBranco">require</span>: <span class="tLaranja">true</span> },
+    <span class="tBranco">idade</span>: { <span class="tBranco">type</span>: <span class="tBranco">Number</span>, <span class="tBranco">require</span>: <span class="tLaranja">true</span> },
+    <span class="tBranco">email</span>: { <span class="tBranco">type</span>: <span class="tBranco">String</span>, <span class="tBranco">require</span>: <span class="tLaranja">true</span> },
+    <span class="tBranco">pais</span>: { <span class="tBranco">type</span>: <span class="tBranco">String</span>, <span class="tBranco">require</span>: <span class="tLaranja">false</span>, <span class="tBranco">default</span>: <span class="tLaranja">"Brasil"</span> }
+})
+
+const <span class="tBranco">Usuario</span> = <span class="tBranco">mongoose</span>.<span class="tRosa">model</span>(<span class="tLaranja">"usuarios"</span>, <span class="tBranco">UsuarioSchema</span>)
+</code>
+</pre>
+
+        <p>E então podemos finalmente chamar de model <b>o que temos na variável <span class="tCodigo"><span class="tBranco">Usuario</span></span></b>. O método <span class="tCodigo"><span class="tRosa">model</span></span>, como dito antes, é utilizado para realizar essa espécie de "registro" de uma Model, onde informamos no primeiro parâmetro <b>uma string contendo o nome da coleção dentro do banco de dados que representa essa coleção associada à model</b> e por fim, informamos a estrutura de esquema que é toda a parte estrutural da nossa coleção em si. À paritr desses dois, temos uma model da nossa coleção pronta para ser utilizada para criar o primeiro documento.</p>
+
+        <p>E fazemos isso também declarativamente, <b>como se estivessemos instanciando um objeto</b>, só que sem à parte de atribuir isso à alguma coisa, à princípio. Observe:</p>
+
+<pre>
+<span class="arquivo">teste.js</span>
+<code>
+...
+
+const <span class="tBranco">Usuario</span> = <span class="tBranco">mongoose</span>.<span class="tRosa">model</span>(<span class="tLaranja">"usuarios"</span>, <span class="tBranco">UsuarioSchema</span>)
+
+new <span class="tBranco">Usuario</span>({
+    <span class="tBranco">nome</span>: <span class="tLaranja">"Jorge"</span>,
+    <span class="tBranco">sobrenome</span>: <span class="tLaranja">"Aragão"</span>,
+    <span class="tBranco">idade</span>: <span class="tLaranja">67</span>,
+    <span class="tBranco">email</span>: <span class="tLaranja">"jorge@email.com"</span>,
+    <span class="tBranco">pais</span>: <span class="tLaranja">"Brasil"</span>,
+
+}).<span class="tRosa">save</span>().then(() => {
+    console.log(<span class="tLaranja">"Documento adicionado com sucesso!"</span>)
+
+}).catch((<span class="tBranco">err</span>) => {
+    console.log(<span class="tLaranja">"Erro ao adicionar documento!"</span> + <span class="tBranco">err</span>)
+
+})
+</code>
+</pre>
+
+        <p>Após preencher todos os campos referentes ao registro, <b>basta salvá-lo como documento oficialmente utilizando o método <span class="tCodigo"><span class="tRosa">save</span></span></b>. Podemos envolvê-lo em <b>uma estrutura then/catch e realizar alguma outra ação dentro dos blocos de código dependendo do resultado</b>.</p>
+
+        <p>E por falar em resultado, vamos para o terminal <b>onde rodamos o mongosh</b>, e verificar se <b>as informações registradas batem com o que fizemos no código</b>, e verificar também se o tal banco de dados está lá mesmo...</p>
+
+        <p>E para fazer essa verificação, basta rodar o comando <span class="tCodigo"><span class="tBranco">show databases</span></span>, um velho conhecido de antigamente...</p>
+
+<pre>
+<span class="arquivo">cmd - mongosh</span>
+<code>
+<span class="tBranco">test> show databases
+
+admin     40.00 KiB
+bdteste   40.00 KiB
+config   108.00 KiB
+local     72.00 KiB</span>
+</code>
+</pre>
+
+        <p>Como esperado, <b>este comando retorna todos os bancos de dados do MongoDB criados</b>. Fora os que vem criado por padrão de instalação, lá temos o nosso banco de dados, que mais uma vez: <b>não precisamos criar um previamente</b>. Apenas passando o nome na URL de conexão já é o suficiente.</p>
+
+        <p>E para 'usar' o nosso banco de dados, no melhor sentido da palavra, basta rodar <span class="tCodigo"><span class="tBranco">use bdteste</span></span></p>
+
+<pre>
+<span class="arquivo">cmd - mongosh</span>
+<code>
+<span class="tBranco">test> use bdteste
+
+switched to db bdteste
+bdteste></span>
+</code>
+</pre>
+
+        <p>Para exibir todas as coleções, fazemos quase da mesma maneira quando queremos exibir as tabelas de um banco de dados no MySQL, apenas mudando para o termo apropriado...</p>
+
+<pre>
+<span class="arquivo">cmd - mongosh</span>
+<code>
+<span class="tBranco">bdteste> show collections
+
+usuarios
+bdteste></span>
+</code>
+</pre>
+
+        <p>E por fim, vamos selecionar nossa coleção de documentos e listar o registro feito. O comando abaixo seleciona <b>todos os registros, ou documentos, feitos até então</b>, mas é possível passar parâmetros de busca e filtros assim como no MySQL.</p>
+
+<pre>
+<span class="arquivo">cmd - mongosh</span>
+<code>
+<span class="tBranco">bdteste> db.usuarios.find()
+    
+[
+  {
+    _id: ObjectId("6503a0c209bf5bf79e251e77"),
+    nome: <span class="tVerde">'Jorge'</span>,
+    sobrenome: <span class="tVerde">'Aragão'</span>,
+    email: <span class="tVerde">'jorge@email.com'</span>,
+    idade: <span class="tLaranja">67</span>,
+    pais: <span class="tVerde">'Brasil'</span>,
+    __v: <span class="tLaranja">0</span>
+  }
+]
+bdteste></span>
+</code>
+</pre>
+
         <footer>
             <a href="../a25/a25.html">Página Anterior</a>
-            <a href="#">Próxima Página</a>
+            <a href="../a30/a30.html">Próxima Página</a>
         </footer>
     </main>
 </body>
