@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../stemp-css/stemp.css" type="text/css">
+    <title>a31</title>
+</head>
+<body>
+    <h1>a31 - Iniciando projeto com Express</h1>
+
+    <main>
+        <h1>O projeto</h1>
+        <p>Unindo tudo o que vimos de criação de ambientes de servidor com Express e a integração de bancos de dados e seus modelos em uma aplicação, vamos dar início à um projeto funcional na prática e aproveitar para <b>aprofundar mais em alguns conceitos e outros elementos importantes dentro das tecnologias vistas e em outras não abordadas diretamente</b>, como: organizar estrutural e de forma correta uma aplicação Express / NodeJS, hierarquizar tipos de usuários e seus acessos de acordo com a aplicação proposta, features e outros artifícios importantes para aplicações web como autenticação de usuários e dados tranferidos para e do sistema, gerenciamento de sessões, cookies, etc.</p>
+
+        <p>O projeto consistirá em uma aplicação de blog, onde a criação e administração de postagens serão possíveis baseada na hierarquia e níveis de acesso à aplicação por parte de seus usuários dentro do esquema do sistema. Dentro dessa definição de projeto, vamos implementar funcionalidades, definir regras de uso e interação para essas funcionalidades e conhecer mais desse tipo de desenvolvimento de projeto integrados à bancos de dados NoSQL, sobretudo o MongoDB.</p>
+
+        <br></br>
+
+        <h1>Primeiros <em>setups</em>...</h1>
+        <p>Dentro da pasta do projeto, que pode se chamar 'blog-proj', <b>vamos inicializar no terminal com <span class="tCodigo"><span class="tBranco">npm init -y</span></span></b>, e então teremos os JSONs de configuração do projeto inicializados dentro do diretório. Em seguida, vamos instalar todos os packages necessários:</p>
+
+        <ul type="circle">
+            <li><span class="tCodigo"><span class="tBranco"><span>npm install <span class="tCinza">--save</span> express</span></span></span></li>
+
+            <br>
+
+            <li><span class="tCodigo"><span class="tBranco"><span>npm install <span class="tCinza">--save</span> express-handlebars</span></span></span></li>
+
+            <br>
+
+            <li><span class="tCodigo"><span class="tBranco"><span>npm install <span class="tCinza">--save</span> mongoose </span></span></span></li>
+
+            <br>
+
+            <li><span class="tCodigo"><span class="tBranco"><span>npm install <span class="tCinza">--save</span> nodemon</span></span></span></li>
+        </ul>
+
+        <p>Feito isso, vamos criar um arquivo chamado 'app.js', <b>onde iremos inicializar a lógica de servidor do nosso projeto e suas principais configurações</b>.</p>
+
+<pre>
+<span class="arquivo">app.js</span>
+<code>
+<span class="tVerde">//Imports</span>
+const <span class="tBranco">express</span> = require(<span class="tLaranja">"express"</span>)
+const <span class="tBranco">handlebars</span> = require(<span class="tLaranja">"express-handlebars"</span>)
+
+<span class="tVerde">//Inicialização do Express e configurações + configurações do Handlebars</span>
+const <span class="tBranco">app</span> = <span class="tBranco">express</span>()
+<span class="tBranco">app</span>.<span class="tRosa">use</span>(<span class="tBranco">express</span>.<span class="tRosa">urlencoded</span>({<span class="tBranco">extended</span>: <span class="tLaranja">false</span>})
+<span class="tBranco">app</span>.<span class="tRosa">use</span>(<span class="tBranco">express</span>.<span class="tRosa">json</span>())
+
+<span class="tBranco">app</span>.<span class="tRosa">engine</span>(<span class="tLaranja">"Handlebars"</span> <span class="tBranco">handlebars</span>.<span class="tRosa">engine</span>({
+    <span class="tBranco">defaultLayout</span>: <span class="tLaranja">"main"</span>,
+    <span class="tBranco">runtimeOptions</span>: {
+        <span class="tBranco">allowProtoMethodsByDefault</span>: <span class="tLaranja">true</span>,
+        <span class="tBranco">allowProtoPropertiesByDefault</span>: <span class="tLaranja">true</span>
+    }
+})
+<span class="tBranco">app</span>.<span class="tRosa">set</span>(<span class="tLaranja">"view engine"</span>, <span class="tLaranja">"handlebars"</span>)
+
+<span class="tVerde">//Importação de rotas</span>
+
+<span class="tVerde">//Lógica de servidor</span>
+
+<span class="tVerde">//Rodando servidor + outros</span>
+const <span class="tBranco">HOST</span> = <span class="tLaranja">"localhost"</span>
+const <span class="tBranco">PORT</span> = <span class="tLaranja">3030</span>
+
+<span class="tBranco">app</span>.<span class="tRosa">listen</span>(<span class="tBranco">PORT</span>, <span class="tBranco">HOST</span>, () => {
+    console.log(<span class="tLaranja">`Aberto em '${<span class="tBranco">HOST</span>}:${<span class="tBranco">PORT</span>}'. Ctrl+C para encerrar.`</span>)
+})
+</code>
+</pre>
+        <p>Essa, por enquanto, <b>é a estrutura do nosso servidor</b>, nada do que tenhamos visto antes. E veja que há uma separação de cada etapa de construção do servidor pelos comentários, onde alguns serão explorados devidamente daqui em diante...</p>
+        <p>E dentro do nosso diretório, criaremos as seguintes e pastas e subpastas:</p>
+
+        <ul type="circle">
+            <li><b>'views/layouts/'</b>, e dentro de 'layouts', um arquivo chamado 'main.handlebars'.</li>
+            <li><b>'models'</b>, onde vamos criar as models referente à cada coleção do banco de dados.</li>
+            <li><b>'routes'</b>, da qual vamos dar um enfoque na próxima seção.</li>
+        </ul>
+
+        <br><br>
+
+        <h1>Grupo de rotas</h1>
+        <p>As rotas, como bem sabemos, <b>é como chamamos os caminhos, ou ainda as seções da nossa aplicação</b>, da qual podemos acessar para ter acesso À algum conteúdo disponibilizado pelo servidor, nessa interação de requisição e resposta. Até aqui, nada de novo. Entretanto, por mais que não tenhamos feito mais do que 4 ou 5 rotas durantes os últimos testes, <b>podemos imaginar que, na medida em que uma aplicação vai se estendendo, mais rotas e mais conteúdos num geral são adicionados</b>, e então entramos no mesmo problema de organização que vimos outras vezes até chegar aqui. Uma hora vai ficar impossível de gerenciar tudo em um único arquivo só, e vimos isso <b>quando começamos a trabalhar com o Sequelize e a criar os primeiros models</b>. Veja que podemos também separar as nossas rotas da mesma forma para garantir ainda mais organização e facilidade de gerenciar cada recurso. O próprio Express oferece uma ferramenta para isso, inclusive.</p>
+
+        <p>Essa ferramenta vai permitir conceber "grupos de rotas", onde podemos separar várias rotas em um grupo de acordo com sua função e contexto dentro de uma aplicação</b>. Veja que a pasta que criamos, 'routes', vai servir justamente para isso: armazenar todas as nossas rotas em arquivos separados.</p>
+
+        <p>Para entender melhor, <b>vamos criar um arquivo chamado 'admin.js', dentro do diretório 'routes'</b>. Aqui, vamos declarar uma série de rotas relacionadas à um contexto específico, <b>que nada mais é do que as rotas de acesso por parte dos administradores da aplicação</b>.</p>
+
+<pre>
+<span class="arquivo">admin.js</span>
+<code>
+const <span class="tBranco">express</span> = require(<span class="tLaranja">"express"</span>)
+const <span class="tBranco">router</span> = <span class="tBranco">express</span>.<span class="tRosa">Router</span>()
+</code>
+</pre>
+
+        <p>A ferramenta de criação de grupos de rotas é o <samp><span class="tRosa">Router</span>()</samp>. Dentro de um arquivo de grupo de rota, utilizamos ele para <b>mapear as rotas de acesso do nosso servidor</b>, assim como fazíamos antes diretamente no arquivo de servidor. A diferença é que agora <b>estamos associando essas rotas à um contexto específico, como dito antes; e ainda: à uma rota de prefixo específica - que vai fazer sentido mais pra frente</b>, e tudo isso ainda significa a mesma coisa. Todas as rotas declaradas dentro do arquivo de administrador está relacionado ao contexto do administrador, ponto.</p>
+
+        <p>E então, <b>basta criar as rotas devidamente</b>, da mesma forma que fazíamos antes. E dessa vez, utilizando a variável <samp><span class="tBranco">router</span></samp>, que atribuímos a ferramenta de criação de grupos de rotas de mesmo nome.</p>
+
+        <p>Haverão três rotas principais relacionadas ao administrador aqui: 'admin', 'posts' e 'categorias', que, por questões de teste, retornará uma mensagem simples como resposta ao serem acessadas.</p>
+
+<pre>
+<span class="arquivo">admin.js</span>
+<code>
+const <span class="tBranco">express</span> = require(<span class="tLaranja">"express"</span>)
+const <span class="tBranco">router</span> = <span class="tBranco">express</span>.<span class="tRosa">Router</span>()
+
+<span class="tBranco">router</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">res</span>.<span class="tRosa">send</span>(<span class="tLaranja">"&lt;h3&gt;Página principal do painel de administrador.&lt;/h3&gt;"</span>)
+})
+
+<span class="tBranco">router</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/posts"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">res</span>.<span class="tRosa">send</span>(<span class="tLaranja">"&lt;h3&gt;Página de posts.&lt;/h3&gt;"</span>)
+})
+
+<span class="tBranco">router</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/categorias"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">res</span>.<span class="tRosa">send</span>(<span class="tLaranja">"&lt;h3&gt;Página de categorias.&lt;/h3&gt;"</span>)
+})
+
+<span class="tBranco">module</span>.<span class="tBranco">exports</span> = <span class="tBranco">router</span>
+</code>
+</pre>
+
+        <p>Antes de rodar o servidor, <b>precisamos exportar o arquivo com o grupo de rotas definido e utilizá-lo no arquivo de servidor</b>. Para isso, fazemos o <em>import</em> do módulo 'router', que exportamos aqui, dentro do arquivo 'app.js'.</p>
+
+<pre>
+<span class="arquivo">app.js</span>
+<code>
+...
+
+<span class="tVerde">//Importação de rotas</span>
+const <span class="tBranco">admin</span> = require(<span class="tLaranja">"./routes/admin"</span>)
+
+<span class="tVerde">//Lógica de servidor</span>
+<span class="tBranco">app</span>.<span class="tRosa">use</span>(<span class="tLaranja">"/admin"</span>, <span class="tBranco">admin</span>)
+
+...
+</code>
+</pre>
+
+        <p>E veja que ao fazer o import, <b>utilizamos um método/diretiva diferente para definir a rota na parte de lógica de servidor</b>. O método <samp><span class="tRosa">use</span></samp> aqui, no contexto de declarar grupos de rotas, recebe dois argumentos diferentes. O primeiro argumento é uma string, <b>que define uma rota de prefixo associado ao grupo de rotas que vai ser informado em seguida</b>, que é justamente o segundo argumento à ser passado: <b>a rota que importamos do nosso diretório 'routes'</b>.</p>
+
+        <p>E rodando o servidor para testar, você verá que, ao acessar a rota "/", por exemplo, vai retornar um erro de que aquela rota nao existe, e isso mais uma vez deve-se <b>à rota de prefixo</b>. Com <samp><span class="tBranco">app</span>.<span class="tRosa">use</span>(<span class="tLaranja">"/admin"</span>, <span class="tBranco">admin</span>)</samp>, queremos dizer ao servidor que <b>o grupo de rotas é diretamente associado com o caminho <samp><span class="tLaranja">"/admin"</span></samp></b>, ou seja, se quisermos acessar "/", devemos <b>complementar o endereço antes informando "/admin" também</b>. Ou seja: "/admin/" ou apenas "admin".</p>
+
+        <p>Ao acessar 'localhost:3030/admin/', a mensagem "Página principal do painel de administrador." <b>será exibida na tela como resposta</b>.</p>
+
+        <p>Assim como as mensagens das rotas 'posts' e 'categorias', consequentemente. Para acessá-las, temos que incluir antecipadamente <b>sua rota de prefixo</b>, da qual está associada seu grupo de rotas: '/admin/posts' para acessar a rota de postagens, '/admin/categorias' para acessar a parte de categorias, etc.</p>
+
+        <p>Seguindo por essa lógica, quando não fazíamos esse tipo de navegação por rotas e apenas criávamos rotas no arquivo de servidor diretamente, a nossa "rota de prefixo", se é que tinhamos até aquele momento, <b>era justamente o que a antecedia</b>, e nesse caso, 'localhost:XXXX/'. A diferença é que esse tipo de coisa não era "definida" previamente, como estamos fazendo agora (até porque não tinha necessidade).</p>
+
+        <footer>
+            <a href="../a27/a27.html">Página Anterior</a>
+            <a href="#">Próxima Página</a>
+        </footer>
+    </main>
+</body>
+</html>
