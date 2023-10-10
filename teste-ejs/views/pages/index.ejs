@@ -1,0 +1,16 @@
+<!-- '< %=' - tag que permite escapar strings/texto literais no HTML. Útil para exibir valores de variáveis. -->
+<!-- Veja que estamos utilizando o objeto passado na renderização anteriormente. -->
+<h3>Olá, meu nome é <%= usuario.nome %>. Tenho <%= usuario.idade %> anos de idade.</h3>
+
+<!-- '< %' - scriptlet tag: permite usar lógica e toda a síntaxe do próprio javascript! -->
+<!-- Se a propriedade do administrador for igual à true, -->
+<!-- um HTML é gerado. Se não, outro HTML é gerado. -->
+
+<% if (usuario.admin) { %> 
+                           
+<h3 style="color: deeppink;">Sou administrador do sistema!</h3>
+
+<% } else { %>
+<h3 style="color: blue;">Sou um usuário comum do sistema.</h3>
+
+<% } %>

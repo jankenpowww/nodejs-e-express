@@ -1,0 +1,16 @@
+<h3>Todos os usuários do sistema:</h3>
+
+<!-- Percorrendo o array de objeto passado no render. -->
+<% usuarios.forEach(usuario => { %>
+    <h4><%= usuario.nome %></h4>
+    <h5><%= usuario.email %></h5>
+    
+    <% if (usuario.admin) { %>
+        <h5><b style="color: deeppink;">Administrador</b></h5>
+
+    <% } else { %>
+        <h5><b style="color: blue;">Usuário</b></h5>
+    <% } %>
+
+    <hr>
+<% }); %>

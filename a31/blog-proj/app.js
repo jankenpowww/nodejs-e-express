@@ -1,13 +1,19 @@
 //Importação de módulos
     const express = require("express")
     const handlebars = require("express-handlebars")
+    const path = require("path")
 
 //Inicialização do Express e suas configurações + Handlebars
     const app = express()
 
+    //Bodyparser e Json.
     app.use(express.urlencoded({extended: true}))
     app.use(express.json())
 
+    //Acesso à arquivos estáticos (CSS e JavaScript)
+    app.use(express.static(path.join(__dirname, "public")))
+
+    //Handlebars
     app.engine("handlebars", handlebars.engine({
         defaultLayout: "main",
         runtimeOptions: {

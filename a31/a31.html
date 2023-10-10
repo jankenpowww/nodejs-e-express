@@ -80,6 +80,7 @@ const <span class="tBranco">PORT</span> = <span class="tLaranja">3030</span>
             <li><b>'views/layouts/'</b>, e dentro de 'layouts', um arquivo chamado 'main.handlebars'.</li>
             <li><b>'models'</b>, onde vamos criar as models referente à cada coleção do banco de dados.</li>
             <li><b>'routes'</b>, da qual vamos dar um enfoque na próxima seção.</li>
+            <li><b>'public'</b>, para os arquivos estáticos.</li>
         </ul>
 
         <br><br>
@@ -153,6 +154,213 @@ const <span class="tBranco">admin</span> = require(<span class="tLaranja">"./rou
         <p>Assim como as mensagens das rotas 'posts' e 'categorias', consequentemente. Para acessá-las, temos que incluir antecipadamente <b>sua rota de prefixo</b>, da qual está associada seu grupo de rotas: '/admin/posts' para acessar a rota de postagens, '/admin/categorias' para acessar a parte de categorias, etc.</p>
 
         <p>Seguindo por essa lógica, quando não fazíamos esse tipo de navegação por rotas e apenas criávamos rotas no arquivo de servidor diretamente, a nossa "rota de prefixo", se é que tinhamos até aquele momento, <b>era justamente o que a antecedia</b>, e nesse caso, 'localhost:XXXX/'. A diferença é que esse tipo de coisa não era "definida" previamente, como estamos fazendo agora (até porque não tinha necessidade).</p>
+
+        <br><br>
+
+        <h1>Arquivos estáticos</h1>
+        <p>No contexto de servidores, arquivos estáticos <b>nada mais é do que conteúdo de estilo, script e mídia oferecidos pelo próprio servidor em resposta à alguma requisição</b>. Com conteúdo de estilo e script, falamos indiretamente dos arquivos de CSS e JavaScript, respectivamente, que complementam o visual e interatividade das páginas HTML 'servidas', e com mídia, todos os outros arquivos que representam imagens, vídeos ou arquivos de vetor. O Express possui um artifício próprio para isso onde <b>indicamos um diretório específico de onde ele terá acesso à esses recursos</b>, e que servirá para gente, no HTML, como referência para utilizar esses arquivos para ilustrar nossas páginas.</p>
+
+        <p>Antes de mais nada, <b>vamos dar uma atenção à parte de layout tradicional do Handlebars</b>. No arquivo 'main.handlebars', dentro de <b>views/layouts</b>, vamos modelar a estrutura principal do HTML aos moldes do próprio Handlebars.</p>
+
+<pre>
+<span class="arquivo">main.handlebars</span>
+<code>
+&lt;!DOCTYPE html&gt;
+&lt;html lang="pt-BR"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;<span class="tBranco">Blog</span>&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    <span class="tBranco">{{{<span class="tRosa">body</span>}}}</span>
+&lt;/body&gt;
+&lt;/html&gt;
+</code>
+</pre>
+
+        <p>Como sabemos, mais uma vez, é dentro de <span class="tCodigo"><span class="tBranco">{{{<span class="tRosa">body</span>}}}</span></span> que serão renderizados os outros arquivos HTML relacionado às outras rotas. Veja que essa estrutura padrão complementa automaticamente os outros HTMLs, o que significa que essa estrutura será o padrão para todas as outras partes de HTML que conterão apenas o 'pedaço de HTML' que importa; seja um formulário, que já fizemos antes, seja uma seção inteira dedicada à uma parte do site, etc.</p>
+
+        <p>E para economizar nosso tempo com a parte de front-end, em questão de estrutura, estilo e interatividade, vamos utilizar o Bootstrap como framework para desenvolver nossos HTMLs à partir de agora.</p>
+
+        <p>Em <a href="https://getbootstrap.com/docs/5.3/getting-started/download/#compiled-css-and-js" target="_blank" rel="external">https://getbootstrap.com/docs/5.3/getting-started/download/#compiled-css-and-js</a>, na parte <b><em>Compiled CSS and JS</em></b>, temos um botão de download para o .zip dos arquivos do Bootstrap compilados. Ao baixar esse zip, vamos extrair as pastas 'css' e 'js' para dentro da nossa pasta <b>public</b>. Esse serão os arquivos estáticos para estilizar e dinamizar o nosso HTML utilizando o Bootstrap, além de aproveitar as estruturas oferecidas na própria documentação do framework. Podemos também criar um arquivo chamado 'img', onde guardaremos todas as imagens da nossa aplicação.</p>
+
+        <p>Com essa primeira parte dos diretórios pronta, vamos "informar para o nosso servidor" que vamos utilizar arquivos estáticos relacionando-o com o nosso diretório 'public', da seguinte maneira:</p>
+
+<pre>
+<span class="arquivo">app.js</span>
+<code>
+<span class="tVerde">//Imports</span>
+const <span class="tBranco">express</span> = require(<span class="tLaranja">"express"</span>)
+const <span class="tBranco">handlebars</span> = require(<span class="tLaranja">"express-handlebars"</span>)
+const <spna class="tBranco">path</spna> = require(<span class="tLaranja">"path"</span>)
+
+<span class="tVerde">//Inicialização do Express e configurações + configurações do Handlebars</span>
+const <span class="tBranco">app</span> = <span class="tBranco">express</span>()
+<span class="tBranco">app</span>.<span class="tRosa">use</span>(<span class="tBranco">express</span>.<span class="tRosa">urlencoded</span>({<span class="tBranco">extended</span>: <span class="tLaranja">false</span>})
+<span class="tBranco">app</span>.<span class="tRosa">use</span>(<span class="tBranco">express</span>.<span class="tRosa">json</span>())
+
+<span class="tBranco">app</span>.<span class="tRosa">engine</span>(<span class="tLaranja">"Handlebars"</span> <span class="tBranco">handlebars</span>.<span class="tRosa">engine</span>({
+    <span class="tBranco">defaultLayout</span>: <span class="tLaranja">"main"</span>,
+    <span class="tBranco">runtimeOptions</span>: {
+        <span class="tBranco">allowProtoMethodsByDefault</span>: <span class="tLaranja">true</span>,
+        <span class="tBranco">allowProtoPropertiesByDefault</span>: <span class="tLaranja">true</span>
+    }
+})
+<span class="tBranco">app</span>.<span class="tRosa">set</span>(<span class="tLaranja">"view engine"</span>, <span class="tLaranja">"handlebars"</span>)
+
+<span class="tBranco">app</span>.<span class="tRosa">use</span>(<span class="tBranco">express</span>.<span class="tRosa">static</span>(<span class="tBranco">path</span>.<span class="tRosa">join</span>(<span class="tBranco">__dirname</span>, <span class="tLaranja">"public"</span>)))
+
+...
+</code>
+</pre>
+
+        <p>Primeiro, fazemos o import/require de um componente nativo do Node chamado de <span class="tCodigo"><span class="tBranco">path</span></span>, da qual já utilizamos em uma aula anterior. Dentre outros usos, utilizamos esse componente <b>para relacionar caminhos e diretórios</b>, e é o que fazemos nessa última linha: a propriedade <span class="tCodigo"><span class="tBranco">__dirname</span></span> <b>é disponibilzada de forma "standalone" quando importamos o módulo 'path'</b>, e ele basicamente carrega de forma dinâmica <b>o endereço absoluto do nosso diretório de projeto</b>.</p>
+
+        <p>No método <span class="tCodigo"><span class="tRosa">join</span></span>, onde passamos <span class="tCodigo"><span class="tBranco">__dirname</span></span> no primeiro argumento, passamos uma string com o nome do nosso diretório de arquivos estáticos. O método faz uma concatenação e forma um endereço completo para o acesso a pasta <b>'public'</b>, que é o argumento passado dentro de <span class="tCodigo"><span class="tBranco">express.<span class="tRosa">static</span></span></span> e consequentemente passado dentro de <span class="tCodigo"><span class="tRosa">use</span></span>.</p>
+
+        <p>Com a parte dos diretórios pronta e agora com a parte configurada no Express, <b>vamos voltar para o main.handlebars</b>, nosso layout principal que conterá todas as outras views, e <b>incorporar a utilização desses arquivos dentro deste HTML</b>. Isso signfica que todo HTML à parte renderizado também poderá utilizar dos conteúdos disponibilizados nos arquivos estáticos, uma vez que, na renderização final, serão um único arquivo HTML. Vamos observar isso mais à frente.</p>
+
+        <p>No arquivo 'main.handlebars', em 'views/layouts', precisamos passar o caminho dos diretórios dos arquivos utilizados, tanto para o CSS quanto para o JavaScript, e em então linkar outros dois links de script importantes para o funcionamento do Bootstrap da nossa aplicação, observe...</p>
+
+<pre>
+<span class="arquivo">main.handlebars</span>
+<code>
+&lt;!DOCTYPE html&gt;
+&lt;html lang="pt-BR"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+
+    <span class="tVerde">&lt;!-- linkando arquivo .css principal do bootstrap da pasta 'public' --&gt;</span>
+    &lt;<span class="tBranco">link</span> rel=<span class="tLaranja">"stylesheet"</span> href=<span class="tLaranja">"/css/bootstrap.css"</span> type=<span class="tLaranja">"text/css"</span>&gt;
+
+    &lt;title&gt;<span class="tBranco">Blog</span>&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    <span class="tBranco">{{{<span class="tRosa">body</span>}}}</span>
+&lt;/body&gt;
+
+<span class="tVerde">&lt;!-- linkando javascript externo do bootstrap --&gt;</span>
+&lt;<span class="tBranco">script</span> src=<span class="tLaranja">"https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"</span> integrity=<span class="tLaranja">"sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"</span> crossorigin=<span class="tLaranja">"anonymous"</span>&gt;&lt;<span class="tBranco">/script</span>&gt;
+&lt;<span class="tBranco">script</span> src=<span class="tLaranja">"https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"</span> integrity=<span class="tLaranja">"sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"</span> crossorigin=<span class="tLaranja">"anonymous"</span>&gt;&lt;<span class="tBranco">/script</span>&gt;
+
+<span class="tVerde">&lt;!-- linkando arquivo .js principal do bootstrap da pasta 'public' --&gt;</span>
+&lt;<span class="tBranco">script</span> src=<span class="tLaranja">"/js/bootstrap.js"</span>&gt;&lt;<span class="tBranco">/script</span>&gt;
+
+&lt;/html&gt;
+</code>
+</pre>
+
+        <p>Veja que incorporamos o nosso CSS servido pelo servidor (¬¬') e o JavaScript passando um caminho aparentemente "incorreto" ou "imcompleto". Você deve lembrar que anteriormente fizemos a associação à nossa pasta 'public' como diretório de arquivos estáticos, e uma vez que o Express 'entende' isso, ele automaticamente faz essa relação e exibe um HTML utilizando o endereço total. Isso pode parecer confuso e complicado no começo, mas, se tudo der errado e o HTML exibido estiver cru, provavelmente <b>é por conta de algum erro no endereço de incorporação de CSS ou JS</b>.</p>
+
+        <p>Por fim, há outros dois links de script <b>que incorporam código de uma fonte externa</b>, que é do próprio Bootstrap nesse caso. Esses links, que são primordiais para que as interações com algumas estruturas fornecidas pelo Bootstrap funcionem, são disponibilzadas na própria documentação <a href="https://getbootstrap.com/docs/5.3/getting-started/download/#cdn-via-jsdelivr" target="_blank" rel="external">aqui</a>, onde temos os links para caso estejamos utilizando os arquivos compilados do bootstrap.</p>
+
+        <p>Isso é tudo o que temos até agora. E já que configuramos o express para lidar com o envio de arquivos estáticos, basta com que testemos esse recurso nos próximos segmentos...</p>
+
+        <br><br>
+
+        <h1>Exibindo um <em>front</em> bonito</h1>
+
+        <p>No diretório <b>'views'</b>, vamos criar dois diretórios: um chamado 'admin', onde estarão todas as views associadas à este tipo de usuário, no contexto da aplicação, e outro chamado <b>'partials'</b>. Parciais, ou partials, nada mais é <b>do que pedaços de HTML que são reutilizados em todas ou pelo menos na maioria das páginas</b>, e nesse contexto, é possível imaginar o que podemos ter em todas as páginas de um site. Toda página tem um rodapé no final da página, assim como todo site tem um cabeçalho com os links das seções principais. E, convenhamos, <b>seria um saco ter que ficar repetindo a mesma estrutura toda vez</b>. É para isso que temos os partials: pedaços de HTML prontos que só precisamos chamar uma única vez e ele estará presente em todas as seções automaticamente: lembre-se que temos um arquivo 'main' do Handlebars que basicamente está funcionando da mesma forma, e é lá que vamos chamar nossa partial uma única vez e ela concatenará com todos os HTMLs requisitados em seguida.</p>
+
+        <p>Na pasta 'partials', vamos criar um arquivo chamado <b>'_navbar.handlebars'</b>. Ele conterá toda a estrutura HTML do cabeçalho do nosso blog.</p>
+
+<pre>
+<span class="arquivo">_navbar.handlebars</span>
+<code>
+&lt;nav class=&quot;navbar navbar-expand-lg bg-body-tertiary&quot;&gt;
+  &lt;div class=&quot;container-fluid&quot;&gt;
+    &lt;a class=&quot;navbar-brand&quot; href=&quot;#&quot;&gt;Navbar&lt;/a&gt;
+    &lt;button class=&quot;navbar-toggler&quot; type=&quot;button&quot; data-bs-toggle=&quot;collapse&quot; data-bs-target=&quot;#navbarSupportedContent&quot; aria-controls=&quot;navbarSupportedContent&quot; aria-expanded=&quot;false&quot; aria-label=&quot;Toggle navigation&quot;&gt;
+      &lt;span class=&quot;navbar-toggler-icon&quot;&gt;&lt;/span&gt;
+    &lt;/button&gt;
+    &lt;div class=&quot;collapse navbar-collapse&quot; id=&quot;navbarSupportedContent&quot;&gt;
+      &lt;ul class=&quot;navbar-nav me-auto mb-2 mb-lg-0&quot;&gt;
+        &lt;li class=&quot;nav-item&quot;&gt;
+          &lt;a class=&quot;nav-link active&quot; aria-current=&quot;page&quot; href=&quot;#&quot;&gt;Home&lt;/a&gt;
+        &lt;/li&gt;
+        &lt;li class=&quot;nav-item&quot;&gt;
+          &lt;a class=&quot;nav-link&quot; href=&quot;#&quot;&gt;Link&lt;/a&gt;
+        &lt;/li&gt;
+        &lt;li class=&quot;nav-item dropdown&quot;&gt;
+          &lt;a class=&quot;nav-link dropdown-toggle&quot; href=&quot;#&quot; role=&quot;button&quot; data-bs-toggle=&quot;dropdown&quot; aria-expanded=&quot;false&quot;&gt;
+            Dropdown
+          &lt;/a&gt;
+          &lt;ul class=&quot;dropdown-menu&quot;&gt;
+            &lt;li&gt;&lt;a class=&quot;dropdown-item&quot; href=&quot;#&quot;&gt;Action&lt;/a&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a class=&quot;dropdown-item&quot; href=&quot;#&quot;&gt;Another action&lt;/a&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;hr class=&quot;dropdown-divider&quot;&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a class=&quot;dropdown-item&quot; href=&quot;#&quot;&gt;Something else here&lt;/a&gt;&lt;/li&gt;
+          &lt;/ul&gt;
+        &lt;/li&gt;
+        &lt;li class=&quot;nav-item&quot;&gt;
+          &lt;a class=&quot;nav-link disabled&quot; aria-disabled=&quot;true&quot;&gt;Disabled&lt;/a&gt;
+        &lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;form class=&quot;d-flex&quot; role=&quot;search&quot;&gt;
+        &lt;input class=&quot;form-control me-2&quot; type=&quot;search&quot; placeholder=&quot;Search&quot; aria-label=&quot;Search&quot;&gt;
+        &lt;button class=&quot;btn btn-outline-success&quot; type=&quot;submit&quot;&gt;Search&lt;/button&gt;
+      &lt;/form&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/nav&gt;
+</code>
+</pre>
+
+        <p>Esta estrutura é oferecida pelo próprio bootstrap como exemplo <a href="https://getbootstrap.com/docs/5.3/components/navbar/#supported-content" target="_blank" rel="external">aqui</a>.</p>
+
+        <p>Agora, basta chamar <b>essa estrutura no arquivo 'main.handlebars'</b>, e a partir daí, assim como próprio HTML deste arquivo em si, <b>vai ser exibido juntamente com os outros HTMLs de outras requisições</b>.</p>
+
+<pre>
+<span class="arquivo">main.handlebars</span>
+<code>
+&lt;!DOCTYPE html&gt;
+&lt;html lang="pt-BR"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+
+    <span class="tVerde">&lt;!-- linkando arquivo .css principal do bootstrap da pasta 'public' --&gt;</span>
+    &lt;<span class="tBranco">link</span> rel=<span class="tLaranja">"stylesheet"</span> href=<span class="tLaranja">"/css/bootstrap.css"</span> type=<span class="tLaranja">"text/css"</span>&gt;
+
+    &lt;title&gt;<span class="tBranco">Blog</span>&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    <span class="tBranco">{{> <span class="tRosa">_navbar</span>}}</span>
+    <span class="tBranco">{{{<span class="tRosa">body</span>}}}</span>
+&lt;/body&gt;
+
+...
+</code>
+</pre>
+
+        <p>No diretório <b>'views/admin'</b>, que criamos agora pouco, vamos criar um arquivo chamado 'index.handlebars', e vamos renderizá-lo na rota principal que criamos para este grupo de rotas em particular. Para fins de teste, vamos exibir um título simples.</p>
+
+<pre>
+<span class="arquivo">index.handlebars</span>
+<code>
+&lt;h3&gt;Página do administrador!&lt;/h3&gt;
+</code>
+</pre>
+
+        <p>E por fim, basta <b>fazer a view renderizar na rota principal</b>, dentro do arquivo de grupo de rotas do administrador que criamos anteriormente.</p>
+
+<pre>
+<span class="arquivo">admin.js</span>
+<code>
+const <span class="tBranco">express</span> = require(<span class="tLaranja">"express"</span>)
+const <span class="tBranco">router</span> = <span class="tBranco">express</span>.<span class="tRosa">Router</span>()
+
+<span class="tBranco">router</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"admin/index"</span>)
+})
+
+...
+</code>
+</pre>
+
+        <p>E então, basta rodar o arquivo e acessar a rota '/admin'. É bom ressaltar que, neste caso, o navbar e a estrutura do main só vai ser renderizada junto com o HTML index do administrador se o HTML em questão for mostrada pelo método <span class="tCodigo"><span class="tRosa">render</span></span>.</p>
 
         <footer>
             <a href="../a27/a27.html">Página Anterior</a>

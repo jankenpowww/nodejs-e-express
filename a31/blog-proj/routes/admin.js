@@ -3,11 +3,11 @@ const express = require("express")
 const router = express.Router() //Vai permitir grupos de rotas associados. Precisamos associar à uma variável.
 
 router.get("/", (req, res) => {
-    res.send("<h3>Página principal do painel de administrador.<h3>")
+    res.render("admin/index")
 })
 
 router.get("/posts", (req, res) => {
-    res.send("<h3>Página de posts.</h3>")
+    res.render("admin/posts")
 })
 
 router.get("/categorias", (req, res) => {

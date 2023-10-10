@@ -1,0 +1,14 @@
+<!-- '< %-': escapa tags HTML. Incluímos um HTML com include. -->
+<%- include("../partials/head") %>
+<%- include("../partials/header") %>
+
+<h2>Postagens recentes:</h2>
+
+<% posts.forEach(post => { %>
+    <h4><%= post.titulo %></h4>
+    <p><%= post.legenda %></p>
+    <hr>
+<% }); %>
+
+<!-- '< %-': escapa tags HTML. Incluímos um HTML com include. -->
+<%- include("../partials/footer") %>
