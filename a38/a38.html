@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../stemp-css/stemp.css" type="text/css">
+    <title>a38</title>
+</head>
+<body>
+    <h1>a38 - Middleware</h1>
+
+    <main>
+        <h1>Talvez você não se lembre...</h1>
+        <p>Lá atrás, houve alguma referência ou menção sobre <em>Middlewares</em> de forma bem sucinta, e vamos abordar agora com mais profundidade essa funcionalidade do Express nesse contexto de servidor, requisição e resposta (e também porque chegou a hora de saber como isso funciona).</p>
+
+        <p>E talvez você não tenha percebido, <b>mas desde então, nas partes práticas do projeto e em testes, estivemos utilizando <em>Middlewares</em> a torto e a direito</b>: quando definimos o Express com <b>o bodyparser para receber informações enviadas no cabeçalho de uma requisição via POST</b>; para definir <b>o diretório de arquivos estáticos utilizados nas nossas views</b>, etc. Veja que os Middlewares estão diretamente relacionado ao esquema de requisição e resposta: temos um Middleware <b>que 'intermedia' o envio de dados enviados de um cabeçalho de requisição para outras rotas</b>, assim como <b>definimos um Middleware que recupera dados enviados de um formulário para uma rota de redirecionamento, onde os dados são tratados</b>.</p>
+
+        <p>E na prática, <em>Middlewares</em> nada mais são do que <b>funções que possuem uma maior prioridade para serem executadas</b>, quando definidas no servidor. Voltando aos <em>Middlewares</em> que utilizamos até agora: para os arquivos estáticos, antes mesmo de acessarmos uma rota, o Middleware responsável executa primeiro <b>oferencendo acesso ao diretório e aos arquivos</b>, e só então o recurso de renderização, definido dentro da lógica, é executado. Dizemos que os <em>Middlewares</em> <b>executam antes do que foi definido em um bloco de rota</b>.</p>
+
+        <p>E dizer que <em>Middlewares</em> nada mais são do que funções significa que podem ser qualquer coisa, e não somente o que o próprio Express oferece em questão de manipulação de recursos do servidor. Definimos e vinculamos o uso de um <em>Middleware</em> através do método <span class="tCodigo"><span class="tRosa">use</span>()</span>, acessado de uma instância de aplicação do Express.</p>
+
+<pre>
+<code>
+<span class="tVerde">//Exemplo de uso de Middleware. Esse Middleware permitiu o acesso 
+//das informações enviadas de um formulário, enviadas no 
+//cabeçalho de uma requisição HTTP.</span>
+<span class="tBranco">app</span>.<span class="tRosa">use</span>(<span class="tBranco">express</span>.<span class="tRosa">urlencoded</span>({<span class="tBranco">extended</span>: <span class="tLaranja">true</span>}))
+</code>
+</pre>
+
+        <p>Para entender como <em>Middlewares</em> funcionam de verdade, vamos criar um <em>Middleware</em> e ver como ele está diretamente relacionado aos acessos de rotas definidas na nossa aplicação...</p>
+
+<pre>
+<code>
+const <span class="tBranco">app</span> = require(<span class="tLaranja">"express"</span>)()
+
+<span class="tVerde">//Estrutura do Middleware</span>
+<span class="tBranco">app</span>.<span class="tRosa">use</span>((<span class="tBranco">req</span>, <span class="tBranco">res</span>, <span class="tRosa">next</span>) => {
+    console.log(<span class="tLaranja">"Isto é um Middleware. Middlewares são executados primeiro!"</span>)
+    
+    <span class="tRosa">next</span>()
+})
+
+<span class="tBranco">app</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    console.log(<span class="tLaranja">"Você acessou a página principal!"</span>)
+    <span class="tBranco">res</span>.<span class="tRosa">send</span>(<span class="tLaranja">"&lt;h1&gt;Teste Middleware! ^^&lt;/h1&gt;"</span>)
+})
+
+<span class="tBranco">app</span>.<span class="tRosa">listen</span>(<span class="tLaranja">8085</span>, <span class="tLaranja">"localhost"</span>, () => {
+    console.log(<span class="tLaranja">"Aberto em 'localhost:8085/'."</span>)
+})
+</code>
+</pre>
+
+        <p>Como sabemos, definimos um uso ou uma estrutura de <em>Middleware</em> com o método <span class="tCodigo"><span class="tRosa">use</span></span>. Para a criação da função de <em>Middleware</em> em si, temos parâmetros <b>iguais à definição de rotas convencional</b> ('<em>req</em>' e '<em>res</em>'), <b>o que permite ter um controle a mais sobre as requisições e resposta fora do escopo de rotas</b>, e que vai permitir (spoiler!) criar a lógica de autenticação de usuário da nossa aplicação. Porém, veja que há um outro "parâmetro" importante: <span class="tCodigo"><span class="tRosa">next</span>()</span> na verdade <b>é uma função importante e essencial</b>, que deve ser chamada no final de todo <em>Middleware</em>. Este método avança para o executar próximo <em>Middleware</em> definido (se houver) depois deste <em>Middleware</em> em questão, até que o bloco de código da rota finalmente seja executado.</p>
+
+        <p>Partindo disso, <b>é lógico pensar que, ao acessar a rota principal, o <samp>console.log</samp> do <em>Middleware</em> vai ser printado no console primeiro</b>, e em seguida, o <samp>console.log</samp> da rota. E é isso mesmo que acontece. Se houvesse outro <em>Middleware</em> definido depois deste, ele seria executado em fila até chegar na lógica da rota.</p>
+
+        <p>Ao acessar a rota, o console printará as informações nessa exata ordem:</p>
+
+<pre>
+<code>
+<span class="tBranco">Isto é um Middleware. Middlewares são executados primeiro!
+Você acessou a página principal!</span>
+</code>
+</pre>
+
+        <footer>
+            <a href="../a37/a37.html">Página Anterior</a>
+            <a href="#">Próxima Página</a>
+        </footer>
+    </main>
+</body>
+</html>

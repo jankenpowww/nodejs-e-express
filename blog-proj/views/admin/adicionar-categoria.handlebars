@@ -1,0 +1,16 @@
+<h3>Adicionar Categoria</h3>
+<hr>
+
+<div class="card">
+    <div class="card-body">
+        <form action="/admin/categorias/adicionar" method="post">
+            <label for="nome" class="mb-1">Nome:</label>
+            <input type="text" id="nome" name="nome" placeholder="Nome da categoria" class="form-control">
+
+            <label for="slug" class="mt-2 mb-1">Slug:</label>
+            <input type="text" id="slug" name="slug" placeholder="Slug da categoria" class="form-control">
+
+            <button type="submit" class="btn btn-block btn-success mt-4" style="width: 100%;">Criar Categoria</button>
+        </form>
+    </div>
+</div>

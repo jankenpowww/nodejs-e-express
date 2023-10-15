@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../stemp-css/stemp.css" type="text/css">
+    <title>a37</title>
+</head>
+<body>
+    <h1>a37 - Cookies e Sessões</h1>
+
+    <main>
+        <p>Nossa aplicação finalmente está ganhando forma! Uma vez que temos a parte essencial do projeto configurada, em questão de estrutura que está pronta para receber as principais 'features', precisamos antes <b>discutir sobre outros conceitos importantes</b> que vão vir a ser importante nos próximos passos, <b>que envolvem efetivamente o próprio usuário do sistema</b>. Falamos brevemente do próprio usuário anteriormente e agora, vamos aprofundar algumas questões que são fundamentais para a concepção de uma aplicação.</p>
+
+        <br><br>
+
+        <h1><s>Biscoitos</s> Bolachas e Sessões</h1>
+        <p>Cookies e Sessões funcionam de forma equivalentemente iguais, podem ou não serem a mesma coisa (???), mas tem suas particularidades. <em>Cookies</em>, como bem conhecemos, <b>nada mais é do que arquivos que armazenam informações e definições de um usuário</b>. Basicmente, Cookies são um recurso utilizado por aplicações web para guardar informações à respeito da navegação do usuário por um site ou aplicação. Informações de navegação podem se referir às <b>preferências do usuário definidas durante seu uso</b>, por exemplo: idiomas de preferência do usuário; definições de recurso de acessibilidade (temas de cores ou qualquer outro recurso visual que pode ser definido pelo usuário); links que o usuário acessou, etc. Mas saiba que os cookies <b>não necessariamente servem para guardar esse tipo de informação sobre o usuário</b>. Alguns serviços de e-mail como o Gmail e o Outlook, por exemplo, também utilizam recursos de cookies para guardar informações de e-mails e senhas utilizadas no dispositivo.</p>
+
+        <p>Mas de forma mais simples, <b>Cookies é um recurso comumente utilizado para garantir a experiência do usuário</b>, nessa questão de lembrar e armazenar informações de navegação do usuário para toda vez que um usuário acessar ou utilizar uma aplicação e o servidor ou navegador disponiblizar essa informação rapidamente.</p>
+
+        <p>Mas há quem diga que essa seja a principal funcionalidade dos Cookies. Essa modalidade de uso refere-se aos 'Cookies Temporários' ou Cookies que permanecem e são utilizados apenas durante a navegação do usuário por um site. Há também os <b>Cookies de Sessão</b>, que se refere à outra modalidade de uso de Cookies na questão de segurança e autenticação de usuários em uma aplicação web, e que é o que vamos discutir em seguida.</p>
+
+        <p>Sessões, ou <em>Session</em>, pode muito bem ser considerado um tipo de Cookie especifico para a autenticação de sessão de um usuário, porém, à fim de causar menos confusão, vamos tratar como algo "separado". E quando dizemos "separado" do que conhecemos dos Cookies, nem é tanto assim, já que esse recurso depende de cookies para funcionar.</p> 
+        
+        <p>Sessões, ou <em>Session</em>, referem-se justamente <b>às informações de sessão de um usuário autenticado dentro de uma aplicação</b>. De forma mais prática, uma sessão de usuário é iniciada <b>dentro do servidor</b>, que por sua vez <b>envia um cookie ao navegador contendo o registro de ID único daquela sessão</b>. As sessões, como dito antes, são armazenadas dentro do servidor, onde são acessadas através dessa ID única.</p>
+
+        <p>Em toda requisição, o cookie que contém a ID da sessão é enviada para o servidor, que por sua vez oferece acesso às informações de sessão relacionados à ID em questão.</p>
+
+        <p>Em questão de comparação, utilizar o recurso de Sessions ao invés de Cookies diretamente é <b>mais seguro e vantajoso do que utilizar somente Cookies para isso</b>. Seguro pois os dados não são armazenados diretamente nos Cookies, o que significa que outra pessoa que não seja um usuário autenticado pode ter acesso ao Cookie, mas não às informações, já que estas estão registradas no servidor. E vantajoso pelo simplesmente motivo de: cookies não são capazes de armazenar muita informação.</p>
+
+        <p>De qualquer forma, <b>esses recursos vão ser utilizados na prática nas próximas implementações</b>.</p>
+
+        <footer>
+            <a href="../a31/a31.html">Página Anterior</a>
+            <a href="../a38/a38.html">Próxima Página</a>
+        </footer>
+    </main>
+</body>
+</html>
