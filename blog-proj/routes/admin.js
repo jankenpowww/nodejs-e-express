@@ -35,8 +35,8 @@ router.post("/categorias/adicionar", (req, res) => {
         res.send("<h3>Categoria registrada com sucesso!</h3>")
 
     }).catch((err) => {
-        res.send(`<h3>Não foi possível registrar!</h3><br><p>${err}</p>`)
+        res.send(`<h3>Não foi possível registrar!</h3><br><p>${err}</h3>`)
     })
 })
 
-module.exports = router //Exportamos o módulo para utilizar no arquivo de servidor pirncipal.
+module.exports = router //Exportamos o módulo para utilizar no arquivo de servidor principal.

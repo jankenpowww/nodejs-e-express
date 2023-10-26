@@ -130,9 +130,7 @@ pre{
 }
 
 pre{
-    word-wrap: break-word;
     overflow-x: auto;
-    white-space: pre-wrap;
 }
 
 footer{

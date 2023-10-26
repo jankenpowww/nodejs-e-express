@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../stemp-css/stemp.css" type="text/css">
+    <title>a31-2</title>
+</head>
+<body>
+    <h1>a31 - Iniciando projeto com Express (parte 02)</h1>
+
+    <main>
+        <h1>Criando o primeiro formulário de cadastro</h1>
+        <p>Agora que temos basicamente toda a parte de envio de arquivos estáticos pronta e o grupo de rotas do administrador estruturado, vamos implementar o primeiro formulário de cadastro da nossa aplicação.</p>
+
+        <p>Anteriormente, criamos uma rota, associado ao grupo de rotas da administração, para a seção de 'categorias'. Vamos fazer com que administradores consigam cadastrar categorias no sistema <b>que serviram, basicamente, para rotular postagens e associá-las à um mesmo grupo de postagem que também possuem a mesma categoria</b>. A premissa desta implementação vai dar margem para conhecer formas de estruturação e de visualização de dados de uma aplicação de uma maneira diferente e interessante. Acompanhe...</p>
+
+        <p>Para esta tarefa de implementação de cadastro de categorias, <b>vamos ver primeiro o que temos por enquanto no grupo de rotas da administração</b>.</p>
+
+<pre>
+<span class="arquivo">admin.js</span>
+<code>
+const <span class="tBranco">express</span> = require(<span class="tLaranja">"express"</span>)
+const <span class="tBranco">router</span> = <span class="tBranco">express</span>.<span class="tRosa">Router</span>()
+
+<span class="tBranco">router</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"admin/index"</span>)
+})
+
+<span class="tBranco">router</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/posts"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">res</span>.<span class="tRosa">send</span>(<span class="tLaranja">"&lt;h3&gt;Página de posts.&lt;/h3&gt;"</span>)
+})
+
+<span class="tBranco">router</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/categorias"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">res</span>.<span class="tRosa">send</span>(<span class="tLaranja">"&lt;h3&gt;Página de categorias.&lt;/h3&gt;"</span>)
+})
+
+<span class="tBranco">module</span>.<span class="tBranco">exports</span> = <span class="tBranco">router</span>
+</code>
+</pre>
+
+        <p>Na aula anterior, renderizamos uma view para testar o envio de arquivos estáticos do servidor para uma resposta de requisição.</p>
+
+        <p>Porém, nosso foco aqui agora é a parte de categorias. Vamos criar mais uma rota GET de acesso ao formulário de cadastro por parte do usuário e outra rota POST para o processamento e registro das informações preenchidas no nosso banco de dados.</b> Observe:</p>
+
+<pre>
+<span class="arquivo">admin.js</span>
+<code>
+const <span class="tBranco">express</span> = require(<span class="tLaranja">"express"</span>)
+const <span class="tBranco">router</span> = <span class="tBranco">express</span>.<span class="tRosa">Router</span>()
+
+<span class="tBranco">router</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"admin/index"</span>)
+})
+
+<span class="tBranco">router</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/posts"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">res</span>.<span class="tRosa">send</span>(<span class="tLaranja">"&lt;h3&gt;Página de posts.&lt;/h3&gt;"</span>)
+})
+
+<span class="tBranco">router</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/categorias"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tVerde">//Exibindo front da página de categorias.</span>
+    <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"admin/categorias"</span>)
+})
+
+<span class="tVerde">//Rota de acesso para o formulário de cadastro de categorias.</span>
+<span class="tBranco">router</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/categorias/adicionar"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"admin/adicionar-categoria"</span>)
+})
+
+<span class="tVerde">//Rota de processamento dos dados do formulário.</span>
+<span class="tBranco">router</span>.<span class="tRosa">post</span>(<span class="tLaranja">"/categorias/adicionar"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+
+})
+
+<span class="tBranco">module</span>.<span class="tBranco">exports</span> = <span class="tBranco">router</span>
+</code>
+</pre>
+
+        <p>Note que <b>temos o mesmo caminho de rota para ambos as rotas GET e POST</b>, e isso é totalmente possível. Acontece que faz parte das boas práticas de um sistema de servidor HTTP usar a mesa rota de acesso, de onde o usuário preenche e envia informações, na rota de processamento desses dados, relacionando ambas rotas GET e POST.</p>
+
+        <p>Note que dessa vez também vamos criar uma view para a página de categorias, de onde o usuário administrador terá o acesso ao formulário.</p>
+
+        <p>Para a rota POST, que vai processar os dados enviados do formulário, vamos deixar aberto para implementação por enquanto. É aqui onde <b>vamos criar um novo documento associado a model de categorias</b>, a partir dos dados enviados do formulário.</p>
+
+        <p>Mas antes, vamos criar as views referente a rota de categorias e do formulário de categorias. Lembre-se que os nomes dos arquivos .handlebars de cada view devem condizer com que está sendo renderizado dentro das rotas de acesso.</p>
+
+        <br><br>
+
+        <h1><em>front-ending</em></h1>
+        <p>Vamos criar, no diretório 'views/admin', os arquivos <b>'categorias.handlebars'</b> e <b>'adicionar-categoria.handlebars'</b>.</p>
+
+        <p>Temos a seguinte estrutura HTML para cada view:</p>
+
+<pre>
+<span class="arquivo">categorias.handlebars</span>
+<code>
+&lt;h3&gt;<span class="tBranco">Lista de categorias</span>&lt;/h3&gt;
+&lt;hr&gt;
+&lt;a <span class="tLaranja">href=&quot;/admin/categorias/adicionar&quot;</span>&gt;&lt;button class=&quot;btn btn-outline-success&quot;&gt;<span class="tBranco">+ Adicionar</span>&lt;button&gt;&lt;/a&gt;
+</code>
+</pre>
+
+<p>Esta view, associada a rota "/admin/categorias", vai exibir <b>todas as categorias cadastradas até agora</b>. Por enquanto, dispõe apenas de um botão envolto de uma tag de âncora que <b>redireciona para a rota do formulário de categorias</b>, da qual temos a estrutura de view abaixo. Note que o endereço do <span class="tCodigo"><span class="tLaranja">href</span></span> consta <b>o caminho exato para esta rota</b>, incluindo a rota de prefixo 'admin' (como visto na aula anterior).</p>
+
+<br>
+
+<pre>
+<span class="arquivo">adicionar-categoria.handlebars</span>
+<code>
+&lt;h3&gt;Adicionar Categoria&lt;/h3&gt;
+&lt;hr&gt;
+    
+&lt;div class=&quot;card&quot;&gt;
+    &lt;div class=&quot;card-body&quot;&gt;
+
+        <span class="tVerde">&lt;!-- Formulário de cadastro --&gt;</span>
+        &lt;form <span class="tBranco">action=</span><span class="tLaranja">&quot;/admin/categorias/adicionar&quot;</span> <span class="tBranco">method=</span><span class="tLaranja">&quot;post&quot;</span>&gt;
+            &lt;label for=&quot;nome&quot; class=&quot;mb-1&quot;&gt;Nome:&lt;/label&gt;
+            &lt;input type=&quot;text&quot; id=&quot;nome&quot; <span class="tBranco">name=</span><span class="tLaranja">&quot;nome&quot;</span> placeholder=&quot;Nome da categoria&quot; class=&quot;form-control&quot;&gt;
+    
+            &lt;label for=&quot;slug&quot; class=&quot;mt-2 mb-1&quot;&gt;Slug:&lt;/label&gt;
+            &lt;input type=&quot;text&quot; id=&quot;slug&quot; <span class="tBranco">name=</span><span class="tLaranja">&quot;slug&quot;</span> placeholder=&quot;Slug da categoria&quot; class=&quot;form-control&quot;&gt;
+    
+            &lt;button type=&quot;submit&quot; class=&quot;btn btn-block btn-success mt-4&quot; style=&quot;width: 100%;&quot;&gt;<span class="tBranco">Criar Categoria</span>&lt;/button&gt;
+        &lt;/form&gt;
+        
+    &lt;/div&gt;
+&lt;/div&gt;
+</code>
+</pre>
+
+        <p>Esta view, como se espera, vai dispor a estrutura do nosso formulário de cadastro de categorias. Nesta estrutura, temos os inputs principais que são identificados pelo valor <span class="tCodigo"><span class="tBranco">name</span></span>, da qual poderão ser acessadas dentro da rota de processamento das informações enviadas pelo formulário.</p>
+
+        <p>Os inputs se referem, respectivamente, <b>ao nome da categoria</b> e ao <b>slug da categoria</b>. Para o próximo passo, que é estruturação do banco de dados e do model referente às categorias, entraremos em mais detalhes à respeito, principalmente ao campo de slug e o que ele significa.</p>
+
+        <p>Finalmente, <b>estamos com as views associadas as rotas principais prontas</b>. Como já fizemos as associações com as rotas anteriormente no grupo de rotas do admin, já é possível visualizar os resultados simplemente acessando as rotas no navegador.</p>
+
+        <p>... E antes de mais nada, vamos alinhar as coisas aqui. Literalmente. Esse ajuste no arquivo 'main.handlebars', envolvendo <span class="tCodigo"><span class="tBranco">{{{<span class="tRosa">body</span>}}}</span></span> em uma div da classe "container" do Bootstrap vai centralizar e dar o devido espaçamento a todas as views renderizadas posteriormente.</p>
+
+<pre>
+<span class="arquivo">main.handlebars</span>
+<code>
+&lt;!DOCTYPE html&gt;
+&lt;html lang="pt-BR"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+
+    <span class="tVerde">&lt;!-- linkando arquivo .css principal do bootstrap da pasta 'public' --&gt;</span>
+    &lt;<span class="tBranco">link</span> rel=<span class="tLaranja">"stylesheet"</span> href=<span class="tLaranja">"/css/bootstrap.css"</span> type=<span class="tLaranja">"text/css"</span>&gt;
+
+    &lt;title&gt;<span class="tBranco">Blog</span>&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+    <span class="tBranco">{{> <span class="tRosa">_navbar</span>}}</span>
+    &lt;div class="container"&gt;
+        <span class="tBranco">{{{<span class="tRosa">body</span>}}}</span>
+    &lt;/div&gt;
+
+&lt;/body&gt;
+
+<span class="tVerde">&lt;!-- linkando javascript externo do bootstrap --&gt;</span>
+&lt;<span class="tBranco">script</span> src=<span class="tLaranja">"https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"</span> integrity=<span class="tLaranja">"sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"</span> crossorigin=<span class="tLaranja">"anonymous"</span>&gt;&lt;<span class="tBranco">/script</span>&gt;
+&lt;<span class="tBranco">script</span> src=<span class="tLaranja">"https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"</span> integrity=<span class="tLaranja">"sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"</span> crossorigin=<span class="tLaranja">"anonymous"</span>&gt;&lt;<span class="tBranco">/script</span>&gt;
+
+<span class="tVerde">&lt;!-- linkando arquivo .js principal do bootstrap da pasta 'public' --&gt;</span>
+&lt;<span class="tBranco">script</span> src=<span class="tLaranja">"/js/bootstrap.js"</span>&gt;&lt;<span class="tBranco">/script</span>&gt;
+
+&lt;/html&gt;
+</code>
+</pre>
+
+        <p>Dentre as etapas de implementação do formulário, já temos as rotas e suas views correspondentes prontas. Vamos para a parte de banco de dados e criar o model referente as categorias (e aproveitar para se aprofundar mais em como tudo isso vai funcionar).</p>
+
+        <br><br>
+
+        <h1>Esquematização de categorias</h1>
+        <p>Como já temos o Mongoose instalado como dependência do nosso projeto, basta agora partir para a prática <b>criando o model de categorias</b>. Vamos criar um diretório chamado '<b>models</b>', e nele, criar um arquivo chamado 'Categoria.js'. Este arquivo conterá a esquematização e estruturação do model de categorias, da qual vai armazenar documentos pra cada registro feito.</p>
+
+        <p>A estrutura para receber os dados do formulário e registrá-los no banco de dados se parecerá com isso. Veja que toda a explicação sobre o MongoDB e o Mongoose e sobre como criar models para este tipo de banco de dados foram explicadas anteriormente:</p>
+
+<pre>
+<span class="arquivo">Categoria.js</span>
+<code>
+const <span class="tBranco">mongoose</span> = require(<span class="tLaranja">"mongoose"</span>)
+const { <span class="tBranco">Schema</span> } = require(<span class="tLaranja">"mongoose"</span>)
+
+const <span class="tBranco">categoriaSchema</span> = new <span class="tBranco">Schema</span>({
+    <span class="tBranco">nome</span>: { <span class="tBranco">type</span>: <span class="tBranco">String</span>, <span class="tBranco">required</span>: <span class="tLaranja">true</span> },
+    <span class="tBranco">slug</span>: { <span class="tBranco">type</span>: <span class="tBranco">String</span>, <span class="tBranco">required</span>: <span class="tLaranja">true</span> },
+    <span class="tBranco">date</span>: { <span class="tBranco">type</span>: <span class="tBranco">Date</span>, <span class="tBranco">default</span>: <span class="tBranco">Date</span>.<span class="tRosa">now</span>() },
+})
+
+const <span class="tBranco">Categoria</span> = <span class="tBranco">mongoose</span>.<span class="tRosa">model</span>(<span class="tLaranja">"categoria"</span>, <span class="tBranco">categoriaSchema</span>)
+
+<span class="tBranco">module</span>.<span class="tBranco">exports</span> = <span class="tBranco">Categoria</span>
+</code>
+</pre>
+
+        <p>E como prometido, vamos explicar o que <b>cada estrutura de dados vai armazenar e para que fim os documentos relacionados a categoria vão ser armazenados no contexto da aplicação</b>. Sobretudo sobre o campo <samp><span class="tBranco">slug</span></samp>. A categoria, como dito antes, é recurso utilizado pelos administradores do sistema para registrar categorias relacionadas aos posts do blog. Em resumo, cada post vai ser relacionado a uma categoria diferente, que por sua vez pode <b>ser utilizada para filtrar postagens em comuns que estão relacionados a aquela categoria em questão. As categorias vão ser tópicos genéricos (exemplo: "Tecnologia", "Programação", "Notícias")</b> associados a uma ou várias postagens que tratam desse mesmo assunto.</p>
+
+        <p>Além do nome, que define o que é a categoria, <b>temos o slug da categoria</b>, que basicamente vai ser um complemento associado à URL e que vai permitir <b>filtrar e realizar buscas de postagens associadas aquele mesmo tópico de forma mais simples, dinâmica e <a href="https://acesso.agencianaweb.net.br/knowledgebase/834/O-que-sao-URLs-amigaveis.html" target="_blank" rel="external">amigável</a></b>.</p>
+
+        <p>E "amigável" não é atoa: slugs não servem apenas para a conveniência de facilitar buscas de conteúdos em uma aplicação web, mas também torna sua leitura mais fácil para quem visita: o formato de dado que uma slug vai receber deve condizer exatamente o tipo de categoria: <b>se a categoria for "Marketing", seu slug deve ser "marketing"; se for "Tecnologia", o slug é "tecnologia"; se for "Notícias da Semana", o slug nesse caso vai ser "noticias-da-semana"</b>.</p>
+
+        <p>Note que slugs URL <b>é, como o nome diz, parte do endereço associado à um tipo de conteúdo específico</b>. Neste caso, as categorias com as postagens do blog. Então, deve sempre seguir nesse formato: tudo minúsculo, sem acentuação ou caracteres especiais e substituir tudo o que for espaço por traço.</p>
+
+        <p>Dito isso, fazemos a exportação do mais novo model de categorias na última linha, <b>da qual utilizamos para criar um novo registro</b>, ao estilo de "instanciação" que o Mongoose oferece.</p>
+
+        <br><br>
+
+        <h1>Registrando uma categoria</h1>
+        <p>Sabemos que o processamento de dados <b>ocorre justamente no endereço de redirecionamento do formulário, proposto no parâmetro <span class="tCodigo"><span class="tBranco">action</span></span></b>. Na parte de servidor e rotas, para garantir a integridade e segurança dos dados enviados no corpo da requisição, utilizamos o método POST para criar uma rota de redirecionamento, que está diretamente relacionada ao formulário de cadastro de categorias. Nada disso é novo: agora, o que temos que fazer é <b>o incluir o model de categorias e, na rota POST, criar um novo documento a partir das informações enviadas do formulário</b>.</p>
+
+        <p>No grupo de rotas 'admin.js', incluimos o model de categorias. Em seguida, na rota POST, acessamos as informações enviadas do formulário junto do corpo da requisição através da propriedade <samp><span class="tBranco">req</span>.<span class="tBranco">body</span></samp>, passando os identificadores do parâmetro <samp><span class="tLaranja">name</span></samp>, incluídas nos &lt;input&gt; de cada campo do formulário, para acessar os dados efetivamente.</p>
+
+<pre>
+<span class="arquivo">admin.js</span>
+<code>
+const <span class="tBranco">express</span> = require(<span class="tLaranja">"express"</span>)
+const <span class="tBranco">router</span> = <span class="tBranco">express</span>.<span class="tRosa">Router</span>()
+
+<span class="tVerde">//Importando o model de categorias.</span>
+const <span class="tBranco">Categoria</span> = require(<span class="tLaranja">"../models/Categoria"</span>)
+
+<span class="tBranco">router</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"admin/index"</span>)
+})
+
+<span class="tBranco">router</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/posts"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">res</span>.<span class="tRosa">send</span>(<span class="tLaranja">"&lt;h3&gt;Página de posts.&lt;/h3&gt;"</span>)
+})
+
+<span class="tBranco">router</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/categorias"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tVerde">//Exibindo front da página de categorias.</span>
+    <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"admin/categorias"</span>)
+})
+
+<span class="tVerde">//Rota de acesso para o formulário de cadastro de categorias.</span>
+<span class="tBranco">router</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/categorias/adicionar"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"admin/adicionar-categoria"</span>)
+})
+
+<span class="tVerde">//Rota de processamento dos dados do formulário.</span>
+<span class="tBranco">router</span>.<span class="tRosa">post</span>(<span class="tLaranja">"/categorias/adicionar"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+
+    <span class="tVerde">Acessando dados do formulário:</span>
+    const <span class="tBranco">nomeCategoria</span> = <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">nome</span>
+    const <span class="tBranco">slugCategoria</span> = <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">slug</span>
+
+    new <span class="tBranco">Categoria</span>({
+        <span class="tBranco">nome</span>: <span class="tBranco">nomeCategoria</span>,
+        <span class="tBranco">slug</span>: <span class="tBranco">slugCategoria</span>
+
+    }).<span class="tRosa">save</span>().then(() => {
+        <span class="tBranco">res</span>.<span class="tRosa">send</span>(<span class="tLaranja">"&lt;h3&gt;Categoria registrada com sucesso!&lt;/h3&gt;"</span>)
+    }).catch(() => {
+        <span class="tBranco">res</span>.<span class="tRosa">send</span>(<span class="tLaranja">`&lt;h3&gt;Não foi possível registrar!&lt;/h3&gt;&lt;br&gt;&lt;p&gt;<span class="tRosa">${<span class="tBranco">err</span>}</span>&lt;/h3&gt;`</span>)
+
+    })
+})
+
+<span class="tBranco">module</span>.<span class="tBranco">exports</span> = <span class="tBranco">router</span>
+</code>
+</pre>
+
+        <p>Para tudo funcionar devidamente, precisamos incluir <b>o mongoose e realizar a conexão dentro do arquivo de servidor</b>.</p>
+
+<pre>
+<span class="arquivo">app.js</span>
+<code>
+<span class="tVerde">//Imports</span>
+const <span class="tBranco">express</span> = require(<span class="tLaranja">"express"</span>)
+const <span class="tBranco">handlebars</span> = require(<span class="tLaranja">"express-handlebars"</span>)
+const <span class="tBranco">path</span> = require(<span class="tLaranja">"path"</span>)
+const <span class="tBranco">mongoose</span> = require(<span class="tLaranja">"mongoose"</span>)
+
+<span class="tVerde">//Inicialização do Express e configurações + configurações do Handlebars</span>
+const <span class="tBranco">app</span> = <span class="tBranco">express</span>()
+
+<span class="tBranco">app</span>.<span class="tRosa">use</span>(<span class="tBranco">express</span>.<span class="tRosa">urlencoded</span>({<span class="tBranco">extended</span>: <span class="tLaranja">false</span>})
+<span class="tBranco">app</span>.<span class="tRosa">use</span>(<span class="tBranco">express</span>.<span class="tRosa">json</span>())
+
+<span class="tBranco">app</span>.<span class="tRosa">engine</span>(<span class="tLaranja">"Handlebars"</span> <span class="tBranco">handlebars</span>.<span class="tRosa">engine</span>({
+    <span class="tBranco">defaultLayout</span>: <span class="tLaranja">"main"</span>,
+    <span class="tBranco">runtimeOptions</span>: {
+        <span class="tBranco">allowProtoMethodsByDefault</span>: <span class="tLaranja">true</span>,
+        <span class="tBranco">allowProtoPropertiesByDefault</span>: <span class="tLaranja">true</span>
+    }
+})
+<span class="tBranco">app</span>.<span class="tRosa">set</span>(<span class="tLaranja">"view engine"</span>, <span class="tLaranja">"handlebars"</span>)
+
+<span class="tBranco">app</span>.<span class="tRosa">use</span>(<span class="tBranco">express</span>.<span class="tRosa">static</span>(<span class="tBranco">path</span>.<span class="tRosa">join</span>(<span class="tBranco">__dirname</span>, <span class="tLaranja">"public"</span>)))
+
+<span class="tVerde">//Conexão com o Mongoose</span>
+<span class="tBranco">mongoose</span>.<span class="tRosa">connect</span>(<span class="tLaranja">"mongodb://127.0.0.1:53047/blogApp"</span>).then(() => {
+    console.log(<span class="tLaranja">"MongoDB conectado!"</span>)
+
+}).catch((<span class="tBranco">err</span>) => {
+    console.log(<span class="tLaranja">"Erro ao se conectar."</span>)
+
+})
+
+<span class="tVerde">//Importação de rotas</span>
+const <span class="tBranco">admin</span> = require(<span class="tLaranja">"./routes/admin"</span>)
+
+<span class="tVerde">//Lógica de servidor</span>
+<span class="tBranco">app</span>.<span class="tRosa">use</span>(<span class="tLaranja">"/admin"</span>, <span class="tBranco">admin</span>)
+
+<span class="tVerde">//Rodando servidor + outros</span>
+const <span class="tBranco">HOST</span> = <span class="tLaranja">"localhost"</span>
+const <span class="tBranco">PORT</span> = <span class="tLaranja">3030</span>
+
+<span class="tBranco">app</span>.<span class="tRosa">listen</span>(<span class="tBranco">PORT</span>, <span class="tBranco">HOST</span>, () => {
+    console.log(<span class="tLaranja">`Aberto em '${<span class="tBranco">HOST</span>}:${<span class="tBranco">PORT</span>}'. Ctrl+C para encerrar.`</span>)
+})
+</code>
+</pre>
+
+        <p>Ao rodar a aplicação, será possível <b>cadastrar uma nova categoria através do formulário</b>. Lembre-se que a URL de conexão do banco de dados do MongoDB é obtida através do <samp><span class="tBranco">mongosh</span></samp> em uma instância de terminal.</p>
+
+        <footer>
+            <a href="../a31-1/a31-1.html">Página Anterior</a>
+            <a href="../a37/a37.html">Próxima Página</a>
+        </footer>
+    </main>
+</body>
+</html>
