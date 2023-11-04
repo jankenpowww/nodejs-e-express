@@ -139,7 +139,13 @@ const <span class="tBranco">handlebars</span> = require(<span class="tLaranja">"
 const <span class="tBranco">app = <span class="tBranco">express</span>()</span>
 
 <span class="tVerde">//Configuração do Handlebars</span>
-<span class="tBranco">app</span>.<span class="tRosa">engine</span>(<span class="tLaranja">"handlebars"</span>, <span class="tBranco">handlebars</span>.<span class="tRosa">engine</span>({ <span class="tBranco">defaultLayout</span>: <span class="tLaranja">"main"</span> }))
+<span class="tBranco">app</span>.<span class="tRosa">engine</span>(<span class="tLaranja">"Handlebars"</span> <span class="tBranco">handlebars</span>.<span class="tRosa">engine</span>({
+    <span class="tBranco">defaultLayout</span>: <span class="tLaranja">"main"</span>,
+    <span class="tBranco">runtimeOptions</span>: {
+        <span class="tBranco">allowProtoMethodsByDefault</span>: <span class="tLaranja">true</span>,
+        <span class="tBranco">allowProtoPropertiesByDefault</span>: <span class="tLaranja">true</span>
+    }
+}))
 <span class="tBranco">app</span>.<span class="tRosa">set</span>(<span class="tLaranja">"view engine"</span>, <span class="tLaranja">"handlebars"</span>)
 
 ...
@@ -149,6 +155,8 @@ const <span class="tBranco">app = <span class="tBranco">express</span>()</span>
         <p>Após instanciar a variável <span class="tCodigo"><span class="tBranco">app</span></span>, temos acesso aos métodos <span class="tCodigo"><span class="tRosa">engine</span>()</span> e <span class="tCodigo"><span class="tRosa">set</span>()</span>. Com a primeira, <b>definimos o uso do Handlebars como template engine principal dentro do servidor</b>.</p>
 
         <p>Este é o processo padrão para a utilização do Handlebars ou de outros template engines com Express. Mas, por hora, notemos o trecho <span class="tCodigo"><span class="tBranco">defaultLayout</span>: <span class="tLaranja">"main"</span></span>. Essa configuração define um layout padrão à ser utilizado para a renderização HTML dos conteúdos, e o nome deste layout dentro <b>de uma hierarquia de pastas que vamos criar agora</b>.</p>
+
+        <p>Todas as configurações em <samp><span class="tBranco">runtimeOptions</span></samp> vai permitir que escapemos corretamente as informações enviadas do servidor para as views em questão.</p>
 
         <p>Na pasta do projeto, vamos criar os seguintes diretórios e o arquivo 'main' referenciado anteriormente: <b>'views/layouts/'</b>. E dentro da pasta layouts, <b>um arquivo de nome 'main.handlebars'</b>. Este arquivo conterá nada mais nada menos do que HTML dentro onde será possível utilizar tags do Handlebars para referenciar variáveis dentro de HTMLs, que renderizará esses valores.</p>
 

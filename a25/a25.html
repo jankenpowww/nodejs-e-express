@@ -33,7 +33,13 @@ const <span class="tBranco">handlebars</span> = require(<span class="tLaranja">"
 const <span class="tBranco">app = <span class="tBranco">express</span>()</span>
 
 <span class="tVerde">//Configuração do Handlebars</span>
-<span class="tBranco">app</span>.<span class="tRosa">engine</span>(<span class="tLaranja">"handlebars"</span>, <span class="tBranco">handlebars</span>.<span class="tRosa">engine</span>({ <span class="tBranco">defaultLayout</span>: <span class="tLaranja">"main"</span> }))
+<span class="tBranco">app</span>.<span class="tRosa">engine</span>(<span class="tLaranja">"Handlebars"</span> <span class="tBranco">handlebars</span>.<span class="tRosa">engine</span>({
+    <span class="tBranco">defaultLayout</span>: <span class="tLaranja">"main"</span>,
+    <span class="tBranco">runtimeOptions</span>: {
+        <span class="tBranco">allowProtoMethodsByDefault</span>: <span class="tLaranja">true</span>,
+        <span class="tBranco">allowProtoPropertiesByDefault</span>: <span class="tLaranja">true</span>
+    }
+}))
 <span class="tBranco">app</span>.<span class="tRosa">set</span>(<span class="tLaranja">"view engine"</span>, <span class="tLaranja">"handlebars"</span>)
 
 <span class="tBranco">app</span>.<span class="tRosa">use</span>(<span class="tBranco">express</span>.<span class="tRosa">urlencoded</span>({ <span class="tBranco">extended</span>: <span class="tLaranja">true</span> })
