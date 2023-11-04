@@ -53,7 +53,7 @@ const <span class="tBranco">app</span> = require(<span class="tLaranja">"express
 </code>
 </pre>
 
-        <p>Como sabemos, definimos um uso ou uma estrutura de <em>Middleware</em> com o método <span class="tCodigo"><span class="tRosa">use</span></span>. Para a criação da função de <em>Middleware</em> em si, temos parâmetros <b>iguais à definição de rotas convencional</b> ('<em>req</em>' e '<em>res</em>'), <b>o que permite ter um controle a mais sobre as requisições e resposta fora do escopo de rotas</b>, e que vai permitir (spoiler!) criar a lógica de autenticação de usuário da nossa aplicação. Porém, veja que há um outro "parâmetro" importante: <span class="tCodigo"><span class="tRosa">next</span>()</span> na verdade <b>é uma função importante e essencial</b>, que deve ser chamada no final de todo <em>Middleware</em>. Este método avança para o executar próximo <em>Middleware</em> definido (se houver) depois deste <em>Middleware</em> em questão, até que o bloco de código da rota finalmente seja executado.</p>
+        <p>Como sabemos, definimos um uso ou uma estrutura de <em>Middleware</em> com o método <span class="tCodigo"><span class="tRosa">use</span></span>. Para a criação da função de <em>Middleware</em> em si, temos parâmetros <b>iguais à definição de rotas convencional</b> ('<em>req</em>' e '<em>res</em>'), <b>o que permite ter um controle a mais sobre as requisições e resposta fora do escopo de rotas</b>, e que vai permitir (spoiler!) criar a lógica de autenticação de usuário da nossa aplicação. Porém, veja que há um outro "parâmetro" importante: <span class="tCodigo"><span class="tRosa">next</span>()</span> na verdade <b>é uma função importante e essencial</b>, que deve ser chamada no final de todo <em>Middleware</em>. Este método avança para executar o próximo <em>Middleware</em> definido (se houver) depois deste <em>Middleware</em> em questão, até que o bloco de código da rota finalmente seja executado.</p>
 
         <p>Partindo disso, <b>é lógico pensar que, ao acessar a rota principal, o <samp>console.log</samp> do <em>Middleware</em> vai ser printado no console primeiro</b>, e em seguida, o <samp>console.log</samp> da rota. E é isso mesmo que acontece. Se houvesse outro <em>Middleware</em> definido depois deste, ele seria executado em fila até chegar na lógica da rota.</p>
 
@@ -68,7 +68,7 @@ Você acessou a página principal!</span>
 
         <footer>
             <a href="../a37/a37.html">Página Anterior</a>
-            <a href="#">Próxima Página</a>
+            <a href="../a39/a39.html">Próxima Página</a>
         </footer>
     </main>
 </body>

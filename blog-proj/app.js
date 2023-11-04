@@ -2,10 +2,32 @@
     const express = require("express")
     const handlebars = require("express-handlebars")
     const path = require("path")
+
     const mongoose = require("mongoose")
+
+    const session = require("express-session") //Utilizado para configurar sessões.
+    const flash = require("connect-flash")
 
 //Inicialização do Express e suas configurações + Handlebars
     const app = express()
+
+    //Configuração da sessão
+    app.use(session({
+        secret: "idsessao",
+        resave: true,
+        saveUninitialized: true
+    }))
+
+    //Configuração do flash.
+    app.use(flash())
+
+    //Middleware de sessão
+    app.use((req, res, next) => {
+        res.locals.success_msg = req.flash("success_msg") //locals define variáveis de escopo global.
+        res.locals.error_msg = req.flash("error_msg")
+        
+        next()
+    })
 
     //Bodyparser e Json.
     app.use(express.urlencoded({extended: true}))

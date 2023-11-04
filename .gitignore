@@ -1,2 +1,5 @@
 # todas as ocorrências de 'node_modules', independente do nível de diretório em que estão, serão desconsideradas.
 node_modules/
+
+# Ignorando outros diretórios/arquivos.
+blog-proj-full-codes/

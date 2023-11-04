@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../stemp-css/stemp.css" type="text/css">
+    <title>a39</title>
+</head>
+<body>
+    <h1>a39 - Como Configurar Sessões?</h1>
+
+    <main>
+        <p>Agora que sabemos como cookies e sessões e middlewares funcionam, <b>vamos criar a lógica de sessões e validações da nossa aplicação</b>!</p>
+
+        <br><br>
+
+        <h1>Instalações</h1>
+        <p>Para configurar as sessões/cookies da nossa aplicação, que vai efetivamente armazenar as informações do usuário no cliente, vamos instalar e utilizar duas dependências do npm...</p>
+
+        <ul>
+            <li><samp><span class="tBranco">npm install <span class="tCinza">--save</span> express-session</span></samp></li>
+
+            <br>
+
+            <li><samp><span class="tBranco">npm install <span class="tCinza">--save</span> connect-flash</span></samp></li>
+        </ul>
+
+        <p>O módulo <samp><span class="tBranco">express-session</span></samp> é utilizado para definir um middleware de sessão da própria aplicação. Ele recebe uma chave que corresponde basicamente ao ID de sessão do usuário, que é a chave de acesso às informações do usuário salvas durante o uso da aplicação (conforme explicado na aula anterior). Este módulo é o que vai permitir criar as sessões que identifica os dados e outras predefinições do usuário conforme o uso do nosso sistema.</p>
+
+        <p>Já o módulo <samp><span class="tBranco">connect-flash</span></samp>, segundo sua definição na página oficial da dependência, reserva <b>um espaço especial de uma sessão para armazenar mensagens temporárias</b>, ou em outras palavras, <b><em>"flash messages"</em></b>, entre redirecionamentos de página. Isso significa que vamos poder configurar mensagens de aviso para toda ação importante de um usuário dentro do sistema, por exemplo, <b>com o extra de que essas mensagens são 'apagadas' assim que são disponibilizadas</b>. Mensagens flash podem ser utilizadas para exibir uma mensagem de sucesso ao cadastrar um post, ou ao realizar um login, por exemplo.</p>
+
+        <p>Todo o uso daqui para frente será entendido melhor com a prática. Veja:</p>
+
+        <hr><hr>
+
+        <h1>Configurando os módulos</h1>
+        <p>Veja que toda a configuração vai acontecer no arquivo '<b>app.js</b>', onde está praticamente toda a lógica do nosso servidor. Veja:</p>
+
+<pre>
+<span class="arquivo">app.js</span>
+<code>
+<span class="tVerde">//Imports</span>
+const <span class="tBranco">express</span> = require(<span class="tLaranja">"express"</span>)
+const <span class="tBranco">handlebars</span> = require(<span class="tLaranja">"express-handlebars"</span>)
+const <span class="tBranco">path</span> = require(<span class="tLaranja">"path"</span>)
+const <span class="tBranco">mongoose</span> = require(<span class="tLaranja">"mongoose"</span>)
+
+const <span class="tBranco">session</span> = require(<span class="tLaranja">"express-session"</span>) <span class="tVerde">//Para configuração de sessões.</span>
+const <span class="tBranco">flash</span> = require(<span class="tLaranja">"connect-flash"</span>) <span class="tVerde">//Para configuração de mensagens flash.</span>
+
+<span class="tVerde">//Inicialização do Express e configurações + configurações do Handlebars</span>
+const <span class="tBranco">app</span> = <span class="tBranco">express</span>()
+
+...
+</code>
+</pre>
+
+        <p>Esses módulos são configurados como middlewares do Express, o que significa que toda a estrutura de configuração de ambos os módulos <b>acontecem dentro do método <span class="tCodigo"><span class="tBranco">app</span>.<span class="tRosa">use</span>()</span></b> (bom reforçar ^^).</p>
+
+        <p>Vamos começar configurando a sessão. Observe:</p>
+
+<pre>
+<span class="arquivo">app.js</span>
+<code>
+<span class="tVerde">//Imports</span>
+const <span class="tBranco">express</span> = require(<span class="tLaranja">"express"</span>)
+const <span class="tBranco">handlebars</span> = require(<span class="tLaranja">"express-handlebars"</span>)
+const <span class="tBranco">path</span> = require(<span class="tLaranja">"path"</span>)
+const <span class="tBranco">mongoose</span> = require(<span class="tLaranja">"mongoose"</span>)
+const <span class="tBranco">session</span> = require(<span class="tLaranja">"express-session"</span>) <span class="tVerde">//Para configuração de sessões.</span>
+const <span class="tBranco">flash</span> = require(<span class="tLaranja">"connect-flash"</span>) <span class="tVerde">//Para configuração de mensagens flash.</span>
+
+<span class="tVerde">//Inicialização do Express e configurações + configurações do Handlebars</span>
+const <span class="tBranco">app</span> = <span class="tBranco">express</span>()
+
+<span class="tVerde">//Configurando estrutura de sessões.</span>
+<span class="tBranco">app</span>.<span class="tRosa">use</span>(<span class="tBranco">session</span>({
+    <span class="tBranco">secret</span>: <span class="tLaranja">"idsessionblog"</span>,
+    <span class="tBranco">resave</span>: <span class="tLaranja">true</span>,
+    <span class="tBranco">saveUninitialized</span>: <span class="tLaranja">true</span>
+}))
+
+...
+</code>
+</pre>
+
+        <p>Iniciamos um objeto dentro de <samp><span class="tBranco">session</span></samp>, que define um número de especificações para a configuração de sessões em uma aplicação. Entre as mais importantes, temos definido:</p>
+
+        <ul>
+            <li><samp><span class="tBranco">secret</span></samp>: define a tal da ID de sessão que estivemos falando até aqui. Recebe uma string contendo a chave de ID referente a sessão iniciada.</li>
+
+            <br>
+
+            <li><samp><span class="tBranco">resave</span></samp>: se <samp><span class="tLaranja">true</span></samp> se as informações armazenadas na sessão são salvas mesmo se nada for alterado ou adicionado no armazenamento da sessão.</li>
+
+            <br>
+
+            <li><samp><span class="tBranco">saveIninitialized</span></samp>: se <samp><span class="tLaranja">true</span></samp>, define a mesma que o anterior. O que muda é que ainda armazena dados e informações de uma sessão que ainda não foi inicializada.</li>
+        </ul>
+
+        <p>Ou seja, as sessões iniciadas na nossa aplicação vão basicamente ser salvas e armazenadas independentemente se alterações foram feitas durante as requisições ou se sequer houve alguma sessão iniciada — esta, que nem existe, também será criada e armazenada. Veja que várias sessões serão criadas mesmo se não houver nenhum registro de armazenamento durante o uso da aplicação, e pode ser vantajoso <b>habilitar o armazenamento de sessão apenas quando informações são inseridas ou atualizadas</b>. Isso pode garantir um ganho de espaço na memória significativamente.</p>
+
+        <br><br>
+
+        <p>E agora, vamos configurar o connect-flash para habilitar as mensagens flash na nossa aplicação para autenticar as sessões. Que pasmem, muito mais complicado do que o último...</p>
+
+<pre>
+<span class="arquivo">app.js</span>
+<code>
+<span class="tVerde">//Imports</span>
+const <span class="tBranco">express</span> = require(<span class="tLaranja">"express"</span>)
+const <span class="tBranco">handlebars</span> = require(<span class="tLaranja">"express-handlebars"</span>)
+const <span class="tBranco">path</span> = require(<span class="tLaranja">"path"</span>)
+const <span class="tBranco">mongoose</span> = require(<span class="tLaranja">"mongoose"</span>)
+const <span class="tBranco">session</span> = require(<span class="tLaranja">"express-session"</span>) <span class="tVerde">//Para configuração de sessões.</span>
+const <span class="tBranco">flash</span> = require(<span class="tLaranja">"connect-flash"</span>) <span class="tVerde">//Para configuração de mensagens flash.</span>
+
+<span class="tVerde">//Inicialização do Express e configurações + configurações do Handlebars</span>
+const <span class="tBranco">app</span> = <span class="tBranco">express</span>()
+
+<span class="tVerde">//Configurando estrutura de sessões.</span>
+<span class="tBranco">app</span>.<span class="tRosa">use</span>(<span class="tBranco">session</span>({
+    <span class="tBranco">secret</span>: <span class="tLaranja">"idsessionblog"</span>,
+    <span class="tBranco">resave</span>: <span class="tLaranja">true</span>,
+    <span class="tBranco">saveUninitialized</span>: <span class="tLaranja">true</span>
+}))
+
+<span class="tVerde">//Configurando connect-flash</span>
+<span class="tBranco">app</span>.<span class="tRosa">use</span>(<span class="tBranco">flash</span>())
+
+...
+</code>
+</pre>
+
+        <p>Basta chamar <samp><span class="tBranco">flash</span>()</samp> como um middleware, dentro de <samp><span class="tBranco">app</span>.<span class="tRosa">use</span>()</samp>.</p>
+
+        <br><br>
+
+        <h1>Configurando o middleware de sessão</h1>
+        <p>Com a parte essencial configurada à respeito dos módulos, <b>vamos criar agora o middleware que vai autenticar a sessão do usuário de fato</b>. Vamos fazer com que cada ação do usuário dentro do sistema da aplicação seja registrada e retornada em forma de mensagem de volta, utilizando o módulo de mensagens flash que acabamos de configurar.</p>
+
+<pre>
+<span class="arquivo">app.js</span>
+<code>
+<span class="tVerde">//Imports</span>
+const <span class="tBranco">express</span> = require(<span class="tLaranja">"express"</span>)
+const <span class="tBranco">handlebars</span> = require(<span class="tLaranja">"express-handlebars"</span>)
+const <span class="tBranco">path</span> = require(<span class="tLaranja">"path"</span>)
+const <span class="tBranco">mongoose</span> = require(<span class="tLaranja">"mongoose"</span>)
+const <span class="tBranco">session</span> = require(<span class="tLaranja">"express-session"</span>) <span class="tVerde">//Para configuração de sessões.</span>
+const <span class="tBranco">flash</span> = require(<span class="tLaranja">"connect-flash"</span>) <span class="tVerde">//Para configuração de mensagens flash.</span>
+
+<span class="tVerde">//Inicialização do Express e configurações + configurações do Handlebars</span>
+const <span class="tBranco">app</span> = <span class="tBranco">express</span>()
+
+<span class="tVerde">//Configurando estrutura de sessões.</span>
+<span class="tBranco">app</span>.<span class="tRosa">use</span>(<span class="tBranco">session</span>({
+    <span class="tBranco">secret</span>: <span class="tLaranja">"idsessionblog"</span>,
+    <span class="tBranco">resave</span>: <span class="tLaranja">true</span>,
+    <span class="tBranco">saveUninitialized</span>: <span class="tLaranja">true</span>
+}))
+
+<span class="tVerde">//Configurando connect-flash</span>
+<span class="tBranco">app</span>.<span class="tRosa">use</span>(<span class="tBranco">flash</span>())
+
+<span class="tVerde">//Middleware de sessão.</span>
+<span class="tBranco">app</span>.<span class="tRosa">use</span>((<span class="tBranco">req</span>, <span class="tBranco">res</span>, <span class="tBranco">next</span>) => {
+    <span class="tBranco">res</span>.<span class="tBranco">locals</span>.<span class="tBranco">success_msg</span> = <span class="tBranco">req</span>.<span class="tRosa">flash</span>(<span class="tLaranja">"success_msg"</span>)
+    <span class="tBranco">res</span>.<span class="tBranco">locals</span>.<span class="tBranco">error_msg</span> = <span class="tBranco">req</span>.<span class="tRosa">flash</span>(<span class="tLaranja">"error_msg"</span>)
+
+    <span class="tBranco">next</span>()
+})
+
+...
+</code>
+</pre>
+
+        <p>Sabemos que um middleware é uma função que executa em fila alguma coisa, seja envolvendo questões da própria dinâmica de requisição e resposta ou não. Nosso middleware de sessão registra <b>algumas variáveis locais</b>, que estarão disponíveis em todo o escopo estrutural do servidor. Essas variáveis locais são acessadas ou modificadas <b>no parâmetro de resposta do servidor</b>. E que neste caso, <b>armazenará as mensagens flash de sucesso e erro das ações gerais de um usuário dentro da aplicação</b>.</p>
+
+<pre>
+<code>
+<span class="tBranco">res</span>.<span class="tBranco">locals</span>.<span class="tBranco">success_msg</span> = <span class="tBranco">req</span>.<span class="tRosa">flash</span>(<span class="tLaranja">"success_msg"</span>)
+<span class="tBranco">res</span>.<span class="tBranco">locals</span>.<span class="tBranco">error_msg</span> = <span class="tBranco">req</span>.<span class="tRosa">flash</span>(<span class="tLaranja">"error_msg"</span>)
+</code>
+</pre>
+
+        <p>Definimos variáveis locais <b>simplesmente criando um nome de variável ao acessar o objeto <samp><span class="tBranco">locals</span></samp></b>, e atribuindo um valor em seguida. Neste caso, atribuímos <samp><span class="tBranco">req</span>.<span class="tRosa">flash</span>()</samp> passando o nome da variável local numa string como argumento para associar este valor com as mensagens flash posteriores. <samp><span class="tBranco">success_msg</span></samp> e <samp><span class="tBranco">error_msg</span></samp> estão associados às futuras chamadas de mensagens flash dentro da lógica de processamento de requisições (conforme veremos mais para frente).</p>
+
+        <p>Com a estrutura de configuração de sessões praticamente terminada, vamos <b>testar o envio de mensagens flash para o usuário quando este fazer uma requisição</b>. A resposta, como programamos acima, vai retornar uma mensagem de sucesso ou de erro dependendo da situação. Além do envio de mensagens flash como resposta de requisição, vamos também <b>programar mensagens de aviso que não utilizam do recurso de mensagem flash propriamente dito</b>. Sabemos que as mensagens flash aparecem, como resposta da requisição do usuário, e some em seguida se a página for recarregada.</p>
+
+        <p>Veremos ambos os exemplos no próximo segmento...</p>
+
+        <br><br>
+
+        <h1>Validando formulário</h1>
+        <p>Vamos ao arquivo 'admin.js', <b>onde está todas as rotas para o grupo de usuários administradores do nosso sistema</b>, precisamente no trecho <b>onde processamos as informações do formulário e enviamos para o banco de dados</b>:</p>
+
+<pre>
+<span class="arquivo">admin.js</span>
+<code>
+...
+
+<span class="tVerde">//Rota de processamento dos dados do formulário.</span>
+<span class="tBranco">router</span>.<span class="tRosa">post</span>(<span class="tLaranja">"/categorias/adicionar"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+
+    <span class="tVerde">Acessando dados do formulário:</span>
+    const <span class="tBranco">nomeCategoria</span> = <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">nome</span>
+    const <span class="tBranco">slugCategoria</span> = <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">slug</span>
+
+    new <span class="tBranco">Categoria</span>({
+        <span class="tBranco">nome</span>: <span class="tBranco">nomeCategoria</span>,
+        <span class="tBranco">slug</span>: <span class="tBranco">slugCategoria</span>
+
+    }).<span class="tRosa">save</span>().then(() => {
+        <span class="tBranco">res</span>.<span class="tRosa">send</span>(<span class="tLaranja">"&lt;h3&gt;Categoria registrada com sucesso!&lt;/h3&gt;"</span>)
+    }).catch(() => {
+        <span class="tBranco">res</span>.<span class="tRosa">send</span>(<span class="tLaranja">`&lt;h3&gt;Não foi possível registrar!&lt;/h3&gt;&lt;br&gt;&lt;p&gt;<span class="tRosa">${<span class="tBranco">err</span>}</span>&lt;/h3&gt;`</span>)
+
+    })
+})
+
+...
+</code>
+</pre>
+
+        <p>Veja que os <b>dados enviados do formulário de categorias não são validados</b>, e qualquer coisa digitada nos inputs podem ser cadastradas, o que é um problema. É na rota de processamento de dados que vamos <b>recuperar as informações enviadas, compará-las e, com base na validação, enviar uma resposta para o usuário</b>. E não só isso: dependendo da informação enviada pelo usuário, essas informações com base na validação podem ou não serem armazenadas no banco.</p>
+
+        <p>Para a implementação desses dados, <b>vamos fazer alguns ajustes</b>... A primeira delas é criando um array vazia chamado <samp><span class="tBranco">erros</span></samp>. Esta array vai sendo populada <b>conforme tenha, durante as comparações e validações dos dados, qualquer erro ou algo que não esteja de acordo com os critérios de validação</b>. A validação dos dados ocorrerá se <b>não houver nenhum item na array de erros em questão</b>, o que fará com que o fluxo dentro da rota de processamento vá para o cadastro das informações no banco de dados.</p>
+
+        <p>Abaixo, fazemos a primeira etapa deste processamento de dados que é <b>validar o dado recebido</b>. Se caso a nome de categoria vier vazia ou menor que dois caracteres, a array de erros recebe um objeto com o valor de <samp><span class="tBranco">texto</span></samp>, que recebe a string da mensagem de erro referente. Faremos as duas comparações <b>em <samp>if</samp>s separados.</b> Veja:</p>
+
+<pre>
+<span class="arquivo">admin.js</span>
+<code>
+...
+
+<span class="tVerde">//Rota de processamento dos dados do formulário.</span>
+<span class="tBranco">router</span>.<span class="tRosa">post</span>(<span class="tLaranja">"/categorias/adicionar"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+
+    <span class="tVerde">//Array de erros. Um erro ocorre quando os dados enviados não estarão de acordo com a validação.</span>
+    var <span class="tBranco">erros</span> = []
+
+    <span class="tVerde">//Verifica se o nome de categoria foi informado ou não.</span>
+    if (!<span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">nome</span> || <span class="tRosa">typeof</span> <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">nome</span> == <span class="tLaranja">undefined</span> || <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">nome</span> == <span class="tLaranja">null</span>) {
+        <span class="tBranco">erros</span>.<span class="tRosa">push</span>({<span class="tBranco">texto</span>: <span class="tLaranja">"Nome de categoria inválido."</span>)
+    }
+
+    <span class="tVerde">//Validando se a categoria informada é muito pequena.</span>
+    if (<span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">nome</span>.<span class="tBranco">length</span> < <span class="tLaranja">2</span> ) {
+        <span class="tBranco">erros</span>.<span class="tRosa">push</span>({<span class="tBranco">texto</span>: <span class="tLaranja">"Nome de categoria muito curto."</span>)
+    }
+})
+
+...
+</code>
+</pre>
+
+        <p>Fazemos a mesma comparação para o slug da categoria também, mas desta vez apenas verificando <b>se o dado não está vazio</b>.</p>
+
+<pre>
+<span class="arquivo">admin.js</span>
+<code>
+...
+
+<span class="tVerde">//Rota de processamento dos dados do formulário.</span>
+<span class="tBranco">router</span>.<span class="tRosa">post</span>(<span class="tLaranja">"/categorias/adicionar"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+
+    <span class="tVerde">//Array de erros. Um erro ocorre quando os dados enviados não estarão de acordo com a validação.</span>
+    var <span class="tBranco">erros</span> = []
+
+    <span class="tVerde">//Verifica se o nome de categoria foi informado ou não.</span>
+    if (!<span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">nome</span> || <span class="tRosa">typeof</span> <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">nome</span> == <span class="tLaranja">undefined</span> || <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">nome</span> == <span class="tLaranja">null</span>) {
+        <span class="tBranco">erros</span>.<span class="tRosa">push</span>({<span class="tBranco">texto</span>: <span class="tLaranja">"Nome de categoria inválido."</span>)
+    }
+
+    <span class="tVerde">//Validando se a categoria informada é muito pequena.</span>
+    if (<span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">nome</span>.<span class="tBranco">length</span> < <span class="tLaranja">2</span> ) {
+        <span class="tBranco">erros</span>.<span class="tRosa">push</span>({<span class="tBranco">texto</span>: <span class="tLaranja">"Nome de categoria muito curto."</span>)
+    }
+
+    <span class="tVerde">//Validando se o slug foi informado ou se não está vazio.</span>
+    if (!<span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">slug</span> || <span class="tRosa">typeof</span> <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">slug</span> == <span class="tLaranja">undefined</span> || <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">slug</span> == <span class="tLaranja">null</span>) {
+        <span class="tBranco">erros</span>.<span class="tRosa">push</span>({<span class="tBranco">texto</span>: <span class="tLaranja">"Slug de categoria inválido."</span>)
+    }
+})
+
+...
+</code>
+</pre>
+
+        <p>A segunda e última etapa é <b>verificar se os dados foram validados</b>. Faremos isso em mais uma comparação, verificando se <b>o array de erros está vazio ou não</b>. A ideia é que a array de erros esteja vazia até aqui para que os dados sejam devidamente validados e cadastrados no banco de dados.</p>
+
+        <p>É nesta parte <b>que, além de registrar os dados validados no banco de dados, faremos com que as mensagens de sucesso ou erro (independente se for utilizando o recurso de mensagem flash ou não) sejam devidamente exibidas</b>. Veja:</p>
+
+<pre>
+<span class="arquivo">admin.js</span>
+<code>
+...
+
+    <span class="tVerde">//Validando se o slug foi informado ou se não está vazio.</span>
+    if (!<span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">slug</span> || <span class="tRosa">typeof</span> <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">slug</span> == <span class="tLaranja">undefined</span> || <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">slug</span> == <span class="tLaranja">null</span>) {
+        <span class="tBranco">erros</span>.<span class="tRosa">push</span>({<span class="tBranco">texto</span>: <span class="tLaranja">"Slug de categoria inválido."</span>)
+    }
+
+    <span class="tVerde">//Verificando se há erros com os dados processados ou não.</span>
+    if (<span class="tBranco">erros</span>.<span class="tBranco">length</span> > <span class="tLaranja">0</span>) {
+        <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"admin/adicionar-categoria"</span>, {<span class="tBranco">erro:</span> <span class="tBranco">erros</span>})
+    }
+})
+
+...
+</code>
+</pre>
+
+        <p>Comparamos <b>o comprimento do array de erros</b>. Se o <samp><span class="tBranco">length</span></samp> do array de erros for maior que 0, isso significa que <b>alguns dos dados enviados não estão de acordo com a validação</b>. Como consequência, renderizamos novamente <b>a view do formulário, passando a array de objeto com os textos dos erros para serem renderizados na tela</b>.</p>
+
+        <p>Vamos para a view do formulário de cadastro onde os erros serão exibidos e incluir o bloco de HTML dinâmico onde os erros surgirão. Veja que a exibição de mensagens aqui não utiliza o recurso do <samp><span class="tBranco">connect-flash</span></samp> ainda.</p>
+
+<pre>
+<span class="arquivo">adicionar-categoria.handlebars</span>
+<code>
+<span class="tVerde">&lt;!-- Para cada erro da chave 'texto', se houver, uma div de alerta é gerada. --&gt;</span>
+<span class="tBranco">{{<span class="tRosa">#each</span> <span class="tBranco">erro</span>}}</span>
+    &lt;div class="alert alert-danger"&gt;<span class="tBranco">{{ <span class="tBranco">texto</span> }}</span>&lt;/div&gt;
+
+<span class="tBranco">{{<span class="tRosa">else</span>}}</span>
+
+<span class="tBranco">{{<span class="tRosa">/each</span>}}</span>
+
+&lt;h3&gt;Adicionar Categoria&lt;/h3&gt;
+&lt;hr&gt;
+    
+&lt;div class=&quot;card&quot;&gt;
+    &lt;div class=&quot;card-body&quot;&gt;
+
+        <span class="tVerde">&lt;!-- Formulário de cadastro --&gt;</span>
+        &lt;form <span class="tBranco">action=</span><span class="tLaranja">&quot;/admin/categorias/adicionar&quot;</span> <span class="tBranco">method=</span><span class="tLaranja">&quot;post&quot;</span>&gt;
+            &lt;label for=&quot;nome&quot; class=&quot;mb-1&quot;&gt;Nome:&lt;/label&gt;
+            &lt;input type=&quot;text&quot; id=&quot;nome&quot; <span class="tBranco">name=</span><span class="tLaranja">&quot;nome&quot;</span> placeholder=&quot;Nome da categoria&quot; class=&quot;form-control&quot;&gt;
+    
+            &lt;label for=&quot;slug&quot; class=&quot;mt-2 mb-1&quot;&gt;Slug:&lt;/label&gt;
+            &lt;input type=&quot;text&quot; id=&quot;slug&quot; <span class="tBranco">name=</span><span class="tLaranja">&quot;slug&quot;</span> placeholder=&quot;Slug da categoria&quot; class=&quot;form-control&quot;&gt;
+    
+            &lt;button type=&quot;submit&quot; class=&quot;btn btn-block btn-success mt-4&quot; style=&quot;width: 100%;&quot;&gt;<span class="tBranco">Criar Categoria</span>&lt;/button&gt;
+        &lt;/form&gt;
+        
+    &lt;/div&gt;
+&lt;/div&gt;
+</code>
+</pre>
+
+        <p>Veja que passamos no bloco <samp><span class="tBranco">{{<span class="tRosa">#each</span>}}</span></samp> do handlebars <b>o objeto <samp><span class="tBranco">erro</span></samp></b>, que recebe a array de objetos com cada erro identificado na validação das informações enviadas do formulário. E para cada texto dentro do objeto de erro, <b>uma div com a string da chave <samp><span class="tBranco">texto</span></samp> é gerada dinâmicamente</b>. Veja que nada vai ser renderizado se você acessar a rota por meio do método GET: as divs só serão geradas apenas quando houver o envio dos dados no formulário.</p>
+
+        <p>E reiterando mais uma vez que as mensagens exibidas não utilizam do recurso de mensagens flash AINDA. Você pode verificar isso tentando recarregar a página e ver <b>que as divs geradas pelos erros ainda estarão na tela</b>, o que não é uma característica das mensagens flash.</p>
+
+        <p>Vamos voltar para a rota de processamento e terminar a condição de validação dos dados, dessa vez para <b>caso as informações forem corretamente validadas</b>:</p>
+
+<pre>
+<span class="arquivo">admin.js</span>
+<code>
+...
+
+    <span class="tVerde">//Verificando se há erros com os dados processados ou não.</span>
+    if (<span class="tBranco">erros</span>.<span class="tBranco">length</span> > <span class="tLaranja">0</span>) {
+        <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"admin/adicionar-categoria"</span>, {<span class="tBranco">erro:</span> <span class="tBranco">erros</span>})
+
+    } else {
+        new <span class="tBranco">Categoria</span>({
+            <span class="tBranco">nome</span>: <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">nome</span>
+            <span class="tBranco">slug</span>: <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">slug</span>
+    
+        }).<span class="tRosa">save</span>().then(() => {
+            
+            <span class="tVerde">//Chamando a mensagem flash de sucesso. Uma mensagem temporária aparecerá na view de todas as categorias cadastradas.</span>
+            <span class="tBranco">req</span>.<span class="tRosa">flash</span>(<span class="tLaranja">"success_msg"</span>, <span class="tLaranja">"Categoria adicionada com sucesso!"</span>)
+
+            <span class="tVerde">//Redirecionando para a rota de categorias.</span>
+            <span class="tBranco">res</span>.<span class="tRosa">redirect</span>(<span class="tLaranja">"/admin/categorias"</span>)
+
+        }).catch((<span class="tBranco">err</span>) => {
+            <span class="tBranco">req</span>.<span class="tRosa">flash</span>(<span class="tLaranja">"error_msg"</span>, <span class="tLaranja">"Houve um erro inesperado ao registrar a nova categoria. Tente novamente."</span>)
+            <span class="tBranco">res</span>.<span class="tRosa">redirect</span>(<span class="tLaranja">"/admin/categorias"</span>)
+    
+        })
+
+    }
+})
+
+...
+</code>
+</pre>
+
+        <p>No bloco <samp>else</samp>, está toda a lógica de cadastro dos dados enviados no banco de dados e a exibição de mensagem flash na página de categorias após o redirecionamento de páginas. Veja que, para a exibição de mensagem flash, precisamos <b>referenciar o nome da variável local associada a mensagem que definimos no middleware de sessão mais cedo</b>. Além disso, passamos também uma string contendo <b>a mensagem de exibição que será mostrada para o usuário na tela</b>. Fazemos isso para ambas as situações provisionadas na estrutura <samp>catch</samp> e <samp>error</samp> do método <samp><span class="tRosa">save</span>()</samp>, responsável por salvar as informações no banco de dados.</p>
+
+        <p>Veja que a mensagem de erro aqui não tem mais nada a ver com a validação dos dados, uma vez que a validação foi feita. Os erros aqui ocorrem por questões relacionadas ao próprio registro das informações no banco de dados em si.</p>
+
+        <p>... E é claro que precisamos <b>fazer alterações nas próprias views incluindo o HTML responsável por conter as mensagens flash</b>. E não só isso: para as mensagens flash, <b>vamos criar um arquivo dedicado apenas para conter o front-end respectivo de cada view.</b></p>
+
+        <p>Crie um arquivo dentro de <b>'views/partials'</b> chamado <b>'_msg.handlebars'</b>. Neste arquivo estará todas as &lt;div&gt; relacionadas as mensagens flash associadas as variáveis globais que definimos no middleware de sessão. Olhe:</p>
+
+<pre>
+<span class="arquivo">_msg.handlebars</span>
+<code>
+<span class="tBranco">{{ <span class="tRosa">#if</span> <span class="tBranco">success_msg</span> }}</span>
+    &lt;div class="alert alert-success"&gt;<span class="tBranco">{{ success_msg }}</span>&lt;/div&gt;
+<span class="tBranco">{{ <span class="tRosa">/if</span> }}</span>
+
+<span class="tBranco">{{ <span class="tRosa">#if</span> <span class="tBranco">error_msg</span> }}</span>
+    &lt;div class="alert alert-danger"&gt;<span class="tBranco">{{ error_msg }}</span>&lt;/div&gt;
+<span class="tBranco">{{ <span class="tRosa">/if</span> }}</span>
+</code>
+</pre>
+
+        <p>A idéia é que, quando houver algum redirecionamento de páginas para a exibição de uma mensagem flash, <b>a variável local definida e associada para esta mensagem seja renderizada com a view da rota de redirecionamento</b>, que no momento, pode ser tanto a mensagem flash de <samp><span class="tBranco">success_msg</span></samp> quanto a <samp><span class="tBranco">error_msg</span></samp>, definidas na lógica anteriormente no grupo de rotas do administrador.</p>
+
+        <p>Por ser um arquivo partial, <b>só precisamos chamar este em algum lugar dentro do arquivo 'main.handlebars'</b>. E assim que uma mensagem flash for chamada, significa que alguma variável local associada a esta a view respectiva será exibida.</p>
+
+<pre>
+<span class="arquivo">main.handlebars</span>
+<code>
+&lt;!DOCTYPE html&gt;
+&lt;html lang="pt-BR"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+
+    <span class="tVerde">&lt;!-- linkando arquivo .css principal do bootstrap da pasta 'public' --&gt;</span>
+    &lt;<span class="tBranco">link</span> rel=<span class="tLaranja">"stylesheet"</span> href=<span class="tLaranja">"/css/bootstrap.css"</span> type=<span class="tLaranja">"text/css"</span>&gt;
+
+    &lt;title&gt;<span class="tBranco">Blog</span>&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+    <span class="tBranco">{{> <span class="tRosa">_navbar</span>}}</span>
+    &lt;div class="container"&gt;
+        <span class="tBranco">{{> <span class="tRosa">_msg</span>}}</span> <span class="tVerde">&lt;!-- Incluindo as views de mensagem flash --&gt;</span>
+        <span class="tBranco">{{{<span class="tRosa">body</span>}}}</span>
+    &lt;/div&gt;
+
+&lt;/body&gt;
+
+<span class="tVerde">&lt;!-- linkando javascript externo do bootstrap --&gt;</span>
+&lt;<span class="tBranco">script</span> src=<span class="tLaranja">"https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"</span> integrity=<span class="tLaranja">"sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"</span> crossorigin=<span class="tLaranja">"anonymous"</span>&gt;&lt;<span class="tBranco">/script</span>&gt;
+&lt;<span class="tBranco">script</span> src=<span class="tLaranja">"https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"</span> integrity=<span class="tLaranja">"sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"</span> crossorigin=<span class="tLaranja">"anonymous"</span>&gt;&lt;<span class="tBranco">/script</span>&gt;
+
+<span class="tVerde">&lt;!-- linkando arquivo .js principal do bootstrap da pasta 'public' --&gt;</span>
+&lt;<span class="tBranco">script</span> src=<span class="tLaranja">"/js/bootstrap.js"</span>&gt;&lt;<span class="tBranco">/script</span>&gt;
+
+&lt;/html&gt;
+</code>
+</pre>
+
+        <p>Seguindo a lógica acima, as mensagens flash, quando chamadas no momento de requisição de um usuário, serão exibidas até que a view em questão seja recarregada. Elas serão renderizadas imediatamente acima das views posteriores dentro de <samp><span class="tBranco">{{{<span class="tRosa">body</span>}}}</span></samp>.</p>
+
+        <footer>
+            <a href="../a38/a38.html">Página Anterior</a>
+            <a href="#">Próxima Página</a>
+        </footer>
+    </main>
+</body>
+</html>
