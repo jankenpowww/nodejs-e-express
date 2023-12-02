@@ -1,3 +1,19 @@
-<h3>Lista de categorias</h3>
-<hr>
-<a href="/admin/categorias/adicionar"><button class="btn btn-outline-success">+ Adicionar</button></a>
+<pre>
+<span class="arquivo">categorias.handlebars</span>
+<code>
+&lt;h3&gt;<span class="tBranco">Lista de categorias</span>&lt;/h3&gt;
+&lt;hr&gt;
+&lt;a <span class="tLaranja">href=&quot;/admin/categorias/adicionar&quot;</span>&gt;&lt;button class=&quot;btn btn-outline-success&quot;&gt;<span class="tBranco">+ Adicionar</span>&lt;button&gt;&lt;/a&gt;
+
+<span class="tBranco">{{<span class="tRosa">#each</span> <span class="tBranco">categoria</span>}}</span>
+    &lt;div class=&quot;card mt-2&quot;&gt;
+        &lt;div class=&quot;card-body&quot;&gt;
+            &lt;h4&gt;<span class="tBranco">{{nome}}</span>&lt;/h4&gt;
+            &lt;small&gt;<span class="tBranco">{{slug}}</span>&lt;/small&gt;
+            &lt;br&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+<span class="tBranco">{{<span class="tRosa">/each</span>}}</span>
+</code>
+</pre>

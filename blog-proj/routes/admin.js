@@ -14,7 +14,15 @@ router.get("/posts", (req, res) => {
 })
 
 router.get("/categorias", (req, res) => {
-    res.render("admin/categorias")
+
+    //A renderização ocorre após a coleta de todos os objetos do banco (que nem no sequelize)
+    Categoria.find().then((categorias) => {
+        res.render("admin/categorias", {categoria: categorias}) //Passando objeto com os valores.
+
+    }).catch((err) => {
+        re.flash("error_msg", "Houve um erro inesperado ao recuperar as categorias salvas.")
+        res.redirect("/admin")
+    })
 })
 
 //Acesso ao formukário de categorias.
@@ -69,7 +77,61 @@ router.post("/categorias/adicionar", (req, res) => {
             req.flash("error_msg", "Houve um problema ao cadastrar a categoria. Tente novamente")
             res.send(`<h3>Não foi possível registrar!</h3><br><p>${err}</p>`)
         })
+
     }
+})
+
+//Rota de edição de categorias.
+//Recebe a id do documento associado através do recurso de route parameter.
+//A id associada renderiza uma página de formulário para a edição do documento.
+router.get("/categorias/editar/:id", (req, res) => {
+    
+    //Retorna o documento associado à id, e renderiza a view do form de edição da categoria associada.
+    Categoria.findById(req.params.id).then((categoria) => {
+        res.render("admin/editar-categoria", categoria)
+    })
+
+})
+
+//Rota de processamento de informações de edição de categoria.
+//A rota GET do formulário de categorias envia as informações via post para esta rota.
+//O valor do input do tipo hidden que contém a id é utilizada para identificar 
+//o documento e acessar as informações editadas.
+router.post("/categorias/editar", (req, res) => {
+    Categoria.findOne({_id: req.body.id}).then((categoria) => {
+
+        //Atribuindo o novo valor ao documento recuperado associado à id.
+        categoria.nome = req.body.nome
+        categoria.slug = req.body.slug
+
+        //Salvando as informações de categoria. Se as informações foram editadas com sucesso ou não,
+        //o usuário é redirecionado para a página principal que exibirá uma mensagem flash.
+        categoria.save().then(() => {
+
+            req.flash("success_msg", "Categoria editada com sucesso!")
+            res.redirect("/admin/categorias")
+
+        }).catch(() => {
+            req.flash("error_msg", "Houve um erro ao editar as informações. Por favor, tente novamente.")
+            res.redirect("/admin/categorias")
+        })
+
+    })
+})
+
+//Rota de exclusão de categorias: ao clicar no botão 'Deletar Categoria', o usuário é redirecionado
+//para esta rota, que redireciona para a página de categorias novamente exibindo uma mensagem flash de sucesso ou erro.
+router.post("/categorias/deletar", (req, res) => {
+
+    //Deletando a categoria.
+    Categoria.findByIdAndDelete(req.body.id).then(() => {
+        req.flash("success_msg", "Categoria deletada com sucesso!")
+        res.redirect("/admin/categorias")
+
+    }).catch(() => {
+        req.flash("error_msg", "Houve um erro ao deletar a categoria. Por favor, tente novamente.")
+        res.redirect("/admin/categorias")
+    })
 })
 
 module.exports = router //Exportamos o módulo para utilizar no arquivo de servidor principal.

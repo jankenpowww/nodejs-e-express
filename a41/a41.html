@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../stemp-css/stemp.css" type="text/css">
+    <title>a41</title>
+</head>
+<body>
+    <h1>a41 - CRUD: Listando categorias</h1>
+
+    <main>
+        <p>Agora que acabamos de adicionar a <em>feature</em> de cadastro da nossa aplicação, incluindo adições de mensagens flash e autenticando os dados enviados de uma requisição, <b>vamos terminar o CRUD de categorias seguindo para a listagem dos registros cadastrados</b>.</p>
+
+        <br>
+
+        <h1><em>Read</em></h1>
+        <p>Antes de partir para o <em>front-end</em> da coisa, vamos dar uma olhada no arquivo <b>admin.js</b>, que possui toda a lógica referente à este tipo de usuário e todas as rotas de acesso possíveis, e ver o que temos. Especificamente, na rota de categorias, onde criamos um link de acesso para o formulario de cadastro.</p>
+
+        <p>Vamos atualizar a renderização da view associada à esta rota passando desta vez <b>o objeto com os registros das categorias</b>, recuperados à partir do model de categorias associado.</p>
+
+<pre>
+<span class="arquivo">admin.js</span>
+<code>
+...
+
+<span class="tBranco">router</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/categorias"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tVerde">//Recuperando os registros à partir da model e passando o objeto que contém esses registros na renderização da view</span>
+
+    <span class="tBranco">Categoria</span>.<span class="tRosa">find</span>().then((<span class="tBranco">categorias</span>) => {
+        <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"admin/categorias"</span>, <span class="tBranco">categoria</span>: <span class="tBranco">categorias</span>)
+
+    }).catch(() => {
+        <span class="tBranco">req</span>.<span class="tRosa">flash</span>(<span class="tLaranja">"error_msg"</span>, <span class="tLaranja">"Houve um erro inesperado ao recuperar as categorias salvas."</span>)
+        <span class="tBranco">res</span>.<span class="tRosa">redirect</span>(<span class="tLaranja">"/admin"</span>)
+
+    })
+})
+
+...
+</code>
+</pre>
+
+        <p>Veja que a forma com que fazemos a busca dos registros à partir de um model com o Mongoose ocorre de forma semelhante ao que fizemos com o Sequelize: aqui, utilizamos o método <samp><span class="tRosa">find</span>()</samp> acessado do model para <b>recuperar todos os registros</b>. É no bloco <samp>then()</samp> que informamos o nome do objeto contendo todos os documentos registrados no banco, e é este que vamos passar dentro do método de renderização da view de categorias, identificado pelo nome de <samp><span class="tBranco">categoria</span></samp> dentro do arquivo da view.</p>
+
+        <p>Veja que agora, dentro da estrutura <samp>catch</samp>, utilizamos o recurso de mensagem flash pra toda vez que <b>houver erros durante o carregamento dessas informações</b>. Veja que a renderização da página só ocorre apenas quando <b>todos os documentos são recuperados do banco e armazenados dentro de um objeto de referência</b>.</p>
+
+        <p>Feito isso, podemos utilizar o objeto <samp><span class="tBranco">categoria</span></samp> dentro do arquivo da view de categorias, que vamos utilizar para listar todos os registros na página e suas informações através de uma iteração. Vamos ao arquivo <b>'categorias.handlebars'</b> e adicionar a estrutura que gera, dinamicamente, uma estrutura HTML para cada documento registrado.</p>
+
+<pre>
+<span class="arquivo">categorias.handlebars</span>
+<code>
+&lt;h3&gt;<span class="tBranco">Lista de categorias</span>&lt;/h3&gt;
+&lt;hr&gt;
+&lt;a <span class="tLaranja">href=&quot;/admin/categorias/adicionar&quot;</span>&gt;&lt;button class=&quot;btn btn-outline-success&quot;&gt;<span class="tBranco">+ Adicionar</span>&lt;button&gt;&lt;/a&gt;
+
+<span class="tBranco">{{<span class="tRosa">#each</span> <span class="tBranco">categoria</span>}}</span>
+    &lt;div class=&quot;card mt-2&quot;&gt;
+        &lt;div class=&quot;card-body&quot;&gt;
+            &lt;h4&gt;<span class="tBranco">{{nome}}</span>&lt;/h4&gt;
+            &lt;small&gt;<span class="tBranco">{{slug}}</span>&lt;/small&gt;
+            &lt;br&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+<span class="tBranco">{{<span class="tRosa">/each</span>}}</span>
+</code>
+</pre>
+
+        <p>Na estrutura <b>each</b>, do Handlebars, <b>passamos um array de objeto iterável que repete um bloco de código para cada item deste array</b>. Lembre-se que <samp><span class="tBranco">categoria</span></samp> é o objeto que passamos anteriormente no render desta view, e este objeto é justamente <b>o array com os documentos recuperados do banco de dados</b>. E para cada categoria, exibimos posteriormente as propriedades <samp><span class="tBranco">nome</span></samp> e <samp><span class="tBranco">slug</span></samp>, que descrevem exatamente os campos desse tipo de documento. Toda essa estrutura vai ser replicada x vezes ao renderizar a página, sendo x o tanto de documentos registrados no banco de dados.</p>
+
+        <footer>
+            <a href="../a40/a40.html">Página Anterior</a>
+            <a href="#">Próxima Página</a>
+        </footer>
+    </main>
+</body>
+</html>
