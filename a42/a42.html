@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../stemp-css/stemp.css" type="text/css">
+    <title>a42</title>
+</head>
+<body>
+    <h1>a42 - CRUD: Editando categorias</h1>
+
+    <main>
+        <p>Agora que já conseguimos listar todas as categorias registradas no banco de dados, vamos fazer com que os registros possam ser editados. Aqui, vamos colocar em prática o uso de rotas de parâmetro para a edição dessas informações. Observe:</p>
+
+        <br>
+
+        <h1><em>Update</em></h1>
+        <p>Vamos começar definindo a rota de update no arquivo de rotas do administrador. Vamos adicionar o seguinte trecho no final do arquivo, antes de <samp><span class="tBranco">module</span>.<span class="tBranco">exports</span> = <span class="tBranco">router</span></samp>.</p>
+
+<pre>
+<span class="arquivo">admin.js</span>
+<code>
+...
+
+<span class="tBranco">router</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/categorias/editar/<span class="tBranco">:id</span>"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+
+    <span class="tBranco">Categoria</span>.<span class="tRosa">findById</span>(<span class="tBranco">req</span>.<span class="tBranco">params</span>.<span class="tBranco">id</span>).then((<span class="tBranco">categoria</span>) => {
+        <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"admin/editar-categoria"</span>, <span class="tBranco">categoria</span>)
+    })
+
+})
+
+<span class="tBranco">module</span>.<span class="tBranco">exports</span> = <span class="tBranco">router</span>
+</code>
+</pre>
+
+        <p>Veja que a URL da rota, pra ser acessada, <b>precisa informar alguma coisa dentro do route parameter <samp><span class="tBranco">:id</span></samp></b>. Esse <samp><span class="tBranco">id</span></samp> nada mais é do que <b>o identificador único que torna um documento dentro da coleção de categorias como único</b>. 
+            
+        <p>É esse valor que utilizamos para fazer a consulta e recuperação dos dados do documento associado à id utilizando do método <samp><span class="tRosa">findById</span></samp>, que, como o nome sugere, <b>recupera um documento do banco de dados associada àquela id em específico</b>.</p>
+
+        <p>Com os dados recuperados, <b>renderizamos uma view que iremos criar chamada de 'editar-categoria'</b>, que consistirá basicamente em um formulário que permitirá editar as informações do documento.</p>
+
+        <p>E como o usuário vai acessar essa rota? Através de um botão <b>que redireciona para o endereço da rota que acabamos de criar</b>, associado à cada registro do banco. Como já conseguimos listar todos os registros, basta adicionar na estrutura que gera o HTML para cada registro um botão com a URL da rota + incluir a id recuperada.</p>
+
+        <p>Vamos voltar para o arquivo <b>'categorias.handlebars'</b> e adicionar esse botão que redireciona para a nossa rota de edição de categoria:</p>
+
+<pre>
+<span class="arquivo">categorias.handlebars</span>
+<code>
+&lt;h3&gt;<span class="tBranco">Lista de categorias</span>&lt;/h3&gt;
+&lt;hr&gt;
+&lt;a <span class="tLaranja">href=&quot;/admin/categorias/adicionar&quot;</span>&gt;&lt;button class=&quot;btn btn-outline-success&quot;&gt;<span class="tBranco">+ Adicionar</span>&lt;button&gt;&lt;/a&gt;
+
+<span class="tBranco">{{<span class="tRosa">#each</span> <span class="tBranco">categoria</span>}}</span>
+    &lt;div class=&quot;card mt-2&quot;&gt;
+        &lt;div class=&quot;card-body&quot;&gt;
+            &lt;h4&gt;<span class="tBranco">{{nome}}</span>&lt;/h4&gt;
+            &lt;small&gt;<span class="tBranco">{{slug}}</span>&lt;/small&gt;
+
+            &lt;div class=&quot;d-flex flex-row mt-3&quot;&gt;
+                &lt;a href=<span class="tLaranja">&quot;categorias/editar/<span class="tBranco">{{_id}}</span>&quot;</span>&gt;&lt;button class=&quot;btn btn-outline-primary&quot;&gt;Editar&lt;/button&gt;&lt;/a&gt;
+            &lt;/div&gt;
+
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+<span class="tBranco">{{<span class="tRosa">/each</span>}}</span>
+</code>
+</pre>
+
+        <p>Com a view atualizada, agora, é preciso <b>criar a view do formulário de edição de categoria</b>. Vamos considerar a seguinte estrutura para o arquivo <b>'editar-categoria.handlebars'</b>, que é a mesma view de formulário de criação de novas categorias (com algumas alterações importantes):</p>
+
+<pre>
+<span class="arquivo">editar-categoria.handlebars</span>
+<code>
+&lt;h3&gt;Editar Categoria: <span class="tBranco">{{nome}}</span>&lt;/h3&gt;
+&lt;hr&gt;
+
+&lt;div class=&quot;card&quot;&gt;
+    &lt;div class=&quot;card-body&quot;&gt;
+        &lt;form <span class="tBranco">action=<span class="tLaranja">&quot;/admin/categorias/editar&quot;</span></span> <span class="tBranco">method=<span class="tLaranja">&quot;post&quot;</span></span>&gt;
+            &lt;input type=&quot;hidden&quot; <span class="tBranco">name=<span class="tLaranja">&quot;id&quot;</span></span> <span class="tBranco">value=<span class="tLaranja">&quot;</span>{{id}}<span class="tLaranja">&quot;</span></span>&gt;
+
+            &lt;label for=&quot;nome&quot; class=&quot;mb-1&quot;&gt;Nome:&lt;/label&gt;
+            &lt;input type=&quot;text&quot; id=&quot;nome&quot; <span class="tBranco">name=<span class="tLaranja">&quot;nome&quot;</span></span> placeholder=&quot;Nome da categoria&quot; class=&quot;form-control&quot; <span class="tBranco">value=<span class="tLaranja">&quot;</span>{{nome}}<span class="tLaranja">&quot;</span></span>&gt;
+
+            &lt;label for=&quot;slug&quot; class=&quot;mt-2 mb-1&quot;&gt;Slug:&lt;/label&gt;
+            &lt;input type=&quot;text&quot; id=&quot;slug&quot; <span class="tBranco">name=<span class="tLaranja">&quot;slug&quot;</span></span> placeholder=&quot;Slug da categoria&quot; class=&quot;form-control&quot; <span class="tBranco">value=<span class="tLaranja">&quot;</span>{{slug}}<span class="tLaranja">&quot;</span></span>&gt;
+
+            &lt;button type=&quot;submit&quot; class=&quot;btn btn-block btn-success mt-4&quot; style=&quot;width: 100%;&quot;&gt;Editar Categoria&lt;/button&gt;
+        &lt;/form&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+</code>
+</pre>
+
+        <p>Veja que no formulário <b>passamos todos os valores de campos do documento previamente</b>. Tanto no título <samp>h3</samp> principal quanto como nos valores dos inputs. Veja também que o identificador de <samp><span class="tBranco">name</span></samp>, que permite o acesso dos dados enviados dos inputs em <samp><span class="tBranco">req</span>.<span class="tBranco">query</span></samp> para o nome da categoria e seu slug permanecem os mesmos.</p>
+
+        <p>E até aqui, nada de especial. Porém, há um input novo do tipo 'hidden' aqui: ele vai enviar no corpo da requisição o <samp><span class="tBranco">value</span></samp> do input com o <samp><span class="tBranco">name=</span><span class="tLaranja">"id"</span></samp>, que nada mais é do que <b>a id referente ao documento</b>, que vamos utilizar para identificar o documento à ser editado com as informações novas.</p>
+
+        <p>E sim, o que falta é definir, lá no arquivo de rota do administrador, <b>uma rota POST que vai processar todos os dados enviados desse formulário</b>, exatamente na rota definida em <samp><span class="tBranco">action=<span class="tLaranja">&quot;/admin/categorias/editar&quot;</span></span></samp>.</p>
+
+        <p>Vamos voltar ao arquivo <b>'admin.js'</b> e incluir esta rota POST:</p>
+
+<pre>
+<span class="arquivo">admin.js</span>
+<code>
+...
+
+<span class="tBranco">router</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/categorias/editar/<span class="tBranco">:id</span>"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+
+    <span class="tBranco">Categoria</span>.<span class="tRosa">findById</span>(<span class="tBranco">req</span>.<span class="tBranco">params</span>.<span class="tBranco">id</span>).then((<span class="tBranco">categoria</span>) => {
+        <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"admin/editar-categoria"</span>, <span class="tBranco">categoria</span>)
+    })
+
+})
+
+<span class="tBranco">router</span>.<span class="tRosa">post</span>(<span class="tLaranja">"/categorias/editar"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+
+    <span class="tBranco">Categoria</span>.<span class="tRosa">findById</span>(<span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">id</span>).then((<span class="tBranco">categoria</span>) => {
+        
+        <span class="tBranco">categoria</span>.<span class="tBranco">nome</span> = <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">nome</span>
+        <span class="tBranco">categoria</span>.<span class="tBranco">slug</span> = <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">slug</span>
+
+        <span class="tBranco">categoria</span>.<span class="tRosa">save</span>().then(() => {
+
+            <span class="tBranco">req</span>.<span class="tRosa">flash</span>(<span class="tLaranja">"success_msg"</span>, <span class="tLaranja">"Categoria editada com sucesso!"</span>)
+            <span class="tBranco">res</span>.<span class="tRosa">redirect</span>(<span class="tLaranja">"/admin/categorias"</span>)
+
+        }).catch(() => {
+
+            <span class="tBranco">req</span>.<span class="tRosa">flash</span>(<span class="tLaranja">"error_msg"</span>, <span class="tLaranja">"Houve um erro ao editar as informações. Por favor, tente novamente."</span>)
+            <span class="tBranco">res</span>.<span class="tRosa">redirect</span>(<span class="tLaranja">"/admin/categorias"</span>)
+
+        })
+
+    })
+
+})
+
+<span class="tBranco">module</span>.<span class="tBranco">exports</span> = <span class="tBranco">router</span>
+</code>
+</pre>
+
+        <p>Veja que ao carregar o parâmetro <samp><span class="tBranco">categoria</span></samp> dentro de <samp>then</samp>, <b>podemos acessar os campos que descrevem um documento da coleção de categorias</b>, e atribuindo facilmente os valores novos em seguida, apenas acessando como propriedades de objeto.</p>
+
+        <footer>
+            <a href="../a41/a41.html">Página Anterior</a>
+            <a href="#">Próxima Página</a>
+        </footer>
+    </main>
+</body>
+</html>
