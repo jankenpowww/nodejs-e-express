@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../stemp-css/stemp.css" type="text/css">
+    <title>a43</title>
+</head>
+<body>
+    <h1>a43 - CRUD: Deletando categorias</h1>
+
+    <main>
+        <p>E por fim, vamos implementar a última feature principal do CRUD de categorias: o de deletar categorias!</p>
+
+        <br>
+
+        <h1><em>Delete</em></h1>
+        <p>Para o recurso de deletar, <b>vamos dispor mais um botão para ser renderizado para cada categoria no banco.</b> Desta vez, vamos fazer com que o botão esteja envolto <b>de uma tag &lt;form&gt;, que enviará uma requisição via POST e deletar o dado do banco de dados</b>. Veja:</p>
+
+<pre>
+<span class="arquivo">categorias.handlebars</span>
+<code>
+&lt;h3&gt;<span class="tBranco">Lista de categorias</span>&lt;/h3&gt;
+&lt;hr&gt;
+&lt;a <span class="tLaranja">href=&quot;/admin/categorias/adicionar&quot;</span>&gt;&lt;button class=&quot;btn btn-outline-success&quot;&gt;<span class="tBranco">+ Adicionar</span>&lt;button&gt;&lt;/a&gt;
+
+<span class="tBranco">{{<span class="tRosa">#each</span> <span class="tBranco">categoria</span>}}</span>
+    &lt;div class=&quot;card mt-2&quot;&gt;
+        &lt;div class=&quot;card-body&quot;&gt;
+            &lt;h4&gt;<span class="tBranco">{{nome}}</span>&lt;/h4&gt;
+            &lt;small&gt;<span class="tBranco">{{slug}}</span>&lt;/small&gt;
+
+            &lt;div class=&quot;d-flex flex-row mt-3&quot;&gt;
+                &lt;a href=<span class="tLaranja">&quot;categorias/editar/<span class="tBranco">{{_id}}</span>&quot;</span>&gt;&lt;button class=&quot;btn btn-outline-primary&quot;&gt;Editar&lt;/button&gt;&lt;/a&gt;
+
+                <span class="tVerde">&lt;!-- Botão que deleta a categoria. --&gt;</span>
+                &lt;form <span class="tBranco">method=</span><span class="tLaranja">&quot;post&quot;</span> <span class="tBranco">action=</span><span class="tLaranja">&quot;categorias/deletar&quot;</span> style=&quot;margin-left: 4px;&quot;&gt;
+                    &lt;input <span class="tBranco">type=</span><span class="tLaranja">&quot;hidden&quot;</span> <span class="tBranco">name=</span><span class="tLaranja">&quot;id&quot;</span> <span class="tBranco">value=<span class="tLaranja">&quot;</span>{{_id}}<span class="tLaranja">&quot;</span></span>&gt;
+                    &lt;button class=&quot;btn btn-danger&quot;&gt;Deletar&lt;/button&gt;
+                &lt;/form&gt;
+            &lt;/div&gt;
+
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+<span class="tBranco">{{<span class="tRosa">/each</span>}}</span>
+</code>
+</pre>
+
+        <p>O processo é o mesmo: se estamos falando de uma requisição POST feita do envio de dados de um formulário, <b>fica claro que temos que determinar o endpoint, ou a rota de redirecionamento, para onde as informações de input serão enviadas</b>. Aqui, temos definido em <samp><span class="tBranco">action</span></samp> o endpoint <samp><span class="tLaranja">"categorias/deletar"</span></samp>, que vai basicamente enviar o valor da id do documento à ser excluído de um input do tipo 'hidden'. É à partir da id que, assim como qualquer outra operação basica de crud, vamos utilizar para recuperar o documento e excluir do banco.</p>
+
+        <p>Vamos ao arquivo de rotas do administrador para criar a rota <b>"categorias/deletar"</b>, onde vamos recuperar a id enviada e realizar a operação de delete.</p>
+
+<pre>
+<span class="arquivo">admin.js</span>
+<code>
+...
+
+<span class="tBranco">router</span>.<span class="tRosa">post</span>(<span class="tLaranja">"/categorias/deletar"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+
+    <span class="tBranco">Categoria</span>.<span class="tRosa">findByIdAndDelete</span>(<span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">id</span>).then(() => {
+        <span class="tBranco">req</span>.<span class="tRosa">flash</span>(<span class="tLaranja">"success_msg"</span>, <span class="tLaranja">"Categoria deletada com sucesso!"</span>)
+        <span class="tBranco">res</span>.<span class="tRosa">redirect</span>(<span class="tLaranja">"/admin/categorias"</span>)
+
+    }).catch(() => {
+        <span class="tBranco">req</span>.<span class="tRosa">flash</span>(<span class="tLaranja">"error_msg"</span>, <span class="tLaranja">"Houve um erro ao editar as informações. Por favor, tente novamente."</span>)
+        <span class="tBranco">res</span>.<span class="tRosa">redirect</span>(<span class="tLaranja">"/admin/categorias"</span>)
+
+    })
+
+})
+
+<span class="tBranco">module</span>.<span class="tBranco">exports</span> = <span class="tBranco">router</span>
+</code>
+</pre>
+
+        <p>Até aqui, nada de novo. Chamamos a model <samp><span class="tBranco">Categoria</span></samp> para acessar o método <samp><span class="tRosa">findByIdAndDelete</span></samp></b>, que como o nome já diz, <b>retorna o documento associado à Id e o deleta do banco de dados</b>. O usuário é redirecionado para a página que lista as categorias novamente e dependendo do resultado dessa operação, uma mensagem flash é exibida.</p>
+
+        <p>Com isso, está terminado <b>essa sequência de criação de CRUD de categorias</b>! Foi explorado todos os conceitos e algumas das várias possibilidades de se trabalhar e manipular dados numa aplicação baseada em requisições e resposta.</p> 
+        
+        <p><b>#TudoÉCRUD</b> &#127881;&#127881;</p>
+
+        <footer>
+            <a href="../a42/a42.html">Página Anterior</a>
+            <a href="#">Próxima Página</a>
+        </footer>
+    </main>
+</body>
+</html>
