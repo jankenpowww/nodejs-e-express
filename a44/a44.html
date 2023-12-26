@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../stemp-css/stemp.css" type="text/css">
+    <title>a44</title>
+</head>
+<body>
+    <h1>a44 - Definindo o model de postagens</h1>
+
+    <main>
+        <p>Com os conceitos de CRUD feitos na prática dentro da dinâmica de aplicações baseadas em requisição e resposta definitivamente consolidadas, <b>vamos prosseguir adicionando novos recursos na nossa aplicação</b>, e aproveitar e conhecer outras funcionalidades das tecnologias utilizadas.</p>
+
+        <br>
+
+        <h1>>Relacionamento< com MongoDB</h1>
+        <p>Atualmente, temos uma coleção no nosso banco de dados chamada <b>"categorias"</b>. E recaptulando: dentro da nossa aplicação, essa coleção vai ser responsável por <b>armazenar todos os documentos das categorias registradas na nossa aplicação de blog</b>. As categorias basicamente descreverão <b>um conjunto de postagens do blog com categorias em comum</b>.</p>
+        <p>Isso significa que, de certa maneira, categorias estão diretamente relacionadas com as postagens em si, e é óbvio que isso vai <b>implicar na criação de uma coleção no nosso banco de dados referente às postagens</b> (<s>nem tanto por depender de categoria em si, até porque um blog não é blog sem postagens xP)</s>.</p>
+
+        <p>Vamos criar nossa model de postagens e ver <b>como implementamos esse tipo de relacionamento entre documentos de coleções diferentes</b>, e como tudo isso funciona.</p>
+
+        <p>Vamos criar no diretório 'models', o arquivo <b>Postagem.js</b>, e descrever todos os campos necessários para o nosso mais novo model:</p>
+
+<pre>
+<span class="arquivo">Postagem.js</span>
+<code>
+const <span class="tBranco">mongoose</span> = require(<span class="tLaranja">"mongoose"</span>)
+const { <span class="tBranco">Schema</span> } require(<span class="tLaranja">"mongoose"</span>)
+
+const <span class="tBranco">postagemSchema</span> = ({
+    <span class="tBranco">titulo</span>: { <span class="tBranco">type</span>: <span class="tBranco">String</span>, <span class="tBranco">required</span>: <span class="tLaranja">true</span> },
+    <span class="tBranco">descricao</span>: { <span class="tBranco">type</span>: <span class="tBranco">String</span>, <span class="tBranco">required</span>: <span class="tLaranja">true</span> },
+    <span class="tBranco">conteudo</span>: { <span class="tBranco">type</span>: <span class="tBranco">String</span>, <span class="tBranco">required</span>: <span class="tLaranja">true</span> },
+    <span class="tBranco">slug</span>: { <span class="tBranco">type</span>: <span class="tBranco">String</span>, <span class="tBranco">required</span>: <span class="tLaranja">true</span> },
+    <span class="tBranco">data</span>: { <span class="tBranco">type</span>: <span class="tBranco">Date</span>, <span class="tBranco">default</span>: <span class="tBranco">Date</span>.<span class="tRosa">now</span>() },
+
+    <span class="tBranco">categoria</span>: { 
+        <span class="tBranco">type</span>: { <span class="tBranco">Schema</span>.<span class="tBranco">Types</span>.<span class="tBranco">ObjectId</span> },
+        <span class="tBranco">ref</span>: <span class="tLaranja">"categorias"</span>,
+        <span class="tBranco">required</span>: <span class="tLaranja">true</span>
+    }
+})
+
+const <span class="tBranco">Postagem</span> = <span class="tBranco">mongoose</span>.<span class="tRosa">model</span>(<span class="tLaranja">"postagens"</span>, <span class="tBranco">schemaPostagem</span>)
+
+module.exports = <span class="tBranco">Postagem</span>
+</code> 
+</pre>
+
+        <p>Veja que, assim como no model de categorias, muita coisa para descrever este model em questão se mantém padrão, o ponto é <b>o último campo que definimos para o model de postagens</b>.</p>
+        <p>Como muito se falou até aqui, MongoDB é um banco de dados orientado à documento e NoSQL, o que significa que <b>é um tipo de banco de dados que não se baseia/pouco se baseia no modelo relacional tradicional</b>. E isso com certeza leva a pergunta chave: "e por que diabos vamos relacionar duas coleções diferentes se o MongoDB não trabalha com o modelo relacional?". Porque o MongoDB não trabalha com modelo relacional realmente, e sim <b>com referências</b>!</p>
+
+        <p>À princípio, soa como relacionamentos só que com outro nome, e é mesmo. A grande jogada dos bancos de dados NoSQL <b>está em oferecer liberdade para como os dados são armazenados, tratados e utilizados</b>, algo que você não consegue fazer com muito desempenho em bancos 100% relacionais, por exemplo. Com bancos NoSQL como o MongoDB, <b>o desenvolvedor tem maior liberdade para desenvolver sua própria estratégia de arquitetura de dados sem se preocupar com padrões de modelos definidos</b>, e esse é certamente um ponto forte de se trabalhar com NoSQL em aplicações, por exemplo.</p>
+        <p>Dito isso, veja que no campo <samp><span class="tBranco">categoria</span></samp>, fazemos justamente isso descrevendo dois outros campos importantes e que devem ser descritos em conjunto para que as referências entre documentos de coleções distintas ocorram:</p>
+
+<pre>
+<span class="arquivo">Postagem.js</span>
+<code>
+...
+    <span class="tBranco">type</span>: { <span class="tBranco">Schema</span>.<span class="tBranco">Types</span>.<span class="tBranco">ObjectId</span> },
+    <span class="tBranco">ref</span>: <span class="tLaranja">"categorias"</span>,
+...
+</code>
+</pre>
+
+        <p><samp><span class="tBranco">type</span></samp> recebe <b>um tipo especial que descreve que o campo será populado com a Id de um documento</b>. Isto é, a referência aqui que vai ligar a postagem à uma categoria <b>será pelo Id do documento de uma categoria existente atribuída como valor dentro do campo de categoria de uma postagem</b>.</p>
+        <p>E veja que isso não é o suficiente para <b>determinar que a coleção de postagens está associada de certa forma com a coleção de categorias</b>, uma vez que definimos o tipo de campo para receber a Id de outro documento - não especificamos exatamente de que coleção se refere a este.</p>
+        <p>E para resolver isso, passamos o objeto <samp><span class="tBranco">ref</span></samp> que <b>recebe uma string do nome do identificador da coleção dentro do nosso banco de dados</b>. A referência então determina, finalmente, <b>que o campo receberá o Id de um documento de referência da coleção 'categorias'</b>.</p>
+
+        <footer>
+            <a href="../a43/a43.html">Página Anterior</a>
+            <a href="#">Próxima Página</a>
+        </footer>
+    </main>
+</body>
+</html>
