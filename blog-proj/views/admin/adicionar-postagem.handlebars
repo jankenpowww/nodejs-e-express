@@ -1,0 +1,32 @@
+<h3>Criar uma nova postagem</h3>
+<hr>
+<div class="card">
+    <div class="card-body">
+        <form method="post" action="/admin/postagens/adicionar">
+            <label>Título:</label>
+            <input type="text" class="form-control mb-3" name="titulo">
+
+            <label>Slug:</label>
+            <input type="text" class="form-control mb-3" name="slug">
+
+            <label>Descrição:</label>
+            <input type="text" class="form-control mb-3" name="descricao">
+
+            <label>Categoria:</label>
+            <select class="form-control mb-4" name="categoria">
+                {{#each categoria}}
+                    <option>{{nome}}</option>
+
+                {{else}}
+                    <option value="0">Nenhuma categoria registrada.</option>
+                
+                {{/each}}
+            </select>
+
+            <label>Conteúdo:</label><br>
+            <textarea class="mb-3" style="resize: none; width: 100%; height: 160px;" name="conteudo"></textarea>
+
+            <button style="width: 100%;" class="btn btn-success" type="submit">Criar Postagem</button>
+        </form>
+    </div>
+</div>

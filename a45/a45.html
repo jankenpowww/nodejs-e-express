@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../stemp-css/stemp.css" type="text/css">
+    <title>a45</title>
+</head>
+<body>
+    <h1>a45 - Rotas e view de postagem</h1>
+
+    <main>
+        <p>Uma vez que temos <b>o model de postagens pronto</b>, basta agora definir as rotas e as respectivas views acerca desse recurso de postagens.</p>
+        <br><br>
+
+        <h1>Definindo as rotas</h1>
+        <p>Lá no começo do projeto, nós já haviamos criado uma rota <b>para o recurso de postagens</b>, com a rota definida em '/posts'.</p>
+        <p>Vamos alterar a string da rota para '/postagens' dessa vez e dar continuidade em cima disso...</p>
+
+<pre>
+<span class="arquivo">admin.js</span>
+<code>
+const <span class="tBranco">express</span> = require(<span class="tLaranja">"express"</span>)
+const <span class="tBranco">router</span> = <span class="tBranco">express</span>.<span class="tRosa">Router</span>()
+
+<span class="tVerde">//Importando o model de categorias.</span>
+const <span class="tBranco">Categoria</span> = require(<span class="tLaranja">"../models/Categoria"</span>)
+
+<span class="tBranco">router</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"admin/index"</span>)
+})
+
+<span class="tBranco">router</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/postagens"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"admin/postagens"</span>)
+})
+
+...
+</code>
+</pre>
+
+        <p>Note que ao acessar a rota, um arquivo <b>'postagens.handlebars'</b> será renderizado na tela. Vamos criar, no diretório de views na pasta 'admin', <b>criar este arquivo</b>:</p>
+
+<pre>
+<span class="arquivo">categorias.handlebars</span>
+<code>
+&lt;h3&gt;<span class="tBranco">Lista de postagens</span>&lt;/h3&gt;
+&lt;hr&gt;
+&lt;a <span class="tLaranja">href=&quot;/admin/postagens/adicionar&quot;</span>&gt;&lt;button class=&quot;btn btn-outline-success&quot;&gt;<span class="tBranco">+ Adicionar</span>&lt;button&gt;&lt;/a&gt;
+</code>
+</pre>
+
+        <p>O link que envolve o elemento &lt;button&gt; acima <b>redireciona o usuário para uma outra rota da qual vamos criar ainda</b>, que consiste em um formulário de criação de postagens. Veja que estamos seguindo exatamente a mesma linha de quando criamos os recursos de categoria.</p>
+
+        <p>Vamos fazer isso então...</p>
+
+<pre>
+<span class="arquivo">admin.js</span>
+<code>
+...
+
+<span class="tBranco">router</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/postagens"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"admin/postagens"</span>)
+})
+
+<span class="tBranco">router</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/postagens/adicionar"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    
+    <span class="tBranco">Categoria</span>.<span class="tRosa">find</span>().then((<span class="tBranco">categorias</span>) => {
+        <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"admin/adicionar-postagem"</span>, {<span class="tBranco">categoria</span>: <span class="tBranco">categorias</span>})
+    })
+
+})
+
+...
+</code>
+</pre>
+
+        <p>Isso implica, mais uma vez, na criação de um arquivo <b>'adicionar-postagem.handlebars'</b>, que será renderizada ao acessar <samp><span class="tLaranja">"/admin/postagens/adicionar"</span></samp> no navegador. Veja que utilizamos o model de <samp><span class="tBranco">Categoria</span></samp> para recuperar <b>todos os documentos registrados da coleção até o momento e renderizá-los junto com a view</b>.</p>
+        <p>Isso será importante para <b>determinar o valor de um campo dos documentos registrados de postagens</b>, como veremos em diante.</p>
+
+        <p>Vamos então criar a view <b>adicionar-postagem.handlebars</b>, no diretório 'views/admin'...</p>
+
+<pre>
+<span class="arquivo">adicionar-postagem.handlebars</span>
+<code>
+&lt;h3&gt;Criar uma nova postagem&lt;/h3&gt;
+&lt;hr&gt;
+&lt;div class=&quot;card&quot;&gt;
+    &lt;div class=&quot;card-body&quot;&gt;
+
+        &lt;form <span class="tBranco">method=</span><span class="tLaranja">&quot;post&quot;</span> <span class="tBranco">action=</span><span class="tLaranja">&quot;/admin/postagens/adicionar&quot;</span>&gt;
+            &lt;label&gt;<span class="tBranco">T&iacute;tulo:</span>&lt;/label&gt;
+            &lt;input type=&quot;text&quot; class=&quot;form-control mb-3&quot; <span class="tBranco">name=</span><span class="tLaranja">&quot;titulo&quot;</span>&gt;
+
+            &lt;label&gt;<span class="tBranco">Slug:</span>&lt;/label&gt;
+            &lt;input type=&quot;text&quot; class=&quot;form-control mb-3&quot; <span class="tBranco">name=</span><span class="tLaranja">&quot;slug&quot;</span>&gt;
+
+            &lt;label&gt;<span class="tBranco">Descri&ccedil;&atilde;o:</span>&lt;/label&gt;
+            &lt;input type=&quot;text&quot; class=&quot;form-control mb-3&quot; <span class="tBranco">name=</span><span class="tLaranja">&quot;descricao&quot;</span>&gt;
+
+            &lt;label&gt;<span class="tBranco">Categoria:</span>&lt;/label&gt;
+            &lt;select class=&quot;form-control mb-4&quot; <span class="tBranco">name=</span><span class="tLaranja">&quot;categoria&quot;</span>&gt;
+                
+                <span class="tBranco">{{<span class="tRosa">#each</span> categoria}}</span>
+                    &lt;option&gt;<span class="tBranco">{{nome}}</span>&lt;/option&gt;
+
+                <span class="tBranco">{{<span class="tRosa">else</span>}}</span>
+                    &lt;option value=&quot;0&quot;&gt;<span class="tBranco">Nenhuma categoria registrada.</span>&lt;/option&gt;
+                
+                <span class="tBranco">{{<span class="tRosa">/each</span>}}</span>
+                
+            &lt;/select&gt;
+
+            &lt;label&gt;<span class="tBranco">Conte&uacute;do:</span>&lt;/label&gt;&lt;br&gt;
+            &lt;textarea class=&quot;mb-3&quot; style=&quot;resize: none; width: 100%; height: 160px;&quot; <span class="tBranco">name=</span><span class="tLaranja">&quot;conteudo&quot;</span>&gt;&lt;/textarea&gt;
+
+            &lt;button style=&quot;width: 100%;&quot; class=&quot;btn btn-success&quot; type=&quot;submit&quot;&gt;<span class="tBranco">Criar Postagem</span>&lt;/button&gt;
+        &lt;/form&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+</code>
+</pre>
+
+        <p>Veja que para a maioria dos dados que incluem <b>título, slug, descrição</b> e <b>categoria</b> estão em inputs de tipo texto normais, inclui também o input do campo de <b>conteúdo</b>, que receberá os dados dentro de um &lt;textarea&gt;.</p>
+        <p>O destaque está aqui, dentro da tag &lt;select&gt;. Veja:</p>
+
+<pre>
+<span class="arquivo">adicionar-postagem.handlebars</span>
+<code>
+...
+    &lt;label&gt;<span class="tBranco">Categoria:</span>&lt;/label&gt;
+    &lt;select class=&quot;form-control mb-4&quot; <span class="tBranco">name=</span><span class="tLaranja">&quot;categoria&quot;</span>&gt;
+        
+        <span class="tBranco">{{<span class="tRosa">#each</span> categoria}}</span>
+            &lt;option&gt;<span class="tBranco">{{nome}}</span>&lt;/option&gt;
+
+        <span class="tBranco">{{<span class="tRosa">else</span>}}</span>
+            &lt;option value=&quot;0&quot;&gt;<span class="tBranco">Nenhuma categoria registrada.</span>&lt;/option&gt;
+        
+        <span class="tBranco">{{<span class="tRosa">/each</span>}}</span>
+        
+    &lt;/select&gt;
+...
+</code>
+</pre>
+
+        <p>Observe que aqui dentro da tag, estamos gerando <b>um elemento &lt;select&gt; para cada categoria registrada no banco de dados</b>. Isso vai permitir o usuário administrador, ao criar uma nova postagem, associar uma categoria já existente registrada no banco de dados com muita facilidade.</p>
+        <p>Veja que quando não há nenhuma categoria registrada, <b>isso também é mostrado para o usuário</b>. Note que o parâmetro <samp><span class="tBranco">value</span></samp> neste caso recebe o valor '0', uma vez que isso <b>vai ser de suma importância ao realizar as validações dos dados enviados</b>.</p>
+
+        <footer>
+            <a href="../a44/a44.html">Página Anterior</a>
+            <a href="#">Próxima Página</a>
+        </footer>
+    </main>
+</body>
+</html>

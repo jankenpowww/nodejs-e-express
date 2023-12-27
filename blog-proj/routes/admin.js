@@ -9,10 +9,6 @@ router.get("/", (req, res) => {
     res.render("admin/index")
 })
 
-router.get("/posts", (req, res) => {
-    res.render("admin/posts")
-})
-
 router.get("/categorias", (req, res) => {
 
     //A renderização ocorre após a coleta de todos os objetos do banco (que nem no sequelize)
@@ -132,6 +128,25 @@ router.post("/categorias/deletar", (req, res) => {
         req.flash("error_msg", "Houve um erro ao deletar a categoria. Por favor, tente novamente.")
         res.redirect("/admin/categorias")
     })
+})
+
+/**/
+
+router.get("/postagens", (req, res) => {
+    res.render("admin/postagens")
+})
+
+router.get("/postagens/adicionar", (req, res) => {
+
+    //Carregando todas as categorias para o <select> de categorias do form
+    Categoria.find().then((categorias) => {
+        res.render("admin/adicionar-postagem", {categoria: categorias})
+
+    }).catch((err) => {
+        req.flash("error_msg", "Houve um erro ao carregar alguns recursos.")
+        res.redirect("/admin/postagens")
+    })
+
 })
 
 module.exports = router //Exportamos o módulo para utilizar no arquivo de servidor principal.
