@@ -10,7 +10,7 @@ const postagemSchema = new Schema({
 
     categoria: {
         type: Schema.Types.ObjectId, //O valor de categoria será associada/relacionada ao id de um outro documento.
-        ref: "categorias", //O objeto 'ref' define o nome da coleção de referência no banco de dados à ser relacionada.
+        ref: "categoria", //O objeto 'ref' define o nome da coleção de referência no banco de dados à ser relacionada.
         required: true
     } 
 })

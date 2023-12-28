@@ -8,7 +8,7 @@
     <title>a45</title>
 </head>
 <body>
-    <h1>a45 - Rotas e view de postagem</h1>
+    <h1>a45 - Rotas e views de postagem</h1>
 
     <main>
         <p>Uma vez que temos <b>o model de postagens pronto</b>, basta agora definir as rotas e as respectivas views acerca desse recurso de postagens.</p>
@@ -102,10 +102,10 @@ const <span class="tBranco">Categoria</span> = require(<span class="tLaranja">".
             &lt;select class=&quot;form-control mb-4&quot; <span class="tBranco">name=</span><span class="tLaranja">&quot;categoria&quot;</span>&gt;
                 
                 <span class="tBranco">{{<span class="tRosa">#each</span> categoria}}</span>
-                    &lt;option&gt;<span class="tBranco">{{nome}}</span>&lt;/option&gt;
+                    &lt;option <span class="tBranco">value=</span><span class="tLaranja">&quot;<span class="tBranco">{{_id}}</span>&quot;</span>&gt;<span class="tBranco">{{nome}}</span>&lt;/option&gt;
 
                 <span class="tBranco">{{<span class="tRosa">else</span>}}</span>
-                    &lt;option value=&quot;0&quot;&gt;<span class="tBranco">Nenhuma categoria registrada.</span>&lt;/option&gt;
+                    &lt;option <span class="tBranco">value=</span><span class="tLaranja">&quot;0&quot;</span>&gt;<span class="tBranco">Nenhuma categoria registrada.</span>&lt;/option&gt;
                 
                 <span class="tBranco">{{<span class="tRosa">/each</span>}}</span>
                 
@@ -133,10 +133,10 @@ const <span class="tBranco">Categoria</span> = require(<span class="tLaranja">".
     &lt;select class=&quot;form-control mb-4&quot; <span class="tBranco">name=</span><span class="tLaranja">&quot;categoria&quot;</span>&gt;
         
         <span class="tBranco">{{<span class="tRosa">#each</span> categoria}}</span>
-            &lt;option&gt;<span class="tBranco">{{nome}}</span>&lt;/option&gt;
+            &lt;option <span class="tBranco">value=</span><span class="tLaranja">&quot;<span class="tBranco">{{_id}}</span>&quot;</span>&gt;<span class="tBranco">{{nome}}</span>&lt;/option&gt;
 
         <span class="tBranco">{{<span class="tRosa">else</span>}}</span>
-            &lt;option value=&quot;0&quot;&gt;<span class="tBranco">Nenhuma categoria registrada.</span>&lt;/option&gt;
+            &lt;option <span class="tBranco">value=</span><span class="tLaranja">&quot;0&quot;</span>&gt;<span class="tBranco">Nenhuma categoria registrada.</span>&lt;/option&gt;
         
         <span class="tBranco">{{<span class="tRosa">/each</span>}}</span>
         
@@ -146,7 +146,7 @@ const <span class="tBranco">Categoria</span> = require(<span class="tLaranja">".
 </pre>
 
         <p>Observe que aqui dentro da tag, estamos gerando <b>um elemento &lt;select&gt; para cada categoria registrada no banco de dados</b>. Isso vai permitir o usuário administrador, ao criar uma nova postagem, associar uma categoria já existente registrada no banco de dados com muita facilidade.</p>
-        <p>Veja que quando não há nenhuma categoria registrada, <b>isso também é mostrado para o usuário</b>. Note que o parâmetro <samp><span class="tBranco">value</span></samp> neste caso recebe o valor '0', uma vez que isso <b>vai ser de suma importância ao realizar as validações dos dados enviados</b>.</p>
+        <p>Veja que quando não há nenhuma categoria registrada, <b>isso também é mostrado para o usuário</b>. Note que o parâmetro <samp><span class="tBranco">value</span></samp> neste caso recebe o valor '0', uma vez que isso <b>vai ser de suma importância ao realizar as validações dos dados enviados</b>. Para os &lt;option&gt; normais, o parâmetro <samp><span class="tBranco">value</span></samp> recebe exatamente <b>a string da Id do documento associado àquela categoria</b>, uma vez que definimos que este mesmo campo, na model de postagens, <b>recebe a id de um documento da coleção de categorias da qual a postagem está associada</b>.</p>
 
         <footer>
             <a href="../a44/a44.html">Página Anterior</a>

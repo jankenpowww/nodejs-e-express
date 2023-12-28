@@ -2,8 +2,9 @@
 const express = require("express")
 const router = express.Router() //Vai permitir grupos de rotas associados. Precisamos associar à uma variável.
 
-//Importando model associada ao administrador.
+//Importando models associada ao administrador.
 const Categoria = require("../models/Categoria")
+const Postagem = require("../models/Postagem")
 
 router.get("/", (req, res) => {
     res.render("admin/index")
@@ -147,6 +148,39 @@ router.get("/postagens/adicionar", (req, res) => {
         res.redirect("/admin/postagens")
     })
 
+})
+
+router.post("/postagens/adicionar", (req, res) => {
+    let erros = []
+
+    const titulo = req.body.titulo,
+          slug = req.body.slug,
+          descricao = req.body.descricao,
+          conteudo = req.body.conteudo,
+          categoria = req.body.categoria
+
+    if (categoria != "0") {
+        new Postagem({
+            titulo: titulo,
+            slug: slug,
+            descricao: descricao,
+            conteudo: conteudo,
+            categoria: categoria
+
+        }).save().then(() => {
+            req.flash("success_msg", "Postagem adicionada com sucesso!")
+            res.redirect("/admin/postagens")
+
+        }).catch((err) => {
+            req.flash("error_msg", "Erro ao cadastrar a postagem. Tente novamente.")
+            res.redirect("/admin/postagens")
+            
+        })
+
+    } else {
+        erros.push({texto: "Nenhuma categoria registrada. Por favor, adicione uma nova categoria e prossiga criando uma nova postagem."})
+        res.render("admin/adicionar-postagem", {erro: erros})
+    }
 })
 
 module.exports = router //Exportamos o módulo para utilizar no arquivo de servidor principal.
