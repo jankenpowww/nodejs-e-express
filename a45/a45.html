@@ -148,9 +148,67 @@ const <span class="tBranco">Categoria</span> = require(<span class="tLaranja">".
         <p>Observe que aqui dentro da tag, estamos gerando <b>um elemento &lt;select&gt; para cada categoria registrada no banco de dados</b>. Isso vai permitir o usuário administrador, ao criar uma nova postagem, associar uma categoria já existente registrada no banco de dados com muita facilidade.</p>
         <p>Veja que quando não há nenhuma categoria registrada, <b>isso também é mostrado para o usuário</b>. Note que o parâmetro <samp><span class="tBranco">value</span></samp> neste caso recebe o valor '0', uma vez que isso <b>vai ser de suma importância ao realizar as validações dos dados enviados</b>. Para os &lt;option&gt; normais, o parâmetro <samp><span class="tBranco">value</span></samp> recebe exatamente <b>a string da Id do documento associado àquela categoria</b>, uma vez que definimos que este mesmo campo, na model de postagens, <b>recebe a id de um documento da coleção de categorias da qual a postagem está associada</b>.</p>
 
+        <br><br>
+
+        <h1>Registrando no banco de dados</h1>
+        <p>Aqui não há muito segredo. Como dito anteriormente, a única validação que vai determinar o cadastro de uma postagem ou não é se <b>há categorias registradas no sistema disponíveis para serem associadas a este</b>.</p>
+        <p>Aos valores possíveis enviados via POST dos &lt;option&gt; respectivos, '0' define que não há nenhuma categoria registrada no sistema da nossa aplicação, e portanto, não permitrá o cadastro deste no banco de dados. Por outro lado, <b>o campo de categoria será preenchido pela Id correspondente ao documento da coleção de categorias</b>, conforme selecionado durante a criação da postagem.</p>
+
+        <p>E é isso o que faremos, <b>vamos recuperar todos os valores e comparar se o campo de categoria veio com '0' ou não</b>, e daí determinar o cadastro ou não da postagem. O resto é procedimento padrão.</p>
+
+<pre>
+<span class="arquivo">admin.js</span>
+<code>
+...
+
+<span class="tBranco">router</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/postagens"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"admin/postagens"</span>)
+})
+
+<span class="tBranco">router</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/postagens/adicionar"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    
+    <span class="tBranco">Categoria</span>.<span class="tRosa">find</span>().then((<span class="tBranco">categorias</span>) => {
+        <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"admin/adicionar-postagem"</span>, {<span class="tBranco">categoria</span>: <span class="tBranco">categorias</span>})
+    })
+
+})
+
+<span class="tBranco">router</span>.<span class="tRosa">post</span>(<span class="tLaranja">"/postagens/adicionar"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    let <span class="tBranco">erros</span> = []
+
+    const <span class="tBranco">titulo</span> = <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">titulo</span>
+    const <span class="tBranco">slug</span> = <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">slug</span>
+    const <span class="tBranco">descricao</span> = <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">descricao</span>
+    const <span class="tBranco">conteudo</span> = <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">conteudo</span>
+    const <span class="tBranco">categoria</span> = <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">categoria</span>
+
+    <span class="tVerde">//Compara se a categoria é diferente de zero. Se sim, realiza o cadastro.</span>
+    if (<span class="tBranco">categoria</span> != <span class="tLaranja">'0'</span>) {
+        new <span class="tBranco">Postagem</span>({
+            <span class="tBranco">titulo</span>: <span class="tBranco">titulo</span>,
+            <span class="tBranco">slug</span>: <span class="tBranco">slug</span>,
+            <span class="tBranco">descricao</span>: <span class="tBranco">descricao</span>,
+            <span class="tBranco">conteudo</span>: <span class="tBranco">conteudo</span>,
+            <span class="tBranco">categoria</span>: <span class="tBranco">categoria</span>
+
+        }).<span class="tRosa">save</span>().then(() => {
+            <span class="tBranco">req</span>.<span class="tBranco">flash</span>(<span class="tLaranja">"success_msg"</span>, <span class="tLaranja">"Postagem adicionada com sucesso!"</span>)
+            <span class="tBranco">res</span>.<span class="tRosa">redirect</span>(<span class="tLaranja">"/admin/postagens"</span>)
+        
+        }).catch(() => {
+            <span class="tBranco">req</span>.<span class="tBranco">flash</span>(<span class="tLaranja">"error_msg"</span>, <span class="tLaranja">"Erro ao cadastrar a postagem. Tente novamente."</span>)
+            <span class="tBranco">res</span>.<span class="tRosa">redirect</span>(<span class="tLaranja">"/admin/postagens"</span>)
+        })
+    }
+})
+
+...
+</code>
+</pre>
+
         <footer>
             <a href="../a44/a44.html">Página Anterior</a>
-            <a href="#">Próxima Página</a>
+            <a href="../a47/a47.html">Próxima Página</a>
         </footer>
     </main>
 </body>

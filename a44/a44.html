@@ -69,6 +69,8 @@ module.exports = <span class="tBranco">Postagem</span>
         <p>E veja que isso não é o suficiente para <b>determinar que a coleção de postagens está associada de certa forma com a coleção de categorias</b>, uma vez que definimos o tipo de campo para receber a Id de outro documento - não especificamos exatamente de que coleção se refere a este.</p>
         <p>E para resolver isso, passamos o objeto <samp><span class="tBranco">ref</span></samp> que <b>recebe uma string do nome do identificador da coleção dentro do nosso banco de dados</b>. A referência então determina, finalmente, <b>que o campo receberá o Id de um documento de referência da coleção 'categorias'</b>.</p>
 
+        <p>Isso vai permitir que, ao realizar uma busca nos documentos referente à coleção 'Postagem', <b>também podemos recuperar dados de outro documento associado à este</b>. Ou seja, podemos buscar em 'Postagem' as informações da sua categoria associada.</p>
+
         <footer>
             <a href="../a43/a43.html">Página Anterior</a>
             <a href="../a45/a45.html">Próxima Página</a>

@@ -1,3 +1,15 @@
 <h3>Lista de postagens</h3>
 <hr>
-<a href="/admin/postagens/adicionar"><button class="btn btn-success">+ Adicionar</button></a>
+<a href="/admin/postagens/adicionar"><button class="btn btn-success mb-4">+ Adicionar</button></a>
+
+{{#each postagem}}
+    <div class="card mb-3">
+        <div class="card-body">
+            <h3>{{titulo}}</h3>
+            <p>{{descricao}}</p>
+            <small>{{categoria.nome}}</small>
+        </div>
+    </div>
+{{else}}
+    <h3>Não há nenhuma postagem ainda.</h3>
+{{/each}}

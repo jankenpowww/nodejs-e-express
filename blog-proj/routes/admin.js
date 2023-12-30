@@ -134,7 +134,19 @@ router.post("/categorias/deletar", (req, res) => {
 /**/
 
 router.get("/postagens", (req, res) => {
-    res.render("admin/postagens")
+
+    Postagem.find()
+    .populate("categoria", "nome")
+    .sort({data: "desc"})
+    .then((postagens) => {
+        res.render("admin/postagens", {postagem: postagens})
+
+    }).catch((err) => {
+        req.flash("error_msg", "Erro ao carregar postagens.")
+        res.redirect("/admin/postagens")
+
+    })
+
 })
 
 router.get("/postagens/adicionar", (req, res) => {

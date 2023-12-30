@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../stemp-css/stemp.css" type="text/css">
+    <title>a47</title>
+</head>
+<body>
+    <h1>a47 - Listando postagens</h1>
+
+    <main>
+        <p>O próximo passo é listar <b>todas as postagens registradas</b>, focando principalmente em como retornar informações <b>de um documento referenciado pela Id à partir do documento que recebeu essa referência</b>. Ou seja: como retornar informações de categoria associada às postagens à partir de um documento da coleção de postagens.</p>
+        <br><br>
+
+        <h1><em>Read</em></h1>
+        <p>Antes de partir para a view que exibirá as postagens, <b>vamos para a rota onde iremos recuperar essas informações</b> e fazê-lo. Antes de mais nada, importamos o model de postagens para dentro do arquivo 'admin.js'.</p>
+        <p>Note que, dessa vez, não se trata de apenas utilizar um <samp><span class="tRosa">find</span>()</samp> normal para recuperar os dados, uma vez que <b>cada documento de postagem possui referência com outro documento de outra coleção</b>. Observe:</p>
+
+<pre>
+<span class="arquivo">admin.js</span>
+<code>
+const <span class="tBranco">express</span> = require(<span class="tLaranja">"express"</span>)
+const <span class="tBranco">router</span> = <span class="tBranco">express</span>.<span class="tRosa">Router</span>()
+
+<span class="tVerde">//Importando o model de categorias e de postagem.</span>
+const <span class="tBranco">Categoria</span> = require(<span class="tLaranja">"../models/Categoria"</span>)
+const <span class="tBranco">Postagem</span> = require(<span class="tLaranja">"../models/Postagem"</span>)
+
+<span class="tBranco">router</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"admin/index"</span>)
+})
+
+<span class="tBranco">router</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/postagens"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    
+    <span class="tBranco">Postagem</span>.<span class="tRosa">find</span>()
+    .<span class="tRosa">populate</span>(<span class="tLaranja">"categoria"</span>, <span class="tLaranja">"nome"</span>)
+    .<span class="tRosa">sort</span>({<span class="tBranco">data</span>: <span class="tLaranja">"desc"</span>})
+    .then((<span class="tBranco">postagens</span>) => {
+        <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"admin/postagens"</span>, {<span class="tBranco">postagem</span>: <span class="tBranco">postagens</span>})
+
+    }).catch(() => {
+        <span class="tBranco">req</span>.<span class="tRosa">flash</span>(<span class="tLaranja">"error_msg"</span>, <span class="tLaranja">"Erro ao carregar as postagens."</span>)
+        <span class="tBranco">res</span>.<span class="tRosa">redirect</span>(<span class="tLaranja">"/admin/postagens"</span>)
+    
+    })
+
+})
+
+...
+</code>
+</pre>
+
+        <p>Precisamos também, de alguma forma, <b>recuperar os dados do outro documento que foi associado ao documento de postagens</b>. Para isso, utilizamos o método <samp><span class="tRosa">populate</span>()</samp>, que basicamente <b>é utilizado para 'popular' um campo com informações de outro documento de uma outra coleção</b>. Este campo, como fizemos antes, deve estar apto para isso, uma vez que definimos que o campo de 'categoria', na model de postagens, <b>recebe a Id do documento de categorias que está associada a postagem</b>.</p>
+        <p>O campo que vamos popular, neste caso, <b>se refere a um campo dentro da model de postagens</b>, neste caso, <samp><span class="tLaranja">"categoria"</span></samp>. O campo 'categoria', propriedade do documento de postagens, vai receber o valor do campo <samp><span class="tLaranja">"nome"</span></samp> <b>do documento da coleção de categorias, referenciado à este</b>.</p>
+
+        <p>Isso significa que, agora, o campo 'categoria', do documento de postagens, <b>receberá outro campo que poderá ser acessado chamado 'nome', com o valor de 'nome' do documento da coleção de categorias.</b></p>
+
+        <p>Vamos ver isso na prática <b>criando a estrutura para cada documento de postagem listado na view de postagens</b>:</p>
+
+<pre>
+<span class="arquivo">postagens.handlebars</span>
+<code>
+&lt;h3&gt;<span class="tBranco">Lista de postagens</span>&lt;/h3&gt;
+&lt;hr&gt;
+&lt;a <span class="tLaranja">href=&quot;/admin/postagens/adicionar&quot;</span>&gt;&lt;button class=&quot;btn btn-outline-success&quot;&gt;<span class="tBranco">+ Adicionar</span>&lt;button&gt;&lt;/a&gt;
+
+<span class="tBranco">{{<span class="tRosa">#each</span> postagem}}</span>
+    &lt;div class="card mb-3"&gt;
+        &lt;div class="card-body"&gt;
+            &lt;h3&gt;<span class="tBranco">{{ titulo }}</span>&lt;/h3&gt;
+            &lt;p&gt;<span class="tBranco">{{ descricao }}</span>&lt;/p&gt;
+            &lt;small&gt;<span class="tBranco">{{ categoria.nome }}</span>&lt;/small&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+<span class="tBranco">{{<span class="tRosa">else</span>}}</span>
+    &lt;h3&gt;Não há nenhuma postagem ainda.&lt;/h3&gt;
+<span class="tBranco">{{<span class="tRosa">/each</span>}}</span>
+</code>
+</pre>
+
+        <p>Veja que <samp><span class="tBranco">categoria</span></samp> literalmente <b>pode receber um ou vários objetos referentes aos campos do documento de outra coleção</b>. Neste caso, é como se estivéssemos acessando a propriedade 'nome' do documento da coleção de categorias e trazendo para a view através da recuperação de outro documento.</p>
+
+        <footer>
+            <a href="../a45/a45.html">Página Anterior</a>
+            <a href="#">Próxima Página</a>
+        </footer>
+    </main>
+</body>
+</html>
