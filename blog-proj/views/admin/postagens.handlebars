@@ -7,7 +7,11 @@
         <div class="card-body">
             <h3>{{titulo}}</h3>
             <p>{{descricao}}</p>
-            <small>{{categoria.nome}}</small>
+            <small><b>Categoria:</b> {{categoria.nome}}</small>
+
+            <div class="d-flex flex row mt-3">
+                <a href="/admin/postagens/editar/{{_id}}"><button class="btn btn-outline-primary">Editar</button></a>
+            </div>
         </div>
     </div>
 {{else}}

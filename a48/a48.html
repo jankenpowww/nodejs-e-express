@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../stemp-css/stemp.css" type="text/css">
+    <title>a47</title>
+</head>
+<body>
+    <h1>a48 - Editando e Excluindo Postagens</h1>
+
+    <main>
+        <p>Tudo aqui é idêntico ao que fizemos para as categorias. Por isso, vamos apenas rever o que precisa ser feito, com excessões de pequenos detalhes importantes.</p>
+        <br><br>
+
+        <h1><em>Update</em></h1>
+        <p>Vamos criar as rotas referente à edição de postagens logo abaixo das rotas de adicionar post que criamos anteriormente.</p>
+
+<pre>
+<span class="arquivo">admin.js</span>
+<code>
+...
+
+<span class="tBranco">router</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/postagens/editar/<span class="tBranco">:id</span>"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+
+    <span class="tBranco">Postagem</span>.<span class="tRosa">findById</span>(<span class="tBranco">req</span>.<span class="tBranco">params</span>.<span class="tBranco">id</span>).then((<span class="tBranco">postagem</span>) => {
+
+        <span class="tBranco">Categoria</span>.<span class="tRosa">find</span>().then((<span class="tBranco">categorias</span>) => {
+            <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"admin/editar-postagem"</span>, {<span class="tBranco">postagem</span>: <span class="tBranco">postagem</span>, <span class="tBranco">categoria</span>: <span class="tBranco">categorias</span>})
+
+        }).catch(() => {
+            <span class="tBranco">req</span>.<span class="tRosa">flash</span>(<span class="tLaranja">"error_msg"</span>, <span class="tLaranja">"Houve um erro ao carregar recursos de categorias. Tente novamente."</span>)
+            <span class="tBranco">res</span>.<span class="tRosa">redirect</span>(<span class="tLaranja">"/admin/postagens"</span>)
+        })
+        
+    }).catch(() => {
+        <span class="tBranco">req</span>.<span class="tRosa">flash</span>(<span class="tLaranja">"error_msg"</span>, <span class="tLaranja">"Houve um erro ao carregar recursos de postagens. Tente novamente."</span>)
+        <span class="tBranco">res</span>.<span class="tRosa">redirect</span>(<span class="tLaranja">"/admin/postagens"</span>)
+
+    })
+})
+
+<span class="tBranco">router</span>.<span class="tRosa">post</span>(<span class="tLaranja">"/postagens/editar"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">Postagem</span>.<span class="tRosa">findById</span>(<span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">id</span>).then((<span class="tBranco">postagem</span>) => {
+
+        <span class="tBranco">postagem</span>.<span class="tBranco">titulo</span> = <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">titulo</span>
+        <span class="tBranco">postagem</span>.<span class="tBranco">slug</span> = <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">slug</span>
+        <span class="tBranco">postagem</span>.<span class="tBranco">descricao</span> = <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">descricao</span>
+        <span class="tBranco">postagem</span>.<span class="tBranco">categoria</span> = <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">categoria</span>
+        <span class="tBranco">postagem</span>.<span class="tBranco">conteudo</span> = <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">conteudo</span>
+
+        <span class="tBranco">postagem</span>.<span class="tRosa">save</span>().then(() => {
+            <span class="tBranco">req</span>.<span class="tRosa">flash</span>(<span class="tLaranja">"success_msg"</span>, <span class="tLaranja">"Postagem editada com sucesso!"</span>)
+            <span class="tBranco">res</span>.<span class="tRosa">redirect</span>(<span class="tLaranja">"/admin/postagens"</span>)
+
+        }).catch(() => {
+            <span class="tBranco">req</span>.<span class="tRosa">flash</span>(<span class="tLaranja">"error_msg"</span>, <span class="tLaranja">"Houve um erro ao salvar as alterações. Tente novamente."</span>)
+            <span class="tBranco">res</span>.<span class="tRosa">redirect</span>(<span class="tLaranja">"/admin/postagens"</span>)
+
+        })
+
+    }).catch(() => {
+        <span class="tBranco">req</span>.<span class="tRosa">flash</span>(<span class="tLaranja">"error_msg"</span>, <span class="tLaranja">"Houve um erro ao salvar as alterações. Tente novamente."</span>)
+        <span class="tBranco">res</span>.<span class="tRosa">redirect</span>(<span class="tLaranja">"/admin/postagens"</span>)
+    })
+})
+
+...
+</code>
+</pre>
+
+        <p>No 'get', vamos disponibilizar o acesso ao formulário de edição de postagens, da view <b>'editar-postagem.handlebars'</b>. Veja que antes disso, precisamos recuperar primeiramente: <b>a postagem que iremos editar</b>, à partir de sua id, e em seguida recuperar <b>todas as categorias registradas no sistema</b>, uma vez que vamos utilizar este último para disponibilizar as categorias que a postagem deve ser associada. Passamos dois objetos <samp>{<span class="tBranco">postagem</span>: <span class="tBranco">postagem</span>, <span class="tBranco">categoria</span>: <span class="tBranco">categorias</span>}</samp>, que vão ser renderizados, basicamente, com as informações atuais do documento à ser editado.</p>
+
+        <p>Já no post, onde serão processadas as informações do formulário, parte do mesmo procedimento para salvar as categorias no banco de dados. Nada de novo.</p>
+
+        <p>Para o 'get', precisamos criar um botão de acesso 'Editar' nos cards de cada postagem cadastrada que leva para o formulário de edição, passando um link para a mesma rota informando o id do documento:</p>
+
+<pre>
+<span class="arquivo">postagens.handlebars</span>
+<code>
+&lt;h3&gt;<span class="tBranco">Lista de postagens</span>&lt;/h3&gt;
+&lt;hr&gt;
+&lt;a <span class="tLaranja">href=&quot;/admin/postagens/adicionar&quot;</span>&gt;&lt;button class=&quot;btn btn-outline-success&quot;&gt;<span class="tBranco">+ Adicionar</span>&lt;button&gt;&lt;/a&gt;
+
+<span class="tBranco">{{<span class="tRosa">#each</span> postagem}}</span>
+    &lt;div class="card mb-3"&gt;
+        &lt;div class="card-body"&gt;
+            &lt;h3&gt;<span class="tBranco">{{ titulo }}</span>&lt;/h3&gt;
+            &lt;p&gt;<span class="tBranco">{{ descricao }}</span>&lt;/p&gt;
+            &lt;small&gt;<span class="tBranco">{{ categoria.nome }}</span>&lt;/small&gt;
+
+            &lt;div class=&quot;d-flex flex row mt-3&quot;&gt;
+                &lt;a href=<span class="tLaranja">&quot;/admin/postagens/editar/<span class="tBranco">{{_id}}</span>&quot</span>;&gt;&lt;button class=&quot;btn btn-outline-primary&quot;&gt;<span class="tLaranja">Editar</span>&lt;/button&gt;&lt;/a&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+<span class="tBranco">{{<span class="tRosa">else</span>}}</span>
+    &lt;h3&gt;Não há nenhuma postagem ainda.&lt;/h3&gt;
+<span class="tBranco">{{<span class="tRosa">/each</span>}}</span>
+</code>
+</pre>
+
+        <p>Feito o botão de acesso de edição para cada postagem, basta agora criar finalmente a view com o formulário de edição de postagem <b>'editar-postagem.handlebars'</b>.</p>
+        <p>O formulário consistirá basicamente do mesmo formulário de adição de novas postagens. A única mudança aqui é que vamos preencher o formulário com <b>todas as informações atuais do documento que está prestes a ser editado</b>.</p>
+
+<pre>
+<span class="arquivo">editar-postagem.handlebars</span>
+<code>
+&lt;h3&gt;Editar Postagem&lt;/h3&gt;
+&lt;hr&gt;
+&lt;div class=&quot;card&quot;&gt;
+    &lt;div class=&quot;card-body&quot;&gt;
+
+        &lt;form <span class="tBranco">method=</span><span class="tLaranja">&quot;post&quot;</span> <span class="tBranco">action=</span><span class="tLaranja">&quot;/admin/postagens/editar&quot;</span>&gt;
+            &lt;input type="hidden" <span class="tBranco">name=</span><span class="tLaranja">&quot;id&quot;</span> <span class="tBranco">value=</span><span class="tLaranja">&quot;<span class="tBranco">{{postagem._id}}</span>&quot;</span>&gt;
+        
+            &lt;label&gt;<span class="tBranco">T&iacute;tulo:</span>&lt;/label&gt;
+            &lt;input type=&quot;text&quot; class=&quot;form-control mb-3&quot; <span class="tBranco">name=</span><span class="tLaranja">&quot;titulo&quot;</span> <span class="tBranco">value=</span><span class="tLaranja">&quot;<span class="tBranco">{{postagem.titulo}}</span>&quot;</span>&gt;
+
+            &lt;label&gt;<span class="tBranco">Slug:</span>&lt;/label&gt;
+            &lt;input type=&quot;text&quot; class=&quot;form-control mb-3&quot; <span class="tBranco">name=</span><span class="tLaranja">&quot;slug&quot;</span> <span class="tBranco">value=</span><span class="tLaranja">&quot;<span class="tBranco">{{postagem.slug}}</span>&quot;</span>&gt;
+
+            &lt;label&gt;<span class="tBranco">Descri&ccedil;&atilde;o:</span>&lt;/label&gt;
+            &lt;input type=&quot;text&quot; class=&quot;form-control mb-3&quot; <span class="tBranco">name=</span><span class="tLaranja">&quot;descricao&quot;</span> <span class="tBranco">value=</span><span class="tLaranja">&quot;<span class="tBranco">{{postagem.descricao}}</span>&quot;</span>&gt;
+
+            &lt;label&gt;<span class="tBranco">Categoria:</span>&lt;/label&gt;
+            &lt;select class=&quot;form-control mb-4&quot; <span class="tBranco">name=</span><span class="tLaranja">&quot;categoria&quot;</span>&gt;
+                
+                <span class="tBranco">{{<span class="tRosa">#each</span> categoria}}</span>
+                    &lt;option <span class="tBranco">value=</span><span class="tLaranja">&quot;<span class="tBranco">{{_id}}</span>&quot;</span>&gt;<span class="tBranco">{{nome}}</span>&lt;/option&gt;
+
+                <span class="tBranco">{{<span class="tRosa">else</span>}}</span>
+                    &lt;option <span class="tBranco">value=</span><span class="tLaranja">&quot;0&quot;</span>&gt;<span class="tBranco">Nenhuma categoria registrada.</span>&lt;/option&gt;
+                
+                <span class="tBranco">{{<span class="tRosa">/each</span>}}</span>
+                
+            &lt;/select&gt;
+
+            &lt;label&gt;<span class="tBranco">Conte&uacute;do:</span>&lt;/label&gt;&lt;br&gt;
+            &lt;textarea class=&quot;mb-3&quot; style=&quot;resize: none; width: 100%; height: 160px;&quot; <span class="tBranco">name=</span><span class="tLaranja">&quot;conteudo&quot;</span>&gt;<span class="tBranco">{{postagem.conteudo}}</span>&lt;/textarea&gt;
+
+            &lt;button style=&quot;width: 100%;&quot; class=&quot;btn btn-success&quot; type=&quot;submit&quot;&gt;<span class="tBranco">Editar Postagem</span>&lt;/button&gt;
+        &lt;/form&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+</code>
+</pre>
+
+        <p>Com isso, o recurso de edição de postagens estará funcionando perfeitamente.</p>
+
+        <footer>
+            <a href="../a47/a47.html">Página Anterior</a>
+            <a href="#">Próxima Página</a>
+        </footer>
+    </main>
+</body>
+</html>

@@ -195,4 +195,49 @@ router.post("/postagens/adicionar", (req, res) => {
     }
 })
 
+router.get("/postagens/editar/:id", (req, res) => {
+
+    Postagem.findById(req.params.id).then((postagem) => {
+
+        Categoria.find().then((categorias) => {
+            res.render("admin/editar-postagem", {postagem: postagem, categoria: categorias})
+
+        }).catch(() => {
+            req.flash("error_msg", "Houve um erro ao carregar recursos de categorias. Tente novamente.")
+            res.redirect("/admin/postagens")
+        })
+        
+    }).catch(() => {
+        req.flash("error_msg", "Houve um erro ao carregar recursos de postagens. Tente novamente.")
+        res.redirect("/admin/postagens")
+
+    })
+})
+
+router.post("/postagens/editar", (req, res) => {
+    Postagem.findById(req.body.id).then((postagem) => {
+
+        postagem.titulo = req.body.titulo
+        postagem.slug = req.body.slug
+        postagem.descricao = req.body.descricao
+        postagem.categoria = req.body.categoria
+        postagem.conteudo = req.body.conteudo
+
+        postagem.save().then(() => {
+            req.flash("success_msg", "Postagem editada com sucesso!")
+            res.redirect("/admin/postagens")
+
+        }).catch((err) => {
+            req.flash("error_msg", "Houve um erro ao salvar as alterações. Tente novamente.")
+            res.redirect("/admin/postagens")
+
+        })
+
+    }).catch((err) => {
+        console.log(err)
+        req.flash("error_msg", "Houve um erro ao salvar as alterações. Tente novamente.")
+        res.redirect("/admin/postagens")
+    })
+})
+
 module.exports = router //Exportamos o módulo para utilizar no arquivo de servidor principal.
