@@ -90,8 +90,8 @@
             &lt;p&gt;<span class="tBranco">{{ descricao }}</span>&lt;/p&gt;
             &lt;small&gt;<span class="tBranco">{{ categoria.nome }}</span>&lt;/small&gt;
 
-            &lt;div class=&quot;d-flex flex row mt-3&quot;&gt;
-                &lt;a href=<span class="tLaranja">&quot;/admin/postagens/editar/<span class="tBranco">{{_id}}</span>&quot</span>;&gt;&lt;button class=&quot;btn btn-outline-primary&quot;&gt;<span class="tLaranja">Editar</span>&lt;/button&gt;&lt;/a&gt;
+            &lt;div class=&quot;d-flex flex-row mt-3&quot;&gt;
+                &lt;a href=<span class="tLaranja">&quot;/admin/postagens/editar/<span class="tBranco">{{_id}}</span>&quot</span>;&gt;&lt;button class=&quot;btn btn-outline-primary me-2&quot;&gt;<span class="tLaranja">Editar</span>&lt;/button&gt;&lt;/a&gt;
             &lt;/div&gt;
         &lt;/div&gt;
     &lt;/div&gt;
@@ -149,6 +149,66 @@
 </pre>
 
         <p>Com isso, o recurso de edição de postagens estará funcionando perfeitamente.</p>
+
+        <br><br>
+
+        <h1><em>Delete</em></h1>
+        <p>Para o recurso de deletar postagens, basta fazer com que criemos <b>uma rota post, que vai efetivamente deletar essas informações</b>. E assim como fizemos para as categorias, <b>criar um botão 'Deletar' que envia uma requisição post para a rota, eviando o ID do documento de postagem a ser deletado</b>.</p>
+        <p>Vamos gerar um botão de deletar para cada postagem:</p>
+
+<pre>
+<span class="arquivo">postagens.handlebars</span>
+<code>
+&lt;h3&gt;<span class="tBranco">Lista de postagens</span>&lt;/h3&gt;
+&lt;hr&gt;
+&lt;a <span class="tLaranja">href=&quot;/admin/postagens/adicionar&quot;</span>&gt;&lt;button class=&quot;btn btn-outline-success&quot;&gt;<span class="tBranco">+ Adicionar</span>&lt;button&gt;&lt;/a&gt;
+
+<span class="tBranco">{{<span class="tRosa">#each</span> postagem}}</span>
+    &lt;div class="card mb-3"&gt;
+        &lt;div class="card-body"&gt;
+            &lt;h3&gt;<span class="tBranco">{{ titulo }}</span>&lt;/h3&gt;
+            &lt;p&gt;<span class="tBranco">{{ descricao }}</span>&lt;/p&gt;
+            &lt;small&gt;<span class="tBranco">{{ categoria.nome }}</span>&lt;/small&gt;
+
+            &lt;div class=&quot;d-flex flex-row mt-3&quot;&gt;
+                &lt;a href=<span class="tLaranja">&quot;/admin/postagens/editar/<span class="tBranco">{{_id}}</span>&quot</span>;&gt;&lt;button class=&quot;btn btn-outline-primary me-2&quot;&gt;<span class="tLaranja">Editar</span>&lt;/button&gt;&lt;/a&gt;
+            
+                &lt;form <span class="tBranco">method=</span><span class="tLaranja">"post"</span> <span class="tBranco">action=</span><span class="tLaranja">"/admin/postagens/deletar"</span>&gt;
+                    &lt;input <span class="tBranco">type=<span class="tLaranja">"hidden"</span></span> <span class="tBranco">name=<span class="tLaranja">"id"</span></span> <span class="tBranco">value=<span class="tLaranja">"<span class="tBranco">{{_id}}</span>"</span></span>&gt;
+                    &lt;button type="submit" class="btn btn-danger"&gt;<span class="tBranco">Deletar</span>&lt;/button&gt;
+                &lt;/form&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+<span class="tBranco">{{<span class="tRosa">else</span>}}</span>
+    &lt;h3&gt;Não há nenhuma postagem ainda.&lt;/h3&gt;
+<span class="tBranco">{{<span class="tRosa">/each</span>}}</span>
+</code>
+</pre>
+
+        <p>E então criar a rota post que irá deletar a postagem a partir do ID do documento.</p>
+
+<pre>
+<span class="arquivo">admin.js</span>
+<code>
+...
+
+<span class="tBranco">router</span>.<span class="tRosa">post</span>(<span class="tLaranja">"/postagens/deletar"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    
+    <span class="tBranco">Postagem</span>.<span class="tRosa">findByIdAndDelete</span>(<span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">id</span>).then(() => {
+        <span class="tBranco">req</span>.<span class="tRosa">flash</span>(<span class="tLaranja">"success_msg"</span>, <span class="tLaranja">"Postagem deletada com sucesso!"</span>)
+        <span class="tBranco">res</span>.<span class="tRosa">redirect</span>(<span class="tLaranja">"/admin/postagens"</span>)
+    
+    }).catch(() => {
+        <span class="tBranco">req</span>.<span class="tRosa">flash</span>(<span class="tLaranja">"error_msg"</span>, <span class="tLaranja">"Houve um erro ao deletar a postagem. Tente novamente."</span>)
+        <span class="tBranco">res</span>.<span class="tRosa">redirect</span>(<span class="tLaranja">"/admin/postagens"</span>)
+
+    })
+})
+
+...
+</code>
+</pre>
 
         <footer>
             <a href="../a47/a47.html">Página Anterior</a>

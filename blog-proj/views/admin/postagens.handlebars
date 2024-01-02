@@ -9,8 +9,13 @@
             <p>{{descricao}}</p>
             <small><b>Categoria:</b> {{categoria.nome}}</small>
 
-            <div class="d-flex flex row mt-3">
-                <a href="/admin/postagens/editar/{{_id}}"><button class="btn btn-outline-primary">Editar</button></a>
+            <div class="d-flex flex-row align-items-center mt-3">
+                <a href="/admin/postagens/editar/{{_id}}"><button class="btn btn-outline-primary me-2">Editar</button></a>
+
+                <form method="post" action="/admin/postagens/deletar">
+                    <input type="hidden" name="id" value="{{_id}}">
+                    <button type="submit" class="btn btn-danger">Deletar</button>
+                </form>
             </div>
         </div>
     </div>
