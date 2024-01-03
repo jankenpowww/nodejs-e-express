@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../stemp-css/stemp.css" type="text/css">
+    <title>a50</title>
+</head>
+<body>
+    <h1>a50 - Criando Home Page + página de postagem</h1>
+
+    <main>
+        <p>Vamos agora criar a home page da nossa aplicação de blog e listar as postagens feitas na nossa aplicação.</p>
+        <br><br>
+
+        <h1>Deixando as coisas mais apresentáveis...</h1>
+        <p>Primeiramente, <b>vamos atualizar a nossa Navbar, incluindo todas as seções do site que fizemos até agora</b>.</p>
+        
+<pre>
+<span class="arquivo">_navbar.handlebars</span>
+<code>
+&lt;nav class=&quot;navbar navbar-expand-lg bg-body-tertiary&quot;&gt;
+  &lt;div class=&quot;container-fluid&quot;&gt;
+    &lt;a class=&quot;navbar-brand&quot; href=&quot;/&quot;&gt;Blog App&lt;/a&gt;
+    &lt;button class=&quot;navbar-toggler&quot; type=&quot;button&quot; data-bs-toggle=&quot;collapse&quot; data-bs-target=&quot;#navbarSupportedContent&quot; aria-controls=&quot;navbarSupportedContent&quot; aria-expanded=&quot;false&quot; aria-label=&quot;Toggle navigation&quot;&gt;
+      &lt;span class=&quot;navbar-toggler-icon&quot;&gt;&lt;/span&gt;
+    &lt;/button&gt;
+    &lt;div class=&quot;collapse navbar-collapse&quot; id=&quot;navbarSupportedContent&quot;&gt;
+      &lt;ul class=&quot;navbar-nav me-auto mb-2 mb-lg-0&quot;&gt;
+        &lt;li class=&quot;nav-item&quot;&gt;
+          &lt;a class=&quot;nav-link&quot; href=&quot;/admin/categorias&quot;&gt;Categorias&lt;/a&gt;
+        &lt;/li&gt;
+        &lt;li class=&quot;nav-item&quot;&gt;
+          &lt;a class=&quot;nav-link&quot; href=&quot;/admin/postagens&quot;&gt;Postagens&lt;/a&gt;
+        &lt;/li&gt;
+        &lt;li class=&quot;nav-item&quot;&gt;
+          &lt;a class=&quot;nav-link&quot; href=&quot;#&quot;&gt;Login&lt;/a&gt;
+        &lt;/li&gt;
+        &lt;li class=&quot;nav-item&quot;&gt;
+          &lt;a class=&quot;nav-link&quot; href=&quot;#&quot;&gt;Registro&lt;/a&gt;
+        &lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/nav&gt;
+</code>
+</pre>
+
+        <p>Veja que incluímos também links respectivos para login e cadastro de usuários, que será a próxima implementação da nossa aplicação.</p>
+        <p>Com isso, podemos partir para criar nossa home page, onde listeremos todas as postagens feitas; incluindo também um link de acesso para ler a postagem selecionada.</p>
+
+        <br><br>
+
+        <h1>Criando Home Page</h1>
+        <p>Agora que terminamos basicamente toda a parte de acesso administrativo do site, <b>vamos criar a home page que listará todas as postagens feitas até então</b>.</p>
+        <p>A rota para a home page estará no index da nossa aplicação, o que significa que a rota estará dentro do arquivo <b>app.js</b>:</p>
+
+<pre>
+<span class="arquivo">app.js</span>
+<code>
+...
+
+<span class="tVerde">//Importação de rotas</span>
+const <span class="tBranco">admin</span> = require(<span class="tLaranja">"./routes/admin"</span>)
+
+<span class="tVerde">//Models</span>
+const <span class="tBranco">Postagem</span> = require(<span class="tLaranja">"./models/Postagem"</span>)
+
+<span class="tVerde">//Lógica de servidor</span>
+
+<span class="tBranco">app</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">Postagem</span>.<span class="tRosa">find</span>().<span class="tRosa">populate</span>(<span class="tLaranja">"categoria"</span>, <span class="tLaranja">"nome"</span>).<span class="tRosa">sort</span>({<span class="tBranco">date</span>: <span class="tLaranja">"desc"</span>}).then((<span class="tBranco">postagens</span>) => {
+        <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"index"</span>, {<span class="tBranco">postagem</span>: <span class="tBranco">postagens</span>})
+    })
+})
+
+<span class="tBranco">app</span>.<span class="tRosa">use</span>(<span class="tLaranja">"/admin"</span>, <span class="tBranco">admin</span>)
+
+...
+</code>
+</pre>
+
+        <p>Com isso, precisamos criar a view <b>index.handlebars</b> dentro da pasta 'views' do nosso projeto:</p>
+
+<pre>
+<span class="arquivo">index.handlebars</span>
+<code>
+&lt;div class=&quot;jumbotron jumbotron-fluid&quot;&gt;
+  &lt;div class=&quot;container&quot;&gt;
+    &lt;h1 class=&quot;display-4&quot;&gt;<span class="tBranco">Bem-vindo ao blog!</span>&lt;/h1&gt;
+    &lt;p class=&quot;lead&quot;&gt;<span class="tBranco">Confira todas as atualiza&ccedil;&otilde;es sobre tecnologia e programa&ccedil;&atilde;o por aqui.</span>&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;br&gt;
+
+&lt;h2 class=&quot;mb-3&quot;&gt;<span class="tBranco">Postagens recentes:</span>&lt;/h2&gt;
+
+<span class="tBranco">{{<span class="tRosa">#each</span> <span class="tBranco">postagem</span>}}</span>
+    &lt;div class=&quot;card p-3 mb-3&quot;&gt;
+        &lt;div class=&quot;card-box&quot;&gt;
+            &lt;small&gt;<span class="tBranco">{{categoria.nome}}</span>&lt;/small&gt;
+            
+            &lt;h3&gt;<span class="tBranco">{{titulo}}</span>&lt;/h3&gt;
+            &lt;p&gt;<span class="tBranco">{{descricao}}</span>&lt;/p&gt;
+            &lt;a <span class="tBranco">href=</span><span class="tLaranja">&quot;/postagem/<span class="tBranco">{{slug}}</span>&quot;</span>&gt;&lt;button class=&quot;btn btn-success&quot;&gt;<span class="tBranco">Ler mais</span>&lt;/button&gt;&lt;/a&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+<span class="tBranco">{{<span class="tRosa">else</span>}}</span>
+    &lt;h5&gt;<span class="tBranco">Nenhuma postagem encontrada.</span>&lt;/h5&gt;
+<span class="tBranco">{{<span class="tRosa">/each</span>}}</span>
+</code>
+</pre>
+
+        <p>Essa view vai listar todas as postagens registradas até então na nossa aplicação de blog.</p>
+        <p>Preste atenção no botão de 'Ler mais': é aqui que envolvemos uma tag de link <b>que leva à página para o conteúdo completo de uma postagem</b>. Veja que ele recebe exatamente <b>o slug da postagem</b>, da qual iremos utilizar como <b>parâmetro para localizar a postagem e exibi-la na view</b>.</p>
+        <p>Vamos voltar ao arquivo <b>app.js</b> e <b>criar a rota para o endereço do link acima</b>, passando o route parameter que é justamente o slug de uma postagem:</p>
+
+<pre>
+<span class="arquivo">app.js</span>
+<code>
+...
+
+<span class="tVerde">//Importação de rotas</span>
+const <span class="tBranco">admin</span> = require(<span class="tLaranja">"./routes/admin"</span>)
+
+<span class="tVerde">//Models</span>
+const <span class="tBranco">Postagem</span> = require(<span class="tLaranja">"./models/Postagem"</span>)
+
+<span class="tVerde">//Lógica de servidor</span>
+
+<span class="tBranco">app</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">Postagem</span>.<span class="tRosa">find</span>().<span class="tRosa">populate</span>(<span class="tLaranja">"categoria"</span>, <span class="tLaranja">"nome"</span>).<span class="tRosa">sort</span>({<span class="tBranco">date</span>: <span class="tLaranja">"desc"</span>}).then((<span class="tBranco">postagens</span>) => {
+        <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"index"</span>, {<span class="tBranco">postagem</span>: <span class="tBranco">postagens</span>})
+    })
+})
+
+<span class="tBranco">app</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/postagem/<span class="tBranco">:slug</span>"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    
+    <span class="tBranco">Postagem</span>.<span class="tRosa">findOne</span>({<span class="tBranco">slug</span>: <span class="tBranco">req</span>.<span class="tBranco">params</span>.<span class="tBranco">slug</span>}).<span class="tRosa">populate</span>(<span class="tLaranja">"categoria"</span>, <span class="tLaranja">"nome"</span>).then((<span class="tBranco">postagem</span>) => {
+        if (<span class="tBranco">postagem</span>) {
+            <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"postagem/postagem"</span>, {<span class="tBranco">postagem</span>: <span class="tBranco">postagem</span>})
+
+        } else {
+            <span class="tBranco">req</span>.<span class="tRosa">flash</span>(<span class="tLaranja">"error_msg"</span>, <span class="tLaranja">"Houve um erro ao carregar o conteúdo. Talvez tenha sido excluído ou movido."</span>)
+            <span class="tBranco">res</span>.<span class="tRosa">redirect</span>(<span class="tLaranja">"/"</span>)
+        }
+
+    }).catch(() => {
+        <span class="tBranco">req</span>.<span class="tRosa">flash</span>(<span class="tLaranja">"error_msg"</span>, <span class="tLaranja">"Houve um erro interno."</span>)
+        <span class="tBranco">res</span>.<span class="tRosa">redirect</span>(<span class="tLaranja">"/"</span>)
+    })
+
+})
+
+<span class="tBranco">app</span>.<span class="tRosa">use</span>(<span class="tLaranja">"/admin"</span>, <span class="tBranco">admin</span>)
+
+...
+</code>
+</pre>
+
+        <p>Observe que comparamos <samp><span class="tBranco">postagem</span></samp> dentro de um if/else <b>para verificar se a postagem realmente existe mesmo</b>, uma vez que postagens <b>estão sucetíveis à serem excluídas ou movidas dentro da aplicação</b>. Caso não, isso é imediatamente avisado para o usuário através de uma mensagem flash.</p>
+
+        <p>Agora, basta criar o diretório '<b>postagem/</b>' dentro de <b>'views'</b> e criar a view <b>'postagem.handlbars'</b>, que vai efetivamente exibir o post completo assim que o usuário clicar para ler o conteúdo.</p>
+
+<pre>
+<span class="arquivo">postagem.handlebars</span>
+<code>
+&lt;h2&gt;<span class="tBranco">{{postagem.titulo}}</span>&lt;/h2&gt;
+&lt;hr&gt;
+&lt;div class=&quot;d-flex flex-row justify-content-between&quot;&gt;
+    &lt;small&gt;&lt;b&gt;Categoria: &lt;/b&gt; <span class="tBranco">{{postagem.categoria.nome}}</span>&lt;/small&gt;
+    &lt;small&gt;&lt;b&gt;Data de publica&ccedil;&atilde;o:&lt;/b&gt; <span class="tBranco">{{postagem.data}}</span>&lt;/small&gt;
+&lt;/div&gt;
+
+&lt;br&gt;
+&lt;div class=&quot;card&quot;&gt;
+    &lt;div class=&quot;card-box p-3&quot;&gt;
+        &lt;p&gt;<span class="tBranco">{{postagem.conteudo}}</span>&lt;/p&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+</code>
+</pre>
+
+        <p>Com isso, está finalizado a parte de listagem e exibição de postagens na nossa home page.</p>
+
+        <footer>
+            <a href="../a48/a48.html">Página Anterior</a>
+            <a href="#">Próxima Página</a>
+        </footer>
+    </main>
+</body>
+</html>

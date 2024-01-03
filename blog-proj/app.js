@@ -55,10 +55,37 @@
         console.log("Erro ao se conectar com o MongoDB.\n" + err)
     })
 
+//Models
+    const Postagem = require("./models/Postagem")
+
 //Importação de rotas
     const admin = require("./routes/admin") //Importando grupo de rotas relacionado ao administrador.
 
 //Lógica de servidor
+    app.get("/", (req, res) => { //Index
+        Postagem.find().populate("categoria", "nome").sort({date: "desc"}).then((postagens) => {
+            res.render("index", {postagem: postagens})
+        })
+    })
+
+    app.get("/postagem/:slug", (req, res) => {
+
+        Postagem.findOne({slug: req.params.slug}).populate("categoria", "nome").then((postagem) => {
+            if (postagem) {
+                res.render("postagem/postagem", {postagem: postagem})
+
+            } else {
+                req.flash("error_msg", "Houve um erro ao carregar o conteúdo. Talvez tenha sido excluído ou movido.")
+                res.redirect("/")
+            }
+
+        }).catch((err) => {
+            req.flash("error_msg", "Houve um erro interno.")
+            res.redirect("/")
+        })
+        
+    })
+
     app.use("/admin", admin) //Definindo um caminho e passando o grupo de rotas do administrador como relação.
 
 //Rodando servidor

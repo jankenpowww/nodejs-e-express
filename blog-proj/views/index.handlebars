@@ -1,0 +1,25 @@
+<div class="jumbotron jumbotron-fluid">
+  <div class="container">
+    <h1 class="display-4">Bem-vindo ao blog!</h1>
+    <p class="lead">Confira todas as atualizações sobre tecnologia e programação por aqui.</p>
+  </div>
+</div>
+
+<br>
+
+<h2 class="mb-3">Postagens recentes:</h2>
+
+{{#each postagem}}
+    <div class="card p-3 mb-3">
+        <div class="card-box">
+            <small>{{categoria.nome}}</small>
+            
+            <h3>{{titulo}}</h3>
+            <p>{{descricao}}</p>
+            <a href="/postagem/{{slug}}"><button class="btn btn-success">Ler mais</button></a>
+        </div>
+    </div>
+
+{{else}}
+    <h5>Nenhuma postagem encontrada.</h5>
+{{/each}}
