@@ -15,34 +15,31 @@
         <br><br>
 
         <h1>Deixando as coisas mais apresentáveis...</h1>
-        <p>Primeiramente, <b>vamos atualizar a nossa Navbar, incluindo todas as seções do site que fizemos até agora</b>.</p>
+        <p>Primeiramente, <b>vamos atualizar a nossa Navbar, incluindo seções do site que estarão disponíveis para os usuários do site</b>.</p>
         
 <pre>
 <span class="arquivo">_navbar.handlebars</span>
 <code>
 &lt;nav class=&quot;navbar navbar-expand-lg bg-body-tertiary&quot;&gt;
-  &lt;div class=&quot;container-fluid&quot;&gt;
-    &lt;a class=&quot;navbar-brand&quot; href=&quot;/&quot;&gt;Blog App&lt;/a&gt;
-    &lt;button class=&quot;navbar-toggler&quot; type=&quot;button&quot; data-bs-toggle=&quot;collapse&quot; data-bs-target=&quot;#navbarSupportedContent&quot; aria-controls=&quot;navbarSupportedContent&quot; aria-expanded=&quot;false&quot; aria-label=&quot;Toggle navigation&quot;&gt;
-      &lt;span class=&quot;navbar-toggler-icon&quot;&gt;&lt;/span&gt;
-    &lt;/button&gt;
-    &lt;div class=&quot;collapse navbar-collapse&quot; id=&quot;navbarSupportedContent&quot;&gt;
-      &lt;ul class=&quot;navbar-nav me-auto mb-2 mb-lg-0&quot;&gt;
-        &lt;li class=&quot;nav-item&quot;&gt;
-          &lt;a class=&quot;nav-link&quot; href=&quot;/admin/categorias&quot;&gt;Categorias&lt;/a&gt;
-        &lt;/li&gt;
-        &lt;li class=&quot;nav-item&quot;&gt;
-          &lt;a class=&quot;nav-link&quot; href=&quot;/admin/postagens&quot;&gt;Postagens&lt;/a&gt;
-        &lt;/li&gt;
-        &lt;li class=&quot;nav-item&quot;&gt;
-          &lt;a class=&quot;nav-link&quot; href=&quot;#&quot;&gt;Login&lt;/a&gt;
-        &lt;/li&gt;
-        &lt;li class=&quot;nav-item&quot;&gt;
-          &lt;a class=&quot;nav-link&quot; href=&quot;#&quot;&gt;Registro&lt;/a&gt;
-        &lt;/li&gt;
-      &lt;/ul&gt;
-    &lt;/div&gt;
+&lt;div class=&quot;container-fluid&quot;&gt;
+  &lt;a class=&quot;navbar-brand&quot; <span class="tBranco">href=</span><span class="tLaranja">&quot;/&quot;</span>&gt;<span class="tBranco">Blog App</span>&lt;/a&gt;
+  &lt;button class=&quot;navbar-toggler&quot; type=&quot;button&quot; data-bs-toggle=&quot;collapse&quot; data-bs-target=&quot;#navbarSupportedContent&quot; aria-controls=&quot;navbarSupportedContent&quot; aria-expanded=&quot;false&quot; aria-label=&quot;Toggle navigation&quot;&gt;
+    &lt;span class=&quot;navbar-toggler-icon&quot;&gt;&lt;/span&gt;
+  &lt;/button&gt;
+  &lt;div class=&quot;collapse navbar-collapse&quot; id=&quot;navbarSupportedContent&quot;&gt;
+    &lt;ul class=&quot;navbar-nav me-auto mb-2 mb-lg-0&quot;&gt;
+      &lt;li class=&quot;nav-item&quot;&gt;
+        &lt;a class=&quot;nav-link&quot; <span class="tBranco">href=</span><span class="tLaranja">&quot;/categorias&quot;</span>&gt;<span class="tBranco">Categorias</span>&lt;/a&gt;
+      &lt;/li&gt;
+      &lt;li class=&quot;nav-item&quot;&gt;
+        &lt;a class=&quot;nav-link&quot; <span class="tBranco">href=</span><span class="tLaranja">&quot;/login&quot;</span>&gt;<span class="tBranco">Login</span>&lt;/a&gt;
+      &lt;/li&gt;
+      &lt;li class=&quot;nav-item&quot;&gt;
+        &lt;a class=&quot;nav-link&quot; <span class="tBranco">href=</span><span class="tLaranja">&quot;/registrar&quot;</span>&gt;<span class="tBranco">Registre-se</span>&lt;/a&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
   &lt;/div&gt;
+&lt;/div&gt;
 &lt;/nav&gt;
 </code>
 </pre>
@@ -163,7 +160,7 @@ const <span class="tBranco">Postagem</span> = require(<span class="tLaranja">"./
 
         <p>Observe que comparamos <samp><span class="tBranco">postagem</span></samp> dentro de um if/else <b>para verificar se a postagem realmente existe mesmo</b>, uma vez que postagens <b>estão sucetíveis à serem excluídas ou movidas dentro da aplicação</b>. Caso não, isso é imediatamente avisado para o usuário através de uma mensagem flash.</p>
 
-        <p>Agora, basta criar o diretório '<b>postagem/</b>' dentro de <b>'views'</b> e criar a view <b>'postagem.handlbars'</b>, que vai efetivamente exibir o post completo assim que o usuário clicar para ler o conteúdo.</p>
+        <p>Agora, basta criar o diretório '<b>postagem/</b>' dentro de <b>'views'</b> e criar a view <b>'postagem.handlebars'</b>, que vai efetivamente exibir o post completo assim que o usuário clicar para ler o conteúdo.</p>
 
 <pre>
 <span class="arquivo">postagem.handlebars</span>
@@ -188,7 +185,7 @@ const <span class="tBranco">Postagem</span> = require(<span class="tLaranja">"./
 
         <footer>
             <a href="../a48/a48.html">Página Anterior</a>
-            <a href="#">Próxima Página</a>
+            <a href="../a52/a52.html">Próxima Página</a>
         </footer>
     </main>
 </body>

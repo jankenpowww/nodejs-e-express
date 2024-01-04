@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../stemp-css/stemp.css" type="text/css">
+    <title>a52</title>
+</head>
+<body>
+    <h1>a52 - Listando categorias</h1>
+
+    <main>
+        <p>Agora, vamos criar uma view que <b>lista todas as categorias de postagens para o usuário</b>, e também criar um esquema de filtro por rota que <b>mostra para o usuário todas as postagens associadas aquela postagem</b>.</p>
+
+        <br><br>
+
+        <h1>Listando categorias para o usuário</h1>
+        <p>A ideia aqui é <b>criar uma página pra nossa aplicação que serve especificamente para listar todas as categorias de postagens que existem no blog</b>, uma vez que o usuário pode estar procurando por postagens dentro do blog dentro de um assunto específico.</p>
+        <p>Com isso, vamos criar uma rota para <b>'/categorias'</b> dentro do arquivo <b>app.js</b>, que vai basicamente <b>levar o usuário para uma página que lista todas as categorias de postagens disponíveis no site</b>.</p>
+
+        <p>Importamos o model de categorias dentro de <b>app.js</b> primeiramente...</p>
+<pre>
+<span class="arquivo">app.js</span>
+<code>
+<span class="tVerde">//Models</span>
+const <span class="tBranco">Postagem</span> = require(<span class="tLaranja">"./models/Postagem"</span>)
+const <span class="tBranco">Categoria</span> = require(<span class="tLaranja">"./models/Categoria"</span>)
+
+...
+
+<span class="tBranco">app</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/categorias"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">Categoria</span>.<span class="tRosa">find</span>().then((<span class="tBranco">categorias</span>) => {
+        <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"categoria/categoria"</span>, {<span class="tBranco">categoria</span>: <span class="tBranco">categorias</span>})
+
+    }).catch(() => {
+        <span class="tBranco">req</span>.<span class="tRosa">flash</span>(<span class="tLaranja">"error_msg"</span>, <span class="tLaranja">"Não foi possível carregar alguns recursos. Tente novamente."</span>)
+        <span class="tBranco">res</span>.<span class="tRosa">redirect</span>(<span class="tLaranja">"/"</span>)
+
+    })
+})
+
+<span class="tBranco">app</span>.<span class="tRosa">use</span>(<span class="tLaranja">"/admin"</span>, <span class="tBranco">admin</span>)
+
+...
+</code>
+</pre>
+
+        <p>Veja que o link '/categorias' é o link que se encontra dentro da navbar do site.</p>
+
+        <p>E veja também que devemos criar <b>a view que vai renderizar a página de categorias do blog</b>. Criemos, dentro do diretório <b>views</b>, a pasta <b>categoria</b>, e dentro dela, um arquivo de nome <b>'categoria.handlebars'</b>.</p>
+
+<pre>
+<span class="arquivo">categoria.handlebars</span>
+<code>
+&lt;h3&gt;<span class="tBranco">Categorias</span>&lt;/h3&gt;
+&lt;p&gt;<span class="tBranco">Procure e leia postagens selecionando uma categoria de seu interesse.</span>&lt;/p&gt;
+&lt;hr&gt;
+
+<span class="tBranco">{{<span class="tRosa">#each</span> categoria}}</span>
+    &lt;a <span class="tBranco">href=</span><span class="tLaranja">&quot;/categorias/<span class="tBranco">{{slug}}</span>&quot;</span>&gt;&lt;h4&gt;<span class="tBranco">{{nome}}</span>&lt;/h4&gt;&lt;/a&gt;
+<span class="tBranco">{{<span class="tRosa">else</span>}}</span>
+    &lt;h4&gt;<span class="tBranco">N&atilde;o h&aacute; categorias registradas.</span>&lt;/h4&gt;
+<span class="tBranco">{{<span class="tRosa">/each</span>}}</span>
+</code>
+</pre>
+
+        <p>Isso vai gerar <b>uma lista com todas as categorias</b>, até aí, simples. Veja que cada categoria recebe <b>um link que redireciona para uma página específica, e que está utilizando o slug da categoria como valor para compor este</b>. É através deste link que o usuário terá acesso a todas as postagens relacionadas àquela categoria de escolha.</p>
+        <p>Vamos voltar para <b>app.js</b> e criar exatamente a mesma rota que listará todas as postagens, dessa vez, por categoria.</p>
+
+<pre>
+<span class="arquivo">app.js</span>
+<code>
+...
+
+<span class="tBranco">app</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/categorias"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">Categoria</span>.<span class="tRosa">find</span>().then((<span class="tBranco">categorias</span>) => {
+        <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"categoria/categoria"</span>, {<span class="tBranco">categoria</span>: <span class="tBranco">categorias</span>})
+
+    }).catch(() => {
+        <span class="tBranco">req</span>.<span class="tRosa">flash</span>(<span class="tLaranja">"error_msg"</span>, <span class="tLaranja">"Não foi possível carregar alguns recursos. Tente novamente."</span>)
+        <span class="tBranco">res</span>.<span class="tRosa">redirect</span>(<span class="tLaranja">"/"</span>)
+
+    })
+})
+
+<span class="tBranco">app</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/categorias/<span class="tBranco">:slug</span>"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    
+    <span class="tBranco">Categoria</span>.<span class="tRosa">findOne</span>({<span class="tBranco">slug</span>: <span class="tBranco">req</span>.<span class="tBranco">params</span>.<span class="tBranco">slug</span>}).then((<span class="tBranco">categoria</span>) => {
+        
+        if (<span class="tBranco">categoria</span>) {
+
+            <span class="tBranco">Postagem</span>.<span class="tRosa">find</span>({<span class="tBranco">categoria</span>: <span class="tBranco">categoria</span>.<span class="tBranco">_id</span>}).then((<span class="tBranco">postagens</span>) => {
+                <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"categoria/postagens-categoria"</span>, {<span class="tBranco">postagem</span>: <span class="tBranco">postagens</span>, <span class="tBranco">categoria</span>: <span class="tBranco">categoria</span>})
+            
+            }).catch(() => {
+                <span class="tBranco">req</span>.<span class="tRosa">flash</span>(<span class="tLaranja">"error_msg"</span>, <span class="tLaranja">"Houve um erro ao listar os posts."</span>)
+                <span class="tBranco">res</span>.<span class="tRosa">redirect</span>(<span class="tLaranja">"/"</span>)
+
+            })
+
+        } else {
+            <span class="tBranco">req</span>.<span class="tRosa">flash</span>(<span class="tLaranja">"error_msg"</span>, <span class="tLaranja">"Esta categoria não existe."</span>)
+            <span class="tBranco">res</span>.<span class="tRosa">redirect</span>(<span class="tLaranja">"/"</span>)
+
+        }
+
+    }).catch(() => {
+        <span class="tBranco">req</span>.<span class="tRosa">flash</span>(<span class="tLaranja">"error_msg"</span>, <span class="tLaranja">"Não foi possível carregar alguns recursos. Tente novamente."</span>)
+        <span class="tBranco">res</span>.<span class="tRosa">redirect</span>(<span class="tLaranja">"/"</span>)
+    })
+})
+
+<span class="tBranco">app</span>.<span class="tRosa">use</span>(<span class="tLaranja">"/admin"</span>, <span class="tBranco">admin</span>)
+
+...
+</code>
+</pre>
+
+        <p>Primeiro, localizamos apenas um documento de categorias com o método <samp><span class="tRosa">findOne</span>()</samp>, passando o parâmetro <samp>{<span class="tBranco">slug</span>: <span class="tBranco">req</span>.<span class="tBranco">params</span>.<span class="tBranco">slug</span>}</samp>, que é o <b>slug de categoria associado ao documento escolhido na lista de categorias.</b></p>
+        <p>A partir daí, comparamos se a categoria em questão <b>existe ou não no sistema da nossa aplicação</b>, uma vez que categorias podem ser editadas ou removidas do sistema pela administração.</p>
+        <p>Caso exista, <b>recuperamos todos as postagens associadas a categoria pesquisada</b>, através do método <samp><span class="tRosa">find</span>()</samp>, passando o filtro <samp>{<span class="tBranco">categoria</span>: <span class="tBranco">categoria</span>.<span class="tBranco">_id</span>}</samp>, uma vez que, no model de postagens, definimos que o <b>campo 'categoria' receberia exatamente o ID do documento de categoria a que este estaria associado</b>. Isso vai retornar todas as postagens que estejam associadas àquela categoria em si.</p>
+
+        <p>Se tudo der certo, renderizamos a view com todas as postagens por filtro de categoria para o usuário.</p>
+
+        <p>A view em questão deve estar dentro do diretório <b>views/categoria</b>, chamada <b>'postagens-categoria.handlebars'.</b></p>
+
+<pre>
+<span class="arquivo">postagens-categoria.handlebars</span>
+<code>
+&lt;h2&gt;<span class="tBranco">Todas as postagens: <span class="tBranco">{{categoria.nome}}</span></span>&lt;/h2&gt;
+&lt;br&gt;
+
+<span class="tBranco">{{<span class="tRosa">#each</span> <span class="tBranco">postagem</span>}}</span>
+    &lt;div class=&quot;card p-3 mb-3&quot;&gt;
+        &lt;div class=&quot;card-box&quot;&gt;
+            &lt;small&gt;<span class="tBranco">{{categoria.nome}}</span>&lt;/small&gt;
+            
+            &lt;h3&gt;<span class="tBranco">{{titulo}}</span>&lt;/h3&gt;
+            &lt;p&gt;<span class="tBranco">{{descricao}}</span>&lt;/p&gt;
+            &lt;a <span class="tBranco">href=</span><span class="tLaranja">&quot;/postagem/<span class="tBranco">{{slug}}</span>&quot;</span>&gt;&lt;button class=&quot;btn btn-success&quot;&gt;<span class="tBranco">Ler mais</span>&lt;/button&gt;&lt;/a&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+<span class="tBranco">{{<span class="tRosa">else</span>}}</span>
+    &lt;h5&gt;<span class="tBranco">Nenhuma postagem dessa categoria foi encontrada.</span>&lt;/h5&gt;
+<span class="tBranco">{{<span class="tRosa">/each</span>}}</span>
+</code>
+</pre>
+
+        <p>Na view, exibimos no título <b>a categoria da qual estamos listando os posts posteriormente</b>, e em seguida, em cada card-box, assim como na página inicial, <b>as postagens em si</b>.</p>
+        <p>Veja que ainda há a possibilidade de uma categoria existir, <b>mas nenhum post do blog ter sido associado a esta</b>, como podemos ver na mensagem de exibição no bloco <b>else</b>.</p>
+
+        <footer>
+            <a href="../a50/a50.html">Página Anterior</a>
+            <a href="#">Próxima Página</a>
+        </footer>
+    </main>
+</body>
+</html>
