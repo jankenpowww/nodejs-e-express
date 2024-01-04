@@ -1,0 +1,9 @@
+<h3>Categorias</h3>
+<p>Procure e leia postagens selecionando uma categoria de seu interesse.</p>
+<hr>
+
+{{#each categoria}}
+    <a href="/categorias/{{slug}}"><h4>{{nome}}</h4></a>
+{{else}}
+    <h4>Não há categorias registradas.</h4>
+{{/each}}
