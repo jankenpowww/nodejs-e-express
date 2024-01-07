@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../stemp-css/stemp.css" type="text/css">
+    <title>a54</title>
+</head>
+<body>
+    <h1>a54 - Definindo Usuário</h1>
+
+    <main>
+        <h1>Definindo o grupo de rotas</h1>
+        <p>Vamos agora criar o grupo de rotas de usuário para prosseguirmos <b>com a criação das views especificas para este usuário</b>, tal como fizemos com o grupo de administradores.</p>
+
+        <p>Por agora, vamos primeiramente instalar o módulo <b>bcryptjs</b>, utilizado para <b>criar hashes de senhas</b>, com o seguinte comando, na pasta do projeto:</p>
+
+<pre>
+<code>
+<span class="tBranco">npm install <span class="tCinza">--save</span> bcryptjs</span>
+</code>
+</pre>
+
+        <p>E então, na pasta <b>'routes'</b>, vamos criar o arquivo <b>'usuario.js'</b> e definir o grupo de rotas:</p>
+
+<pre>
+<span class="arquivo">usuario.js</span>
+<code>
+const <span class="tBranco">express</span> = require(<span class="tLaranja">"express"</span>)
+const <span class="tBranco">router</span> = <span class="tBranco">express</span>.<span class="tRosa">Router</span>()
+
+<span class="tVerde">//Importando o bcryptjs</span>
+const <span class="tBranco">bcrypt</span> = require(<span class="tLaranja">"bcryptjs"</span>)
+
+<span class="tVerde">//Importando o model de usuários</span>
+const <span class="tBranco">Usuario</span> = require(<span class="tLaranja">"../models/Usuario"</span>)
+
+<span class="tBranco">router</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/registro"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"usuario/registro"</span>)
+})
+
+<span class="tBranco">module</span>.<span class="tBranco">exports</span> = <span class="tBranco">router</span>
+</code>
+</pre>
+
+        <p>Note que já definimos <b>uma rota onde vamos registrar o usuário no banco</b>. Vamos também criar o arquivo <b>'registro.handlebars'</b> no diretório <b>'views/usuario'</b> correspondente a view de registro de usuários.</p>
+        
+        <p>Antes de começar a estruturar view em si, <b>vamos incluir o novo grupo de rotas no arquivo 'app.js'</b>.</p>
+
+<pre>
+<span class="arquivo">app.js</span>
+<code>
+...
+
+<span class="tVerde">//Importação de rotas</span>
+const <span class="tBranco">admin</span> = require(<span class="tLaranja">"./routes/admin"</span>)
+const <span class="tBranco">usuario</span> = require(<span class="tLaranja">"./routes/usuario"</span>)
+
+...
+
+<span class="tBranco">app</span>.<span class="tRosa">use</span>(<span class="tLaranja">"/admin"</span>, <span class="tBranco">admin</span>)
+<span class="tBranco">app</span>.<span class="tRosa">use</span>(<span class="tLaranja">"/usuario"</span>, <span class="tBranco">usuario</span>)
+
+...
+</code>
+</pre>
+
+        <br><br>
+
+        <h1>Desenhando a view de registro de usuário</h1>
+        <p>Com tudo isso pronto, vamos <b>estruturar a view de usuários finalmente</b>.</p>
+
+<pre>
+<span class="arquivo">registro.handlebars</span>
+<code>
+<span class="tBranco">{{<span class="tRosa">#each</span> <span class="tBranco">erro</span>}}</span>
+    &lt;div class="alert alert-danger"&gt;<span class="tBranco">{{ <span class="tBranco">texto</span> }}</span>&lt;/div&gt;
+
+<span class="tBranco">{{<span class="tRosa">else</span>}}</span>
+
+<span class="tBranco">{{<span class="tRosa">/each</span>}}</span>
+
+&lt;h3&gt;<span class="tBranco">Registre-se</span>&lt;/h3&gt;
+&lt;small&gt;<span class="tBranco">Crie uma conta e aproveite todos os conteúdos!</span>&lt;/small&gt;
+&lt;hr&gt;
+    
+&lt;div class=&quot;card&quot;&gt;
+    &lt;div class=&quot;card-body&quot;&gt;
+
+        <span class="tVerde">&lt;!-- Formulário de cadastro --&gt;</span>
+        &lt;form <span class="tBranco">action=</span><span class="tLaranja">&quot;/usuario/registro&quot;</span> <span class="tBranco">method=</span><span class="tLaranja">&quot;post&quot;</span>&gt;
+            &lt;label class=&quot;mb-1&quot;&gt;<span class="tBranco">Nome:</span>&lt;/label&gt;
+            &lt;input type=&quot;text&quot; <span class="tBranco">name=</span><span class="tLaranja">&quot;nome&quot;</span> placeholder=&quot;Seu nome completo&quot; class=&quot;form-control&quot; required&gt;
+            
+            &lt;label class=&quot;mt-2 mb-1&quot;&gt;<span class="tBranco">E-mail:</span>&lt;/label&gt;
+            &lt;input type=&quot;email&quot; <span class="tBranco">name=</span><span class="tLaranja">&quot;email&quot;</span> placeholder=&quot;Seu e-mail de utilização&quot; class=&quot;form-control&quot; required&gt;
+            
+            &lt;label class=&quot;mt-2 mb-1&quot;&gt;<span class="tBranco">Senha:</span>&lt;/label&gt;
+            &lt;input type=&quot;password&quot; <span class="tBranco">name=</span><span class="tLaranja">&quot;senha&quot;</span> placeholder=&quot;Crie uma senha forte&quot; class=&quot;form-control&quot; required&gt;
+
+            &lt;label class=&quot;mt-2 mb-1&quot;&gt;<span class="tBranco">Confirme a Senha:</span>&lt;/label&gt;
+            &lt;input type=&quot;password&quot; <span class="tBranco">name=</span><span class="tLaranja">&quot;senhaConfirm&quot;</span> placeholder=&quot;Repita a senha digitada&quot; class=&quot;form-control&quot; required&gt;
+
+            &lt;button type=&quot;submit&quot; class=&quot;btn btn-block btn-success mt-4&quot; style=&quot;width: 100%;&quot;&gt;<span class="tBranco">Registrar-se</span>&lt;/button&gt;
+        &lt;/form&gt;
+        
+    &lt;/div&gt;
+&lt;/div&gt;
+</code>
+</pre>
+
+        <p>Feito isso, <b>basta criar a rota POST, onde definimos em <samp><span class="tBranco">action</span></samp>, que vai processar as informações do usuário, fazer as validações e cadastrar o usuário devidamente.</b></p>
+
+        <br><br>
+
+        <h1>Criando a rota POST</h1>
+
+        <p>Para o registro no banco, precisamos validar algumas coisas. Observe:</p>
+
+<pre>
+<span class="arquivo">usuario.js</span>
+<code>
+const <span class="tBranco">express</span> = require(<span class="tLaranja">"express"</span>)
+const <span class="tBranco">router</span> = <span class="tBranco">express</span>.<span class="tRosa">Router</span>()
+
+<span class="tVerde">//Importando o bcryptjs</span>
+const <span class="tBranco">bcrypt</span> = require(<span class="tLaranja">"bcryptjs"</span>)
+
+<span class="tVerde">//Importando o model de usuários</span>
+const <span class="tBranco">Usuario</span> = require(<span class="tLaranja">"../models/Usuario"</span>)
+
+<span class="tBranco">router</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/registro"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"usuario/registro"</span>)
+})
+
+<span class="tBranco">router</span>.<span class="tRosa">post</span>(<span class="tLaranja">"/registro"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    const <span class="tBranco">nome</span> = <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">nome</span>
+    const <span class="tBranco">email</span> = <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">email</span>
+    const <span class="tBranco">senha</span> = <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">senha</span>
+    const <span class="tBranco">senhaConfirm</span> = <span class="tBranco">req</span>.<span class="tBranco">body</span>.<span class="tBranco">senhaConfirm</span>
+    
+    let <span class="tBranco">erros</span> = []
+
+    <span class="tVerde">//Verifica se a senha está vazia e em seguida se é diferente da senha confirmada.</span>
+    if (!<span class="tBranco">senha</span>) {
+        <span class="tBranco">erros</span>.<span class="tRosa">push</span>({<span class="tBranco">texto</span>: <span class="tLaranja">"A senha não foi informada."</span>})
+
+    } else if (<span class="tBranco">senha</span> != <span class="tBranco">senhaConfirm</span>) {
+        <span class="tBranco">erros</span>.<span class="tRosa">push</span>({<span class="tBranco">texto</span>: <span class="tLaranja">"A senha que você criou não confere. Tente novamente."</span>})
+    }
+
+    <span class="tVerde">//Verifica se não há erros. Se sim, o cadastro é feito.</span>
+    if (<span class="tBranco">erros</span>.<span class="tBranco">length</span> === <span class="tLaranja">0</span>) {
+        
+        <span class="tVerde">//O CADASTRO ACONTECE AQUI</span>
+
+    } else {
+        <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"usuario/registro"</span>, {<span class="tBranco">erro</span>: <span class="tBranco">erros</span>})
+    }
+
+})
+
+<span class="tBranco">module</span>.<span class="tBranco">exports</span> = <span class="tBranco">router</span>
+</code>
+</pre>
+
+        <p>A primeira validação a ser feita aqui é a de senha: primeiro verificamos se a senha <b>foi enviada em branco</b>, e em seguida, <b>se a senha é diferente da senha confirmada</b>. Se for afirmativo pra qualquer uma das duas verificações, <b>a array de erros popula um objeto com a chave 'texto' que leva a mensagem do erro em si</b>.</p>
+        <p>Daqui comparamos se <b>há itens no array de erros</b> à partir da propriedade <samp><span class="tBranco">length</span></samp> do array. Se há, o resultado da condição cai em <samp>else</samp> e a página é renderizada com os erros.</p>
+
+        <p>Caso contrário, cadastramos o usuário no banco de dados. E é aqui que as coisas ficam mais interessantes.</p>
+
+        <br><br>
+
+        <h1>Verificando, <em>hasheando</em>, cadastrando...</h1>
+        <p>Uma vez que fizemos as verificações menores, agora, <b>é hora de fazer outra verificação importante</b>. Usuários são únicos dentro de um sistema comum de aplicativo, o que significa que <b>precisamos, antes de qualquer coisa, verificar se o usuário a ser registrado já está registrado no banco de dados</b>.</p>
+        <p>E não exatamente o usuário em si, mas na verdade, vamos tornar o <b>email como sendo único para cada registro nesse caso</b>, o que define que não será possível mais de um usuário utilizar o mesmo e-mail.</p>
+
+        <p>Isso vai requerer que <b>façamos uma busca no banco de dados, em busca de um único documento associado ao e-mail passado no formulário de registro</b>, e em seguida, verificar se o documento existe. Observe:</p>
+
+<pre>
+<span class="arquivo">usuario.js</span>
+<code>
+...
+
+    <span class="tVerde">//Verifica se não há erros. Se sim, o cadastro é feito.</span>
+    if (<span class="tBranco">erros</span>.<span class="tBranco">length</span> === <span class="tLaranja">0</span>) {
+
+        <span class="tVerde">//Faz a busca de um único documento pelo e-mail enviado do formulário.</span>
+        <span class="tBranco">Usuario</span>.<span class="tRosa">findOne</span>({<span class="tBranco">email</span>: <span class="tBranco">email</span>}).then((<span class="tBranco">usuario</span>) => {
+
+            <span class="tVerde">//Verificamos se o usuário buscado NÃO EXISTE para fazer o cadastro.</span>
+            if (!<span class="tBranco">usuario</span>) {
+
+            } else {
+                <span class="tBranco">req</span>.<span class="tRosa">flash</span>(<span class="tLaranja">"error_msg"</span>, <span class="tLaranja">"O e-mail informado já pertence a uma conta existente."</span>)
+                <span class="tBranco">res</span>.<span class="tRosa">redirect</span>(<span class="tLaranja">"/usuario/registro"</span>)
+            }
+        })
+
+    } else {
+        <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"usuario/registro"</span>, {<span class="tBranco">erro</span>: <span class="tBranco">erros</span>})
+    }
+
+})
+
+...
+</code>
+</pre>
+
+        <p>Se a conta já existe a condição cai em <samp>else</samp>. Veja que <b>exibimos uma mensagem flash dizendo que a conta já existe no banco de dados</b>.</p>
+        <p>Se caso não existe, temos passo livre pra <b>cadastrar o usuário devidamente</b>. E para cadastrar o usuário, <b>precisamos criar um hash da senha passada</b>.</p>
+
+<pre>
+<span class="arquivo">usuario.js</span>
+<code>
+...
+
+<span class="tVerde">//Faz a busca de um único documento pelo e-mail enviado do formulário.</span>
+<span class="tBranco">Usuario</span>.<span class="tRosa">findOne</span>({<span class="tBranco">email</span>: <span class="tBranco">email</span>}).then((<span class="tBranco">usuario</span>) => {
+
+
+    <span class="tVerde">//Verificamos se o usuário buscado NÃO EXISTE para fazer o cadastro.</span>
+    if (!<span class="tBranco">usuario</span>) {
+
+        <span class="tVerde">//Passamos os dados dentro de um objeto.</span>
+        const <span class="tBranco">novoUsuario</span> = new <span class="tBranco">Usuario</span>({
+            <span class="tBranco">nome</span>: <span class="tBranco">nome</span>
+            <span class="tBranco">email</span>: <span class="tBranco">email</span>
+            <span class="tBranco">senha</span>: <span class="tBranco">senha</span>
+        })
+
+        <span class="tVerde">//Geramos o hash para a senha</span>
+        <span class="tBranco">bcrypt</span>.<span class="tRosa">genSalt</span>(<span class="tLaranja">10</span>, (<span class="tBranco">err</span>, <span class="tBranco">salt</span>) => {
+            <span class="tBranco">bcrypt</span>.<span class="tRosa">hash</span>(<span class="tBranco">novoUsuario</span>.<span class="tBranco">senha</span>, <span class="tBranco">salt</span>, (<span class="tBranco">err</span>, <span class="tBranco">hash</span>) => {
+
+                <span class="tVerde">//Se houver erros, o usuário é redirecionado</span>
+                if (<span class="tBranco">err</span>) {
+                    <span class="tBranco">req</span>.<span class="tRosa">flash</span>(<span class="tLaranja">"error_msg"</span>, <span class="tLaranja">"Houve erro ao definir hashes do usuário. Tente novamente."</span>)
+                    <span class="tBranco">res</span>.<span class="tRosa">redirect</span>(<span class="tLaranja">"/usuario/registro"</span>)
+
+                } else { <span class="tVerde">//Se não, atribuímos o hash para o atributo 'senha' do objeto com os dados.</span>
+                    <span class="tBranco">novoUsuario</span>.<span class="tBranco">senha</span> = <span class="tBranco">hash</span>
+                
+                    <span class="tVerde">//Por fim, salvamos</span>
+                    <span class="tBranco">novoUsuario</span>.<span class="tRosa">save</span>().then(() => {
+                        <span class="tBranco">req</span>.<span class="tRosa">flash</span>(<span class="tLaranja">"success_msg"</span>, <span class="tLaranja">"Usuário criado com sucesso."</span>)
+                        <span class="tBranco">res</span>.<span class="tRosa">redirect</span>(<span class="tLaranja">"/usuario/registro"</span>)
+
+                    }).catch(() => {
+                        <span class="tBranco">req</span>.<span class="tRosa">flash</span>(<span class="tLaranja">"error_msg"</span>, <span class="tLaranja">"Erro ao criar o registro. Por favor tente novamente."</span>)
+                        <span class="tBranco">res</span>.<span class="tRosa">redirect</span>(<span class="tLaranja">"/usuario/registro"</span>)
+
+                    })
+
+                }
+
+            })
+        })
+
+    } else {
+        <span class="tBranco">req</span>.<span class="tRosa">flash</span>(<span class="tLaranja">"error_msg"</span>, <span class="tLaranja">"O e-mail informado já pertence a uma conta existente."</span>)
+        <span class="tBranco">res</span>.<span class="tRosa">redirect</span>(<span class="tLaranja">"/usuario/registro"</span>)
+    }
+})
+
+...
+</code>
+</pre>
+
+        <p>O módulo bcryptjs, como foi dito antes, <b>é um criador de hash de strings</b>, utilizado especificamente na "criptografia" de senhas - "criptografia" entre aspas porque há uma diferença entre hashes e criptografias, mas a idéia é tornar essas senhas não visíveis ANTES de armazenar no banco de dados, por motivos óbvios de segurança e integridade dos dados do usuário.</p>
+        <p>Veja que, como temos que criar um hash para a senha, armazenamos as informações enviadas do formulário normalmente em um objeto chamado <samp><span class="tBranco">novoUsuario</span></samp>...</p>
+
+<pre>
+<span class="arquivo">usuario.js</span>
+<code>
+...
+
+    <span class="tVerde">//Verificamos se o usuário buscado NÃO EXISTE para fazer o cadastro.</span>
+    if (!<span class="tBranco">usuario</span>) {
+
+        <span class="tVerde">//Passamos os dados dentro de um objeto.</span>
+        const <span class="tBranco">novoUsuario</span> = new <span class="tBranco">Usuario</span>({
+            <span class="tBranco">nome</span>: <span class="tBranco">nome</span>
+            <span class="tBranco">email</span>: <span class="tBranco">email</span>
+            <span class="tBranco">senha</span>: <span class="tBranco">senha</span>
+        })
+
+...
+</code>
+</pre>
+
+        <p>E então chamamos o <samp><span class="tBranco">bcrypt</span></samp> e seus métodos para criar o hash de senha:</p>
+
+<pre>
+<span class="arquivo">usuario.js</span>
+<code>
+...
+
+<span class="tVerde">//Geramos o hash para a senha</span>
+<span class="tBranco">bcrypt</span>.<span class="tRosa">genSalt</span>(<span class="tLaranja">10</span>, (<span class="tBranco">err</span>, <span class="tBranco">salt</span>) => {
+    <span class="tBranco">bcrypt</span>.<span class="tRosa">hash</span>(<span class="tBranco">novoUsuario</span>.<span class="tBranco">senha</span>, <span class="tBranco">salt</span>, (<span class="tBranco">err</span>, <span class="tBranco">hash</span>) => {
+
+        <span class="tVerde">//Se houver erros, o usuário é redirecionado</span>
+        if (<span class="tBranco">err</span>) {
+            <span class="tBranco">req</span>.<span class="tRosa">flash</span>(<span class="tLaranja">"error_msg"</span>, <span class="tLaranja">"Houve erro ao definir hashes do usuário. Tente novamente."</span>)
+            <span class="tBranco">res</span>.<span class="tRosa">redirect</span>(<span class="tLaranja">"/usuario/registro"</span>)
+
+        } else { <span class="tVerde">//Se não, atribuímos o hash para o atributo 'senha' do objeto com os dados.</span>
+            <span class="tBranco">novoUsuario</span>.<span class="tBranco">senha</span> = <span class="tBranco">hash</span>
+        
+            <span class="tVerde">//Por fim, salvamos</span>
+            <span class="tBranco">novoUsuario</span>.<span class="tRosa">save</span>().then(() => {
+                <span class="tBranco">req</span>.<span class="tRosa">flash</span>(<span class="tLaranja">"success_msg"</span>, <span class="tLaranja">"Usuário criado com sucesso."</span>)
+                <span class="tBranco">res</span>.<span class="tRosa">redirect</span>(<span class="tLaranja">"/usuario/registro"</span>)
+
+            }).catch(() => {
+                <span class="tBranco">req</span>.<span class="tRosa">flash</span>(<span class="tLaranja">"error_msg"</span>, <span class="tLaranja">"Erro ao criar o registro. Por favor tente novamente."</span>)
+                <span class="tBranco">res</span>.<span class="tRosa">redirect</span>(<span class="tLaranja">"/usuario/registro"</span>)
+
+            })
+
+...
+</code>
+</pre>
+
+        <p>O método acima de hash, montado em um aninhamento de callbacks, <b>garante que a criação de hash seja um passo importante durante o processo de cadastro das informações do usuário</b>. Uma vez que podemos comparar se há erros através dos parâmetros <samp><span class="tBranco">err</span></samp> e a partir disso, <b>determinar se o usuário será cadastrado ou não</b>.</p>
+        <p>No banco de dados, <b>todos os documentos estarão com os valores do campo de senha hasheados</b>. Veja que é com o mesmo módulo que <b>fazemos a comparação dos hashes para determinar o login de usuário na nossa aplicação</b>.</p>
+
+        <footer>
+            <a href="../a53/a53.html">Página Anterior</a>
+            <a href="#">Próxima Página</a>
+        </footer>
+    </main>
+</body>
+</html>

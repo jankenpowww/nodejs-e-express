@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../stemp-css/stemp.css" type="text/css">
+    <title>a53</title>
+</head>
+<body>
+    <h1>a53 - Definindo Model de Usuário</h1>
+
+    <main>
+        <p>Agora que temos uma base interessante de como funcionaria uma aplicação de blog com Express, <b>vamos partir para o último recurso a ser implementado na nossa aplicação:</b> autenticação, registro e login de usuários.</p>
+        <p>Veja que criamos sessões do site própria para o administrador <b>que gerencia os conteúdos do site</b> e, nas últimas aulas, <b>definimos as páginas que os usuários comuns têm acesso</b>, mas veja que não há nada que distingua realmente quem é um usuário comum/visitante e quem é o usuário administrador; uma vez que qualquer um pode acessar a parte administrativa mesmo se não for de fato um administrador, o que pode ser um problema.</p>
+
+        <p>Além desse problema de autenticação, <b>vamos ver como cadastrar usuários no banco de dados e fornecer a habilidade de login na aplicação</b>, para assim implementar autenticação de usuários e determinar quem pode ou não acessar certo conteúdos.</p>
+
+        <br><br>
+        
+        <h1>Criando o model de usuário</h1>
+        <p>Antes de mais nada, <b>precisamos descrever a model de usuários da aplicação</b>. É a partir daqui que vamos determinar características dos usuários e, não menos importante, <b>definir seu papel dentro da nossa aplicação enquanto usuário</b>.</p>
+
+        <p>Vamos no diretório <b>models</b> e o criar o arquivo <b>Usuario.js</b> e então <b>esquematizar a model de usuário especificando os principais campos</b>:</p>
+
+<pre>
+<span class="arquivo">Usuario.js</span>
+<code>
+const <span class="tBranco">mongoose</span> = require(<span class="tLaranja">"mongoose"</span>)
+const { <span class="tBranco">Schema</span> } = require(<span class="tLaranja">"mongoose"</span>)
+
+const <span class="tBranco">usuarioSchema</span> = new <span class="tBranco">Schema</span>({
+    <span class="tBranco">nome</span>: { <span class="tBranco">type</span>: <span class="tBranco">String</span>, <span class="tBranco">required</span>: <span class="tLaranja">true</span> },
+    <span class="tBranco">email</span>: { <span class="tBranco">type</span>: <span class="tBranco">String</span>, <span class="tBranco">required</span>: <span class="tLaranja">true</span> },
+    <span class="tBranco">senha</span>: { <span class="tBranco">type</span>: <span class="tBranco">String</span>, <span class="tBranco">required</span>: <span class="tLaranja">true</span> },
+    <span class="tBranco">isAdmin</span>: { <span class="tBranco">type</span>: <span class="tBranco">Boolean</span>, <span class="tBranco">default</span>: <span class="tLaranja">false</span> }
+})
+
+const <span class="tBranco">Usuario</span> = <span class="tBranco">mongoose</span>.<span class="tRosa">model</span>(<span class="tLaranja">"usuarios"</span>, <span class="tBranco">usuarioSchema</span>)
+
+module.exports = <span class="tBranco">Usuario</span>
+</code>
+</pre>
+
+        <p>Observe o último campo: <samp><span class="tBranco">isAdmin</span></samp> define se o usuário <b>é administrador ou não</b>. Por padrão, no formulário de cadastro de usuário disponibilizado para o visitante do site, este campo receberá <samp><span class="tLaranja">false</span></samp>. Isso vai ajudar a identificar o tipo de usuário e determinar o que pode ser visto e acessado.</p>
+
+        <p>Isso já é o suficiente para <b>implementar o que estamos planejando</b>...</p>
+
+        <footer>
+            <a href="../a52/a52.html">Página Anterior</a>
+            <a href="../a54/a54.html">Próxima Página</a>
+        </footer>
+    </main>
+</body>
+</html>

@@ -61,6 +61,7 @@
 
 //Importação de rotas
     const admin = require("./routes/admin") //Importando grupo de rotas relacionado ao administrador.
+    const usuario = require("./routes/usuario")
 
 //Lógica de servidor
     app.get("/", (req, res) => { //Index
@@ -128,6 +129,7 @@
     })
 
     app.use("/admin", admin) //Definindo um caminho e passando o grupo de rotas do administrador como relação.
+    app.use("/usuario", usuario)
 
 //Rodando servidor
     const HOST = "localhost"
