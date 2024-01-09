@@ -327,9 +327,31 @@ const <span class="tBranco">Usuario</span> = require(<span class="tLaranja">"../
         <p>O método acima de hash, montado em um aninhamento de callbacks, <b>garante que a criação de hash seja um passo importante durante o processo de cadastro das informações do usuário</b>. Uma vez que podemos comparar se há erros através dos parâmetros <samp><span class="tBranco">err</span></samp> e a partir disso, <b>determinar se o usuário será cadastrado ou não</b>.</p>
         <p>No banco de dados, <b>todos os documentos estarão com os valores do campo de senha hasheados</b>. Veja que é com o mesmo módulo que <b>fazemos a comparação dos hashes para determinar o login de usuário na nossa aplicação</b>.</p>
 
+        <p>Ao criar um novo registro de usuário e realizar a busca dentro do Mongosh, à partir da coleção de usuários, <b>você verá que o campo de senhas estará criptografado, ou melhor, <em>hasheado!</em></b></p>
+
+<pre>
+<code>
+<span class="tBranco">blogApp> db.usuarios.find()
+
+[
+    {
+    _id: ObjectId("6599e94b77c75a209bd7ee87"),
+    nome: <span class="tVerde">'João Silva'</span>,
+    email: <span class="tVerde">'joao@gmail.com'</span>,
+    senha: <span class="tVerde">'$2a$10$hRrEq3LDaIqsENML53bLOO.xeqlXOOzrCh8.Y10kX0yxnjRFg3dFK'</span>,
+    isAdmin: <span class="tLaranja">false</span>,
+    __v: <span class="tLaranja">0</span>
+    }
+]
+    
+    
+blogApp></span>
+</code>
+</pre>
+
         <footer>
             <a href="../a53/a53.html">Página Anterior</a>
-            <a href="#">Próxima Página</a>
+            <a href="../a57/a57.html">Próxima Página</a>
         </footer>
     </main>
 </body>

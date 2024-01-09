@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../stemp-css/stemp.css" type="text/css">
+    <title>a57</title>
+</head>
+<body>
+    <h1>a57 - Formulário de Login</h1>
+
+    <main>
+        <h1>Criando o formulário de login</h1>
+        <p>Agora que já <b>podemos ter usuários cadastrados na nossa aplicação</b>, vamos partir para o próximo passo: <b>desenvolver o recurso de login e autenticação de usuário.</b></p>
+        <p>Nesta aula, vamos desenvolver primeiramente a página de login, onde tudo isso será possível.</p>
+
+        <br><br>
+
+        <h1>Definindo rota e view</h1>
+        <p>Vamos primeiramente <b>definir a rota de onde o formulário pode ser acessado</b>, dentro do arquivo de grupo de rotas do usuário:</p>
+
+<pre>
+<span class="arquivo">usuario.js</span>
+<code>
+...
+
+<span class="tBranco">router</span>.<span class="tRosa">get</span>(<span class="tLaranja">"/login"</span>, (<span class="tBranco">req</span>, <span class="tBranco">res</span>) => {
+    <span class="tBranco">res</span>.<span class="tRosa">render</span>(<span class="tLaranja">"usuario/login"</span>)
+})
+
+<span class="tBranco">module</span>.<span class="tBranco">exports</span> = <span class="tBranco">router</span>
+</code>
+</pre>
+
+        <p>E então criar o arquivo <b>'login.handlebars'</b>, dentro do diretório <b>'views/usuario'</b>.</p>
+
+<pre>
+<span class="arquivo">login.handlebars</span>
+<code>
+&lt;h2&gt;<span class="tBranco">Login</span>&lt;/h2&gt;
+&lt;small&gt;<span class="tBranco">Entre agora mesmo e acesse os conte&uacute;dos.</span>&lt;/small&gt;
+&lt;hr&gt;
+&lt;div class=&quot;card&quot;&gt;
+    &lt;div class=&quot;card-body&quot;&gt;
+        
+        &lt;form <span class="tBranco">method=<span class="tLaranja">&quot;post&quot;</span></span> <span class="tBranco">action=<span class="tLaranja">&quot;/usuario/login&quot;</span></span>&gt;
+            &lt;label&gt;<span class="tBranco">E-mail:</span>&lt;/label&gt;
+            &lt;input type=&quot;email&quot; class=&quot;form-control mb-3&quot; <span class="tBranco">name=<span class="tLaranja">&quot;email&quot;</span></span> required&gt;
+
+            &lt;label&gt;<span class="tBranco">Senha:</span>&lt;/label&gt;
+            &lt;input type=&quot;password&quot; class=&quot;form-control mb-4&quot; <span class="tBranco">name=<span class="tLaranja">&quot;senha&quot;</span></span> required&gt;
+
+            &lt;button style=&quot;width: 100%;&quot; class=&quot;btn btn-success&quot; type=&quot;submit&quot;&gt;<span class="tBranco">Logar</span>&lt;/button&gt;
+        &lt;/form&gt;
+        
+    &lt;/div&gt;
+&lt;/div&gt;
+</code>
+</pre>
+
+        <p>Na próxima aula, vamos ver como <b>montar a autenticação do usuário com o Passport</b>, um módulo do npm que permite <b>montar estratégias de autenticação para aplicações feitas com NodeJS</b>.</p>
+
+        <footer>
+            <a href="../a54/a54.html">Página Anterior</a>
+            <a href="#">Próxima Página</a>
+        </footer>
+    </main>
+</body>
+</html>
